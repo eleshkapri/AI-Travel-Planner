@@ -1,4 +1,4 @@
-# 🌍 AI Student Travel Planner
+# 🌍 AI Travel Planner
 
 A smart, budget-friendly travel itinerary generator built for students. This application leverages the power of **Generative AI (Llama 3 via Groq)** to create personalized day-by-day travel plans and visualizes them on an interactive map using **Folium**.
 
@@ -40,7 +40,7 @@ Follow these steps to run the project locally on your machine.
 ### 1. Clone the Repository
 
 ```bash
-git clone [https://github.com/eleshkapri/AI-Student_Travel_Planner.git]
+git clone [https://github.com/eleshkapri/AI-Travel-Planner.git]
 cd AI-Travel-Planner
 
 ```
@@ -92,3 +92,6 @@ streamlit run app.py
 
 ## 📸 Screenshots
 
+![image alt](Screenshot 2026-01-11 012005.png)
+
+![image alt](Screenshot 2026-01-11 012016.png)
