@@ -1,0 +1,9 @@
+# Ignore the virtual environment folder
+venv/
+
+# Ignore secret keys
+.streamlit/secrets.toml
+
+# Ignore cache files
+__pycache__/
+*.pyc

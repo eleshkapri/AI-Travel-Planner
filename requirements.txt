@@ -1,0 +1,5 @@
+streamlit
+groq
+folium
+streamlit-folium
+geopy
