@@ -92,6 +92,6 @@ streamlit run app.py
 
 ## 📸 Screenshots
 
-![image alt](Screenshot 2026-01-11 012005.png)
+![image alt](https://github.com/eleshkapri/AI-Travel-Planner/blob/cc9f7003ae8aad6e6b9338c229987525e4f82d4f/Screenshot%202026-01-11%20012005.png)
 
-![image alt](Screenshot 2026-01-11 012016.png)
+![image alt](https://github.com/eleshkapri/AI-Travel-Planner/blob/cc9f7003ae8aad6e6b9338c229987525e4f82d4f/Screenshot%202026-01-11%20012016.png)
