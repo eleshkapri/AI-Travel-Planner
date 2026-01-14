@@ -3,3 +3,4 @@ groq
 folium
 streamlit-folium
 geopy
+fpdf

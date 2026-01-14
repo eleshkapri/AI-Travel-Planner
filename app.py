@@ -3,11 +3,11 @@ from groq import Groq
 import folium
 from streamlit_folium import st_folium
 from geopy.geocoders import Nominatim
-import time
+from fpdf import FPDF # <--- NEW IMPORT
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="Student AI Travel Planner", 
+    page_title="AI Student Travel Planner", 
     page_icon="✈️", 
     layout="wide"
 )
@@ -47,18 +47,6 @@ st.markdown("""
         box-shadow: 0 5px 15px rgba(255, 75, 75, 0.4);
     }
     
-    /* Headings */
-    h1 {
-        font-family: 'Helvetica Neue', sans-serif;
-        font-weight: 800;
-        background: -webkit-linear-gradient(#eee, #999);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    h3 {
-        color: #FF914D !important;
-    }
-    
     /* Itinerary Text Box */
     .highlight {
         background-color: #262730;
@@ -80,7 +68,9 @@ if "landmarks" not in st.session_state:
 
 # --- SIDEBAR INPUTS ---
 with st.sidebar:
-    st.title("✈️ Trip Settings")
+    # ✈️ LOGO
+    st.image("https://cdn-icons-png.flaticon.com/512/2200/2200326.png", width=60)
+    st.title("Trip Settings")
     st.markdown("---")
     
     destination = st.text_input("📍 Where to?", placeholder="e.g. Kyoto, Japan")
@@ -91,7 +81,7 @@ with st.sidebar:
     with col2:
         budget_level = st.selectbox("💰 Tier", ["Student (Low)", "Moderate", "Luxury"])
         
-    budget_amount = st.text_input("💵 Total Budget (Optional)", placeholder="e.g. $500, ₹20000")
+    budget_amount = st.text_input("💵 Total Budget (Optional)", placeholder="e.g. $500, 20000 INR")
     
     st.subheader("❤️ Interests")
     selected_interests = st.multiselect(
@@ -102,7 +92,7 @@ with st.sidebar:
     
     custom_interests = st.text_input("Other (Type & Enter)", placeholder="e.g. Anime, Cafes...")
     
-    # NEW: Must-Visit Place
+    # Must-Visit Place
     st.subheader("📍 Must Visit")
     must_visit = st.text_input("Specific Place (Optional)", placeholder="e.g. Tokyo Tower")
 
@@ -117,13 +107,12 @@ with st.sidebar:
 
 # --- FUNCTIONS ---
 
-# ⚡ PERFORMANCE FIX: Cache coordinates so we don't fetch them every time
-# ✅ New Code 
+# ⚡ MAP FIX: Unique User Agent
 @st.cache_data
 def get_coordinates(location_name):
     try:
-        # CHANGE THIS STRING to something unique including your name
-        geolocator = Nominatim(user_agent="travel_planner_2026_elesh_kapri_v1") 
+        # Unique ID to prevent blocking
+        geolocator = Nominatim(user_agent="student_travel_planner_2026_elesh_pdf_v1")
         location = geolocator.geocode(location_name, timeout=10)
         if location:
             return location.latitude, location.longitude
@@ -140,7 +129,6 @@ def generate_trip():
     if budget_amount:
         budget_text += f" with a strict cap of {budget_amount}"
 
-    # Logic to include the must-visit place
     must_visit_instruction = ""
     if must_visit:
         must_visit_instruction = f"CRITICAL: You MUST include a visit to '{must_visit}' in the itinerary."
@@ -168,17 +156,48 @@ def generate_trip():
         st.error(f"AI Error: {e}")
         return None
 
+# 📄 PDF GENERATOR FUNCTION
+def create_pdf(text):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Add Title
+    pdf.set_font("Arial", style="B", size=16)
+    pdf.cell(200, 10, txt="AI Travel Itinerary", ln=True, align='C')
+    pdf.ln(10) # Line break
+    
+    # Add Content
+    pdf.set_font("Arial", size=12)
+    
+    # FPDF doesn't support emojis/special chars well, so we sanitize the text
+    # We replace common problematic characters
+    clean_text = text.replace("’", "'").replace("–", "-").replace("—", "-")
+    
+    for line in clean_text.split('\n'):
+        # Encode to latin-1 to avoid unicode crashes (strips emojis)
+        safe_line = line.encode('latin-1', 'replace').decode('latin-1')
+        pdf.multi_cell(0, 10, txt=safe_line)
+        
+    return pdf.output(dest='S').encode('latin-1')
+
 # --- MAIN UI LAYOUT ---
 
-st.title("🌍 AI Student Travel Planner")
-st.caption("Your personalized, budget-friendly travel agent powered by Llama 3.")
+# 🌍 HEADER
+col1, col2 = st.columns([1, 8])
+
+with col1:
+    st.image("https://cdn-icons-png.flaticon.com/512/921/921490.png", width=80)
+
+with col2:
+    st.title("AI Student Travel Planner")
+    st.caption("Your personalized, budget-friendly travel agent powered by Llama 3.")
+
+st.markdown("---")
 
 # 1. Trigger AI Generation
 if generate_btn and destination:
     with st.spinner("✨ Drafting the perfect plan..."):
-        # Clear cache if destination changes significantly (optional, but good for fresh starts)
-        # st.cache_data.clear() 
-        
         response = generate_trip()
         if response:
             if "LANDMARKS:" in response:
@@ -190,58 +209,52 @@ if generate_btn and destination:
                 st.session_state.itinerary = response
                 st.session_state.landmarks = [destination]
 
-# 2. Display Results (Stacked Layout)
+# 2. Display Results
 if st.session_state.itinerary:
     
-    # --- SECTION 1: THE MAP (Full Width) ---
+    # --- SECTION 1: THE MAP ---
     st.markdown('<div class="css-card">', unsafe_allow_html=True)
     st.subheader(f"📍 Exploring {destination}")
     
     start_coords = get_coordinates(destination)
     if start_coords:
-        # Create a wider map
         m = folium.Map(location=start_coords, zoom_start=12)
         
-        # 1. MAIN CITY PIN (Red)
+        # Pins
         folium.Marker(
             start_coords, 
             popup=f"Destination: {destination}", 
-            tooltip=f"Destination: {destination}", # Hover Text
             icon=folium.Icon(color="red", icon="info-sign")
         ).add_to(m)
         
-        # 2. USER'S MUST-VISIT PIN (Green Star)
         if must_visit:
             mv_coords = get_coordinates(f"{must_visit}, {destination}")
             if mv_coords:
-                 folium.Marker(
-                    mv_coords, 
-                    popup=f"Must Visit: {must_visit}", 
-                    tooltip=f"Must Visit: {must_visit}", # Hover Text
-                    icon=folium.Icon(color="green", icon="star")
-                ).add_to(m)
+                 folium.Marker(mv_coords, popup=f"Must Visit: {must_visit}", icon=folium.Icon(color="green", icon="star")).add_to(m)
 
-        # 3. AI SUGGESTED PINS (Blue Camera)
         for place in st.session_state.landmarks:
             coords = get_coordinates(f"{place}, {destination}")
             if coords:
-                folium.Marker(
-                    coords, 
-                    popup=place, 
-                    tooltip=place, # Hover Text
-                    icon=folium.Icon(color="blue", icon="camera")
-                ).add_to(m)
+                folium.Marker(coords, popup=place, icon=folium.Icon(color="blue", icon="camera")).add_to(m)
         
-        # Display Map Full Width
         st_folium(m, width=1200, height=500)
     else:
-        st.warning("Map server is busy, but your itinerary is ready below!")
+        st.error("Could not find location. Please check the spelling.")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- SECTION 2: THE ITINERARY (Full Width) ---
+    # --- SECTION 2: THE ITINERARY & PDF EXPORT ---
     st.markdown('<div class="css-card">', unsafe_allow_html=True)
     st.subheader("📝 Your AI Itinerary")
     st.markdown(f'<div class="highlight">{st.session_state.itinerary}</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
     
+    # 📄 GENERATE PDF
+    pdf_data = create_pdf(st.session_state.itinerary)
+    
+    st.download_button(
+        label="📄 Download Itinerary as PDF",
+        data=pdf_data,
+        file_name=f"Trip_to_{destination}.pdf",
+        mime="application/pdf"
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
