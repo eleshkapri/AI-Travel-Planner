@@ -112,17 +112,24 @@ with st.sidebar:
 
 # --- FUNCTIONS ---
 
+# ⚡ MAP FIX: Improved Error Handling & User Agent
 @st.cache_data
 def get_coordinates(location_name):
     try:
-        # Unique ID to prevent blocking
-        geolocator = Nominatim(user_agent="student_travel_planner_2026_elesh_pdf_final")
-        location = geolocator.geocode(location_name, timeout=10)
+        # 1. Use a highly specific User Agent (email format helps prevent blocking)
+        geolocator = Nominatim(user_agent="travel_planner_app_elesh_kapri_student_project_v9")
+        
+        # 2. Increase timeout to 20 seconds (Cloud servers can be slow)
+        location = geolocator.geocode(location_name, timeout=20)
+        
         if location:
             return location.latitude, location.longitude
+            
     except Exception as e:
-        print(f"Map Error: {e}")
+        # 3. PRINT THE REAL ERROR so we can see it on the screen
+        st.error(f"⚠️ Geocoding Error: {e}")
         return None
+        
     return None
 
 def generate_trip():
