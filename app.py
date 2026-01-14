@@ -118,10 +118,12 @@ with st.sidebar:
 # --- FUNCTIONS ---
 
 # ⚡ PERFORMANCE FIX: Cache coordinates so we don't fetch them every time
+# ✅ New Code 
 @st.cache_data
 def get_coordinates(location_name):
     try:
-        geolocator = Nominatim(user_agent="student_travel_planner_v8_hover")
+        # CHANGE THIS STRING to something unique including your name
+        geolocator = Nominatim(user_agent="travel_planner_2026_elesh_kapri_v1") 
         location = geolocator.geocode(location_name, timeout=10)
         if location:
             return location.latitude, location.longitude
