@@ -3,7 +3,7 @@ from groq import Groq
 import folium
 from streamlit_folium import st_folium
 from geopy.geocoders import Nominatim
-from fpdf import FPDF # <--- NEW IMPORT
+from fpdf import FPDF
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
@@ -112,7 +112,7 @@ with st.sidebar:
 def get_coordinates(location_name):
     try:
         # Unique ID to prevent blocking
-        geolocator = Nominatim(user_agent="student_travel_planner_2026_elesh_pdf_v1")
+        geolocator = Nominatim(user_agent="student_travel_planner_2026_elesh_hover_v2")
         location = geolocator.geocode(location_name, timeout=10)
         if location:
             return location.latitude, location.longitude
@@ -170,8 +170,7 @@ def create_pdf(text):
     # Add Content
     pdf.set_font("Arial", size=12)
     
-    # FPDF doesn't support emojis/special chars well, so we sanitize the text
-    # We replace common problematic characters
+    # Clean text to prevent PDF errors
     clean_text = text.replace("’", "'").replace("–", "-").replace("—", "-")
     
     for line in clean_text.split('\n'):
@@ -220,22 +219,35 @@ if st.session_state.itinerary:
     if start_coords:
         m = folium.Map(location=start_coords, zoom_start=12)
         
-        # Pins
+        # 1. MAIN DESTINATION PIN (Red)
         folium.Marker(
             start_coords, 
             popup=f"Destination: {destination}", 
+            tooltip=f"Destination: {destination}",  # ✅ ADDED HOVER TEXT
             icon=folium.Icon(color="red", icon="info-sign")
         ).add_to(m)
         
+        # 2. MUST-VISIT PIN (Green)
         if must_visit:
             mv_coords = get_coordinates(f"{must_visit}, {destination}")
             if mv_coords:
-                 folium.Marker(mv_coords, popup=f"Must Visit: {must_visit}", icon=folium.Icon(color="green", icon="star")).add_to(m)
+                 folium.Marker(
+                     mv_coords, 
+                     popup=f"Must Visit: {must_visit}", 
+                     tooltip=f"Must Visit: {must_visit}", # ✅ ADDED HOVER TEXT
+                     icon=folium.Icon(color="green", icon="star")
+                 ).add_to(m)
 
+        # 3. AI SUGGESTION PINS (Blue)
         for place in st.session_state.landmarks:
             coords = get_coordinates(f"{place}, {destination}")
             if coords:
-                folium.Marker(coords, popup=place, icon=folium.Icon(color="blue", icon="camera")).add_to(m)
+                folium.Marker(
+                    coords, 
+                    popup=place, 
+                    tooltip=place,  # ✅ ADDED HOVER TEXT
+                    icon=folium.Icon(color="blue", icon="camera")
+                ).add_to(m)
         
         st_folium(m, width=1200, height=500)
     else:
