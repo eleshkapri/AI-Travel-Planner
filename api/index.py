@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from groq import Groq
 from geopy.geocoders import Nominatim
 
-app = FastAPI(title="AI Travel Planner API")
+app = FastAPI(title="AI Travel Planner API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,12 +22,15 @@ class TripRequest(BaseModel):
     days: int = 3
     budget_level: str = "Student (Low)"
     budget_amount: Optional[str] = ""
+    currency: Optional[str] = "USD"
     interests: List[str] = []
     must_visit: Optional[str] = ""
+    travel_pace: Optional[str] = "Balanced"
+    accommodation_style: Optional[str] = "Hostel / Backpacker"
 
 def get_coordinates(location_name: str):
     try:
-        geolocator = Nominatim(user_agent="travel_planner_vercel_student_project_v10")
+        geolocator = Nominatim(user_agent="travel_planner_v2_modern_web_app")
         location = geolocator.geocode(location_name, timeout=10)
         if location:
             return [location.latitude, location.longitude]
@@ -37,7 +40,12 @@ def get_coordinates(location_name: str):
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "service": "AI Travel Planner API"}
+    return {
+        "status": "ok",
+        "service": "AI Travel Planner API",
+        "version": "2.0.0",
+        "supported_models": ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "llama-3.1-8b-instant", "qwen/qwen3.6-27b"]
+    }
 
 @app.post("/api/generate")
 def generate_itinerary(req: TripRequest):
@@ -50,27 +58,52 @@ def generate_itinerary(req: TripRequest):
 
     client = Groq(api_key=api_key)
 
-    budget_text = f"{req.budget_level} Tier"
+    curr = req.currency or "USD"
+    budget_text = f"{req.budget_level} Tier (in {curr})"
     if req.budget_amount:
-        budget_text += f" with a strict cap of {req.budget_amount}"
+        budget_text += f" with a strict cap of {req.budget_amount} {curr}"
 
     must_visit_instruction = ""
     if req.must_visit:
-        must_visit_instruction = f"CRITICAL: You MUST include a visit to '{req.must_visit}' in the itinerary."
+        must_visit_instruction = f"CRITICAL REQUIREMENT: You MUST feature a dedicated visit to '{req.must_visit}' in the itinerary."
 
-    interests_string = ", ".join(req.interests) if req.interests else "General sightseeing, culture, local food"
+    interests_string = ", ".join(req.interests) if req.interests else "Local culture, budget hidden gems, street food, sightseeing"
+    pace_text = f"Pace: {req.travel_pace or 'Balanced'}. Accommodation: {req.accommodation_style or 'Hostel'}."
 
     prompt = f"""
-    Act as an expert local travel guide. Create a {req.days}-day trip to {req.destination} for a student. 
-    Budget Constraints: {budget_text}.
-    Specific Interests: {interests_string}. 
-    {must_visit_instruction}
+    You are an award-winning local travel guide specializing in epic, student-friendly, budget adventures.
+    Create a detailed, high-energy {req.days}-day trip itinerary to {req.destination}.
+
+    Travel Parameters:
+    - Destination: {req.destination}
+    - Duration: {req.days} Days
+    - Budget Level: {budget_text}
+    - Specific Interests: {interests_string}
+    - {pace_text}
+    - {must_visit_instruction}
+
+    Structure your response strictly in clean Markdown as follows:
+    # 🌍 [Catchy Trip Title & Emoji]
     
-    Structure the response strictly as follows (Use Markdown):
-    1. A Catchy Title (H2)
-    2. Budget Breakdown (Bulleted list)
-    3. Day-by-Day Itinerary (Morning, Afternoon, Evening sections)
-    4. At the very end, list 3 exact landmarks to pin on a map, labeled EXACTLY like this:
+    ## 💰 Estimated Student Budget Breakdown ({curr})
+    - 🏨 **Accommodation ({req.accommodation_style or 'Hostel'}):** [Estimated cost per night & total]
+    - 🍜 **Food & Street Eats:** [Daily & total food estimate]
+    - 🚇 **Local Transport:** [Passes/Subway/Bus estimates]
+    - 🎟️ **Activities & Entry Fees:** [Cost estimates for attractions]
+    - 💡 **Student Savings Tip:** [1 high-impact money-saving hack]
+
+    ## 🗓️ Day-by-Day Itinerary
+
+    ### Day 1: [Day 1 Theme/Title]
+    - ☀️ **Morning:** [Actionable morning activity + budget tip]
+    - 🌤️ **Afternoon:** [Actionable afternoon activity + food spot recommendation]
+    - 🌙 **Evening:** [Evening vibes, sunset spot, or student nightlife]
+
+    (Repeat detailed ### Day X format for all {req.days} days)
+
+    ## 🎒 Essential Student Tips
+    - 3 practical tips for safety, SIM cards, or student discounts in {req.destination}.
+
     LANDMARKS: Place 1, Place 2, Place 3
     """
 
@@ -105,7 +138,7 @@ def generate_itinerary(req: TripRequest):
     if "LANDMARKS:" in response_text:
         parts = response_text.split("LANDMARKS:")
         itinerary = parts[0].strip()
-        raw_landmarks = [l.strip() for l in parts[1].strip().split(",") if l.strip()]
+        raw_landmarks = [l.strip().rstrip('.') for l in parts[1].strip().split(",") if l.strip()]
     else:
         itinerary = response_text.strip()
         raw_landmarks = [req.destination]
@@ -143,5 +176,12 @@ def generate_itinerary(req: TripRequest):
         "itinerary": itinerary,
         "landmarks": raw_landmarks,
         "destination_coords": dest_coords,
-        "markers": markers
+        "markers": markers,
+        "trip_summary": {
+            "destination": req.destination,
+            "days": req.days,
+            "budget_level": req.budget_level,
+            "currency": curr,
+            "interests": req.interests
+        }
     }
