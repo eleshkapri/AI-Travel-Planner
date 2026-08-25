@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Student Travel Planner</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/921/921490.png" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            appDark: '#0E1117',
+            appCard: '#1E1E1E',
+            appHighlight: '#262730',
+            appAccent: '#FF4B4B',
+            appAccentHover: '#FF914D'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Marked.js (Markdown parser) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- html2pdf for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    body {
+      background-color: #0E1117;
+      color: #FFFFFF;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .gradient-btn {
+      background: linear-gradient(90deg, #FF4B4B 0%, #FF914D 100%);
+      transition: all 0.3s ease;
+    }
+    .gradient-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 5px 15px rgba(255, 75, 75, 0.4);
+    }
+    .highlight-box {
+      background-color: #262730;
+      color: #E0E0E0;
+      border-left: 5px solid #FF4B4B;
+    }
+    .markdown-body h2 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #FF4B4B;
+      margin-top: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .markdown-body h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #FF914D;
+      margin-top: 1rem;
+      margin-bottom: 0.4rem;
+    }
+    .markdown-body ul {
+      list-style-type: disc;
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .markdown-body li {
+      margin-bottom: 0.25rem;
+    }
+    .markdown-body p {
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+    .tag-btn.active {
+      background-color: #FF4B4B;
+      color: #FFFFFF;
+      border-color: #FF4B4B;
+    }
+    #map {
+      height: 480px;
+      border-radius: 12px;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <header class="flex items-center gap-4 mb-8 pb-4 border-b border-gray-800">
+      <img src="https://cdn-icons-png.flaticon.com/512/921/921490.png" alt="Logo" class="w-16 h-16" />
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-white">AI Student Travel Planner</h1>
+        <p class="text-gray-400 text-sm">Your personalized, budget-friendly travel agent powered by Groq AI.</p>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left Sidebar / Inputs Form -->
+      <aside class="lg:col-span-4 space-y-6">
+        <div class="bg-appCard p-6 rounded-2xl border border-gray-800 shadow-xl space-y-5">
+          <div class="flex items-center gap-2 pb-3 border-b border-gray-800">
+            <img src="https://cdn-icons-png.flaticon.com/512/2200/2200326.png" class="w-6 h-6" alt="Trip Settings" />
+            <h2 class="text-lg font-bold text-white">Trip Settings</h2>
+          </div>
+
+          <!-- Destination -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">📍 Where to?</label>
+            <input
+              type="text"
+              id="destination"
+              placeholder="e.g. Kyoto, Japan"
+              class="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
+              required
+            />
+          </div>
+
+          <!-- Days & Tier -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">📅 Days</label>
+              <input
+                type="number"
+                id="days"
+                min="1"
+                max="30"
+                value="3"
+                class="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-red-500"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">💰 Tier</label>
+              <select
+                id="budgetTier"
+                class="w-full px-3 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-red-500"
+              >
+                <option value="Student (Low)">Student (Low)</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Luxury">Luxury</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Total Budget -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">💵 Total Budget (Optional)</label>
+            <input
+              type="text"
+              id="budgetAmount"
+              placeholder="e.g. $500, 20000 INR"
+              class="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
+            />
+          </div>
+
+          <!-- Interests Tags -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">❤️ Interests</label>
+            <div class="flex flex-wrap gap-2 mb-3" id="interestsContainer">
+              <button type="button" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-700 bg-gray-900 text-gray-300 transition" onclick="toggleTag(this, 'History')">History</button>
+              <button type="button" class="tag-btn active text-xs px-3 py-1.5 rounded-full border border-gray-700 bg-gray-900 text-gray-300 transition" onclick="toggleTag(this, 'Street Food')">Street Food</button>
+              <button type="button" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-700 bg-gray-900 text-gray-300 transition" onclick="toggleTag(this, 'Nature')">Nature</button>
+              <button type="button" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-700 bg-gray-900 text-gray-300 transition" onclick="toggleTag(this, 'Nightlife')">Nightlife</button>
+              <button type="button" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-700 bg-gray-900 text-gray-300 transition" onclick="toggleTag(this, 'Museums')">Museums</button>
+              <button type="button" class="tag-btn text-xs px-3 py-1.5 rounded-full border border-gray-700 bg-gray-900 text-gray-300 transition" onclick="toggleTag(this, 'Adventure')">Adventure</button>
+            </div>
+            <input
+              type="text"
+              id="customInterests"
+              placeholder="Other (e.g. Anime, Cafes...)"
+              class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
+            />
+          </div>
+
+          <!-- Must Visit -->
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">📍 Must Visit</label>
+            <input
+              type="text"
+              id="mustVisit"
+              placeholder="Specific Place (e.g. Tokyo Tower)"
+              class="w-full px-4 py-2.5 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-red-500"
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            id="planBtn"
+            onclick="planTrip()"
+            class="w-full gradient-btn py-3 rounded-xl font-bold text-white shadow-lg cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span>🚀 Plan My Adventure</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Right Main Content Area -->
+      <main class="lg:col-span-8 space-y-6">
+        <!-- Error Alert -->
+        <div id="errorAlert" class="hidden p-4 rounded-xl bg-red-950 border border-red-800 text-red-200 text-sm"></div>
+
+        <!-- Initial Placeholder State -->
+        <div id="placeholderState" class="bg-appCard p-12 rounded-2xl border border-gray-800 text-center space-y-4">
+          <div class="text-6xl">🗺️</div>
+          <h3 class="text-xl font-bold text-white">Your Adventure Starts Here</h3>
+          <p class="text-gray-400 text-sm max-w-md mx-auto">
+            Choose your destination, customize your budget and interests, and click "Plan My Adventure" to generate an interactive map and day-by-day itinerary.
+          </p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden bg-appCard p-12 rounded-2xl border border-gray-800 text-center space-y-4">
+          <div class="animate-spin inline-block w-10 h-10 border-4 border-current border-t-transparent text-red-500 rounded-full" role="status"></div>
+          <h3 class="text-lg font-semibold text-white">✨ Drafting the perfect plan...</h3>
+          <p class="text-gray-400 text-xs">Finding landmarks, optimizing budget, and creating daily schedule.</p>
+        </div>
+
+        <!-- Results Area -->
+        <div id="resultsArea" class="hidden space-y-6">
+          <!-- Section 1: Map -->
+          <div class="bg-appCard p-6 rounded-2xl border border-gray-800 shadow-xl space-y-4">
+            <h2 id="mapHeading" class="text-xl font-bold text-white">📍 Exploring Destination</h2>
+            <div id="map"></div>
+          </div>
+
+          <!-- Section 2: Itinerary -->
+          <div class="bg-appCard p-6 rounded-2xl border border-gray-800 shadow-xl space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-4 pb-3 border-b border-gray-800">
+              <h2 class="text-xl font-bold text-white">📝 Your AI Itinerary</h2>
+              <div class="flex gap-2">
+                <button onclick="downloadText()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-xs font-semibold text-white transition">
+                  📄 Download Text
+                </button>
+                <button onclick="downloadPDF()" class="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-xs font-semibold text-white shadow transition">
+                  ⬇️ Download PDF
+                </button>
+              </div>
+            </div>
+
+            <div id="itineraryContainer" class="highlight-box p-6 rounded-xl markdown-body text-sm leading-relaxed overflow-x-auto"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    let selectedInterests = ['Street Food'];
+    let currentItinerary = '';
+    let currentDestination = '';
+    let map = null;
+    let markersLayer = null;
+
+    function toggleTag(btn, tag) {
+      if (selectedInterests.includes(tag)) {
+        selectedInterests = selectedInterests.filter(t => t !== tag);
+        btn.classList.remove('active');
+      } else {
+        selectedInterests.push(tag);
+        btn.classList.add('active');
+      }
+    }
+
+    async function planTrip() {
+      const destination = document.getElementById('destination').value.trim();
+      if (!destination) {
+        alert('Please enter a destination.');
+        return;
+      }
+
+      currentDestination = destination;
+      const days = parseInt(document.getElementById('days').value) || 3;
+      const budgetTier = document.getElementById('budgetTier').value;
+      const budgetAmount = document.getElementById('budgetAmount').value.trim();
+      const mustVisit = document.getElementById('mustVisit').value.trim();
+      const customInterests = document.getElementById('customInterests').value.trim();
+
+      const allInterests = [...selectedInterests];
+      if (customInterests) {
+        allInterests.push(customInterests);
+      }
+
+      // UI States
+      document.getElementById('errorAlert').classList.add('hidden');
+      document.getElementById('placeholderState').classList.add('hidden');
+      document.getElementById('resultsArea').classList.add('hidden');
+      document.getElementById('loadingState').classList.remove('hidden');
+
+      const planBtn = document.getElementById('planBtn');
+      planBtn.disabled = true;
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            destination,
+            days,
+            budget_level: budgetTier,
+            budget_amount: budgetAmount,
+            interests: allInterests,
+            must_visit: mustVisit
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.detail || `Server error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        currentItinerary = data.itinerary;
+
+        // Render Map
+        renderMap(data.destination_coords, data.markers, destination);
+
+        // Render Markdown
+        document.getElementById('itineraryContainer').innerHTML = marked.parse(data.itinerary);
+        document.getElementById('mapHeading').innerText = `📍 Exploring ${destination}`;
+
+        document.getElementById('loadingState').classList.add('hidden');
+        document.getElementById('resultsArea').classList.remove('hidden');
+      } catch (err) {
+        document.getElementById('loadingState').classList.add('hidden');
+        const errBox = document.getElementById('errorAlert');
+        errBox.innerText = `Error: ${err.message}`;
+        errBox.classList.remove('hidden');
+      } finally {
+        planBtn.disabled = false;
+      }
+    }
+
+    function renderMap(centerCoords, markers, destination) {
+      const defaultCenter = centerCoords || (markers.length > 0 ? markers[0].coords : [20, 0]);
+      const defaultZoom = centerCoords ? 13 : 2;
+
+      if (!map) {
+        map = L.map('map').setView(defaultCenter, defaultZoom);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        markersLayer = L.featureGroup().addTo(map);
+      } else {
+        markersLayer.clearLayers();
+        map.setView(defaultCenter, defaultZoom);
+      }
+
+      const bounds = [];
+
+      markers.forEach(m => {
+        if (!m.coords || m.coords.length < 2) return;
+        bounds.push(m.coords);
+
+        let iconColor = 'blue';
+        if (m.type === 'destination') iconColor = 'red';
+        if (m.type === 'must_visit') iconColor = 'green';
+
+        const marker = L.marker(m.coords).addTo(markersLayer);
+        marker.bindPopup(`<b>${m.name}</b>`);
+        marker.bindTooltip(m.name);
+      });
+
+      if (bounds.length > 1) {
+        map.fitBounds(bounds, { padding: [40, 40] });
+      } else if (bounds.length === 1) {
+        map.setView(bounds[0], 13);
+      }
+    }
+
+    function downloadText() {
+      if (!currentItinerary) return;
+      const blob = new Blob([currentItinerary], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Trip_to_${currentDestination || 'Destination'}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadPDF() {
+      if (!currentItinerary) return;
+      const element = document.getElementById('itineraryContainer');
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `Trip_to_${currentDestination || 'Destination'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    }
+  </script>
+</body>
+</html>
