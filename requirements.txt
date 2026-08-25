@@ -1,9 +1,6 @@
-fastapi
-uvicorn
-groq
-geopy
-pydantic
 streamlit
+groq
 folium
 streamlit-folium
+geopy
 fpdf
