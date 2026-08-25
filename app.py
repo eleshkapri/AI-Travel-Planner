@@ -156,15 +156,26 @@ def generate_trip():
     4. At the very end, list 3 exact landmarks to pin on a map, labeled EXACTLY like this:
     LANDMARKS: Place 1, Place 2, Place 3
     """
-    try:
-        completion = client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model="llama-3.1-70b-versatile",
-        )
-        return completion.choices[0].message.content
-    except Exception as e:
-        st.error(f"AI Error: {e}")
-        return None
+    models_to_try = [
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+        "llama-3.1-8b-instant",
+        "qwen/qwen3.6-27b",
+    ]
+    last_error = None
+    for model_name in models_to_try:
+        try:
+            completion = client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt}],
+                model=model_name,
+            )
+            return completion.choices[0].message.content
+        except Exception as e:
+            last_error = e
+            continue
+
+    st.error(f"AI Error: {last_error}")
+    return None
 
 # 📄 SMART PDF GENERATOR (Header, Footer, Formatting)
 class PDF(FPDF):
@@ -235,7 +246,7 @@ with col1:
     st.image("https://cdn-icons-png.flaticon.com/512/921/921490.png", width=80)
 with col2:
     st.title("AI Student Travel Planner")
-    st.caption("Your personalized, budget-friendly travel agent powered by Llama 3.")
+    st.caption("Your personalized, budget-friendly travel agent powered by Groq AI.")
 
 st.markdown("---")
 

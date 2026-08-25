@@ -1,10 +1,10 @@
 # 🌍 AI Travel Planner
 
-A smart, budget-friendly travel itinerary generator built for students. This application leverages the power of **Generative AI (Llama 3 via Groq)** to create personalized day-by-day travel plans and visualizes them on an interactive map using **Folium**.
+A smart, budget-friendly travel itinerary generator built for students. This application leverages the power of **Generative AI (via Groq)** to create personalized day-by-day travel plans and visualizes them on an interactive map using **Folium**.
 
 ## ✨ Features
 
-* **🤖 AI-Powered Itineraries:** Generates detailed, day-by-day trip plans based on your destination, budget, and interests using the Llama 3.1 70B model.
+* **🤖 AI-Powered Itineraries:** Generates detailed, day-by-day trip plans based on your destination, budget, and interests using Groq AI.
 * **📍 Interactive Map:** Automatically pins your destination, specific "Must Visit" spots, and AI-suggested landmarks on a dynamic map.
 * **💰 Budget Management:** Input your budget tier (Student, Moderate, Luxury) or a specific amount, and get a breakdown of estimated costs.
 * **⬇️ Export Options:** Download your complete itinerary as a formatted **Text file** (best for keeping emojis) or a clean **PDF**.
@@ -13,7 +13,7 @@ A smart, budget-friendly travel itinerary generator built for students. This app
 ## 🛠️ Tech Stack
 
 * **Frontend:** [Streamlit](https://streamlit.io/)
-* **AI Model:** Llama 3.1 70B (via [Groq API](https://groq.com/))
+* **AI Model:** GPT OSS 120B / Llama 3.1 (via [Groq API](https://groq.com/))
 * **Mapping:** Folium & Streamlit-Folium
 * **Geocoding:** Geopy (Nominatim API)
 * **PDF Generation:** FPDF
