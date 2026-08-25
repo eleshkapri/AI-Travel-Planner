@@ -11,29 +11,29 @@ from fpdf import FPDF
 # 1. PAGE CONFIGURATION & 3D VIBRANT THEME
 # ========================================================
 st.set_page_config(
-    page_title="RoamAI • AI Student Travel Planner",
+    page_title="RoamAI • Next-Gen AI Student Travel Planner",
     page_icon="✈️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom 3D & Vibrant Bright Modern CSS Injection
+# Custom 3D & Vibrant Bright Modern CSS Injection matching index.html
 st.markdown("""
 <style>
-    /* Google Font */
+    /* Google Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Main App Background */
+    /* Main App Background with Ambient 3D Mesh Lighting */
     .stApp {
         background-color: #0B0F19;
         background-image: 
-            radial-gradient(circle at 10% 10%, rgba(255, 94, 54, 0.12) 0%, transparent 45%),
-            radial-gradient(circle at 90% 20%, rgba(6, 182, 212, 0.10) 0%, transparent 45%),
-            radial-gradient(circle at 50% 90%, rgba(139, 92, 246, 0.10) 0%, transparent 50%);
+            radial-gradient(circle at 12% 15%, rgba(255, 94, 54, 0.14) 0%, transparent 45%),
+            radial-gradient(circle at 88% 22%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+            radial-gradient(circle at 50% 88%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
         color: #F3F4F6;
     }
 
@@ -43,19 +43,19 @@ st.markdown("""
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.09);
-        border-radius: 20px;
+        border-radius: 22px;
         padding: 24px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
         margin-bottom: 24px;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .glass-card:hover {
         border-color: rgba(255, 94, 54, 0.35);
         transform: translateY(-2px);
-        box-shadow: 0 15px 35px rgba(255, 94, 54, 0.15);
+        box-shadow: 0 16px 36px rgba(255, 94, 54, 0.18);
     }
 
-    /* Vibrant Gradient Buttons */
+    /* Vibrant Gradient Primary Buttons */
     .stButton>button {
         width: 100%;
         background: linear-gradient(135deg, #FF5E36 0%, #FFA000 100%);
@@ -91,13 +91,13 @@ st.markdown("""
 
     /* Highlighted Itinerary Box */
     .highlight-box {
-        background: rgba(26, 32, 48, 0.9);
+        background: rgba(26, 32, 48, 0.92);
         border-left: 5px solid #FF5E36;
         border-radius: 16px;
         padding: 24px;
         color: #E2E8F0;
         line-height: 1.8;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.35);
         margin-top: 15px;
     }
     .highlight-box h1, .highlight-box h2 {
@@ -114,7 +114,7 @@ st.markdown("""
     }
 
     /* Input Fields Styling */
-    .stTextInput>div>div>input, .stSelectbox>div>div, .stNumberInput>div>div>input {
+    .stTextInput>div>div>input, .stSelectbox>div>div, .stNumberInput>div>div>input, .stMultiSelect>div>div {
         background-color: #121826 !important;
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
         color: #FFFFFF !important;
@@ -127,16 +127,23 @@ st.markdown("""
         font-weight: 800;
     }
 
-    /* Radio buttons / Tabs */
-    .stRadio [role="radiogroup"] {
-        gap: 10px;
+    /* Card Badge */
+    .badge-chip {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(255, 94, 54, 0.18);
+        color: #FFA000;
+        border: 1px solid rgba(255, 94, 54, 0.3);
     }
 </style>
 """, unsafe_allow_html=True)
 
 
 # ========================================================
-# 2. SESSION STATE MANAGEMENT
+# 2. SESSION STATE INITIALIZATION
 # ========================================================
 if "nav_page" not in st.session_state:
     st.session_state.nav_page = "🌟 Discover & Explore"
@@ -150,19 +157,21 @@ if "saved_trips" not in st.session_state:
     st.session_state.saved_trips = []
 if "packing_items" not in st.session_state:
     st.session_state.packing_items = {
-        "Passport / Student ID": True,
-        "Zero-Forex Travel Card": True,
+        "Passport & Student ID Card": True,
+        "Travel Insurance & Visa Copies": False,
+        "Zero-Forex Travel Card & Cash": True,
         "Universal Power Adapter": True,
         "Power Bank (10k mAh)": False,
-        "Comfortable Walking Shoes": True,
+        "Noise-Cancelling Earbuds": False,
+        "Comfortable Walking Sneakers": True,
         "Quick-dry Hostel Towel": False,
-        "Basic First Aid & Meds": False,
+        "Basic First Aid & Prescription Meds": False,
         "Rain Jacket / Windbreaker": False
     }
 
 
 # ========================================================
-# 3. HELPER FUNCTIONS (GEOCODING, GROQ, PDF)
+# 3. HELPER FUNCTIONS
 # ========================================================
 def get_groq_api_key():
     if "GROQ_API_KEY" in st.secrets:
@@ -185,7 +194,7 @@ def get_coordinates(location_name):
 def generate_trip_itinerary(destination, days, budget_level, budget_amount, currency, interests, must_visit, pace, accommodation):
     api_key = get_groq_api_key()
     if not api_key:
-        st.error("⚠️ GROQ_API_KEY is not set in `.streamlit/secrets.toml` or environment variables.")
+        st.error("⚠️ GROQ_API_KEY is not configured in `.streamlit/secrets.toml` or environment variables.")
         return None
 
     client = Groq(api_key=api_key)
@@ -196,9 +205,9 @@ def generate_trip_itinerary(destination, days, budget_level, budget_amount, curr
 
     must_visit_instruction = ""
     if must_visit:
-        must_visit_instruction = f"CRITICAL: You MUST include a visit to '{must_visit}' in the itinerary."
+        must_visit_instruction = f"CRITICAL: You MUST feature a dedicated visit to '{must_visit}' in the itinerary."
 
-    interests_str = ", ".join(interests) if interests else "Local culture, street food, budget gems"
+    interests_str = ", ".join(interests) if interests else "Local street food, culture, secret budget spots"
 
     prompt = f"""
     You are an award-winning local travel architect specializing in epic, student-friendly, budget adventures.
@@ -260,7 +269,6 @@ def generate_trip_itinerary(destination, days, budget_level, budget_amount, curr
     st.error(f"AI Generation Error: {last_err}")
     return None
 
-# PDF Generator Class
 class SmartTravelPDF(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 16)
@@ -326,131 +334,186 @@ def create_itinerary_pdf(text, destination_name):
 
 
 # ========================================================
-# 4. SIDEBAR NAVIGATION & CONTROLS
+# 4. SIDEBAR NAVIGATION
 # ========================================================
 with st.sidebar:
     st.markdown("""
-    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-        <span style="font-size: 32px;">✈️</span>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div style="background: linear-gradient(135deg, #FF5E36, #FFA000); border-radius: 14px; padding: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(255, 94, 54, 0.4);">
+            <span style="font-size: 24px;">✈️</span>
+        </div>
         <div>
-            <h2 style="margin: 0; color: #FFFFFF; font-weight: 800; font-size: 22px;">RoamAI</h2>
+            <h2 style="margin: 0; color: #FFFFFF; font-weight: 800; font-size: 20px; letter-spacing: -0.5px;">RoamAI</h2>
             <p style="margin: 0; color: #FF5E36; font-size: 11px; font-weight: bold; text-transform: uppercase;">Student Travel Architect</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
     st.markdown("---")
 
-    selected_nav = st.radio(
-        "Navigation",
-        [
-            "🌟 Discover & Explore",
-            "🚀 AI Trip Planner",
-            "💰 Budget Calculator",
-            "🎒 Packing Checklist",
-            f"📂 Saved Trips ({len(st.session_state.saved_trips)})"
-        ],
-        index=["🌟 Discover & Explore", "🚀 AI Trip Planner", "💰 Budget Calculator", "🎒 Packing Checklist", f"📂 Saved Trips ({len(st.session_state.saved_trips)})"].index(
-            st.session_state.nav_page if st.session_state.nav_page in ["🌟 Discover & Explore", "🚀 AI Trip Planner", "💰 Budget Calculator", "🎒 Packing Checklist"] else f"📂 Saved Trips ({len(st.session_state.saved_trips)})"
-        )
-    )
+    nav_options = [
+        "🌟 Discover & Explore",
+        "🚀 AI Trip Planner",
+        "💰 Budget Calculator",
+        "🎒 Packing Checklist",
+        f"📂 Saved Trips ({len(st.session_state.saved_trips)})"
+    ]
+
+    current_idx = 0
+    for i, opt in enumerate(nav_options):
+        if st.session_state.nav_page.split('(')[0].strip() in opt:
+            current_idx = i
+            break
+
+    selected_nav = st.radio("Navigation", nav_options, index=current_idx)
     st.session_state.nav_page = selected_nav
 
     st.markdown("---")
-    st.caption("⚡ Powered by Groq AI Models")
+    st.markdown("""
+    <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px;">
+        <p style="margin: 0; color: #FFA000; font-size: 12px; font-weight: bold;">⚡ Powered by Groq AI</p>
+        <p style="margin: 5px 0 0 0; color: #9CA3AF; font-size: 11px;">Ultra low-latency LLM inference for instant travel blueprints.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # ========================================================
-# 5. PAGE ROUTER & IMPLEMENTATION
+# 5. MULTI-PAGE APPLICATION LOGIC
 # ========================================================
 
 # ----------------------------------------------------
 # PAGE 1: 🌟 DISCOVER & EXPLORE
 # ----------------------------------------------------
 if "Discover" in st.session_state.nav_page:
-    # 3D Hero Banner
+    # Hero Section Banner
     st.markdown("""
-    <div class="glass-card" style="border: 1px solid rgba(255, 94, 54, 0.3);">
-        <span style="background: rgba(255, 160, 0, 0.2); color: #FFA000; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;">
-            ✨ Next-Gen AI Travel Architect
-        </span>
-        <h1 style="font-size: 36px; font-weight: 800; color: #FFFFFF; margin-top: 12px; margin-bottom: 8px;">
-            Plan Epic Adventures <span style="background: linear-gradient(135deg, #FF5E36, #FFA000); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">In Seconds.</span>
+    <div class="glass-card" style="border: 1px solid rgba(255, 94, 54, 0.35);">
+        <span class="badge-chip">✨ Powered by High-Performance Groq AI</span>
+        <h1 style="font-size: 40px; font-weight: 800; color: #FFFFFF; margin-top: 14px; margin-bottom: 10px; line-height: 1.2;">
+            Plan Epic Student Adventures <br/>
+            <span style="background: linear-gradient(135deg, #FF5E36 0%, #FFA000 50%, #06B6D4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                On Any Budget in Seconds.
+            </span>
         </h1>
-        <p style="color: #9CA3AF; font-size: 15px; max-width: 680px; line-height: 1.6;">
+        <p style="color: #D1D5DB; font-size: 16px; max-width: 720px; line-height: 1.6;">
             Personalized day-by-day schedules, student budget hacks, interactive 3D map pins, and offline PDF exports generated instantly.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-    # Live Metrics
+    # Live Statistics
     m1, m2, m3 = st.columns(3)
     with m1:
         st.metric("Trips Planned", "50,000+", "⚡ Real-time")
     with m2:
-        st.metric("Global Destinations", "120+ Countries", "🌍 Worldwide")
+        st.metric("Countries Covered", "120+ Worldwide", "🌍 Global")
     with m3:
         st.metric("Student Cost", "100% Free", "🎓 Open Source")
 
+    st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("### 🔥 Trending Student Hotspots")
     st.caption("Click any popular student destination to launch the planner immediately:")
 
-    c1, c2, c3 = st.columns(3)
-
-    with c1:
+    # Row 1 of Hotspots
+    h1, h2, h3 = st.columns(3)
+    with h1:
         st.markdown("""
         <div class="glass-card" style="padding: 16px;">
-            <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 12px;" />
-            <h3 style="margin: 0; color: #FFFFFF;">Tokyo, Japan</h3>
+            <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;" />
+            <h3 style="margin: 0; color: #FFFFFF; font-size: 18px;">Tokyo, Japan</h3>
             <p style="color: #FFA000; font-size: 12px; font-weight: bold; margin: 4px 0;">💰 ~$50/day • Neon Alleys & Cheap Ramen</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("🚀 Plan Tokyo Trip", key="btn_tokyo"):
+        if st.button("🚀 Plan Tokyo Trip", key="h_tokyo"):
             st.session_state.quick_dest = "Tokyo, Japan"
             st.session_state.quick_days = 4
             st.session_state.nav_page = "🚀 AI Trip Planner"
             st.rerun()
 
-    with c2:
+    with h2:
         st.markdown("""
         <div class="glass-card" style="padding: 16px;">
-            <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 12px;" />
-            <h3 style="margin: 0; color: #FFFFFF;">Bali, Indonesia</h3>
-            <p style="color: #06B6D4; font-size: 12px; font-weight: bold; margin: 4px 0;">💰 ~$30/day • Surfing & Lush Waterfalls</p>
+            <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;" />
+            <h3 style="margin: 0; color: #FFFFFF; font-size: 18px;">Bali, Indonesia</h3>
+            <p style="color: #06B6D4; font-size: 12px; font-weight: bold; margin: 4px 0;">💰 ~$30/day • Surfing & Waterfalls</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("🚀 Plan Bali Trip", key="btn_bali"):
+        if st.button("🚀 Plan Bali Trip", key="h_bali"):
             st.session_state.quick_dest = "Bali, Indonesia"
             st.session_state.quick_days = 5
             st.session_state.nav_page = "🚀 AI Trip Planner"
             st.rerun()
 
-    with c3:
+    with h3:
         st.markdown("""
         <div class="glass-card" style="padding: 16px;">
-            <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 12px;" />
-            <h3 style="margin: 0; color: #FFFFFF;">Goa, India</h3>
-            <p style="color: #10B981; font-size: 12px; font-weight: bold; margin: 4px 0;">💰 ~$25/day • Beach Shacks & Nightlife</p>
+            <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;" />
+            <h3 style="margin: 0; color: #FFFFFF; font-size: 18px;">Rome, Italy</h3>
+            <p style="color: #FF5E36; font-size: 12px; font-weight: bold; margin: 4px 0;">💰 ~$60/day • Colosseum & Gelato</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("🚀 Plan Goa Trip", key="btn_goa"):
+        if st.button("🚀 Plan Rome Trip", key="h_rome"):
+            st.session_state.quick_dest = "Rome, Italy"
+            st.session_state.quick_days = 3
+            st.session_state.nav_page = "🚀 AI Trip Planner"
+            st.rerun()
+
+    # Row 2 of Hotspots
+    h4, h5, h6 = st.columns(3)
+    with h4:
+        st.markdown("""
+        <div class="glass-card" style="padding: 16px;">
+            <img src="https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;" />
+            <h3 style="margin: 0; color: #FFFFFF; font-size: 18px;">Amsterdam, Netherlands</h3>
+            <p style="color: #8B5CF6; font-size: 12px; font-weight: bold; margin: 4px 0;">💰 ~$65/day • Canals & Cycling</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("🚀 Plan Amsterdam Trip", key="h_amsterdam"):
+            st.session_state.quick_dest = "Amsterdam, Netherlands"
+            st.session_state.quick_days = 3
+            st.session_state.nav_page = "🚀 AI Trip Planner"
+            st.rerun()
+
+    with h5:
+        st.markdown("""
+        <div class="glass-card" style="padding: 16px;">
+            <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;" />
+            <h3 style="margin: 0; color: #FFFFFF; font-size: 18px;">Goa, India</h3>
+            <p style="color: #10B981; font-size: 12px; font-weight: bold; margin: 4px 0;">💰 ~$25/day • Beach Shacks & Seafood</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("🚀 Plan Goa Trip", key="h_goa"):
             st.session_state.quick_dest = "Goa, India"
+            st.session_state.quick_days = 4
+            st.session_state.nav_page = "🚀 AI Trip Planner"
+            st.rerun()
+
+    with h6:
+        st.markdown("""
+        <div class="glass-card" style="padding: 16px;">
+            <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=500&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;" />
+            <h3 style="margin: 0; color: #FFFFFF; font-size: 18px;">Kyoto, Japan</h3>
+            <p style="color: #FFA000; font-size: 12px; font-weight: bold; margin: 4px 0;">💰 ~$45/day • Temples & Bamboo</p>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("🚀 Plan Kyoto Trip", key="h_kyoto"):
+            st.session_state.quick_dest = "Kyoto, Japan"
             st.session_state.quick_days = 3
             st.session_state.nav_page = "🚀 AI Trip Planner"
             st.rerun()
 
 
 # ----------------------------------------------------
-# PAGE 2: 🚀 AI TRIP PLANNER (CORE GENERATOR)
+# PAGE 2: 🚀 AI TRIP PLANNER
 # ----------------------------------------------------
 elif "Planner" in st.session_state.nav_page:
     st.markdown("## 🚀 AI Trip Architect")
-    st.caption("Craft your dream itinerary with interactive mapping and student budget optimization.")
+    st.caption("Customize your student trip blueprint with interactive mapping, budget breakdown, and 1-click PDF download.")
 
     col_input, col_view = st.columns([4, 6], gap="large")
 
     with col_input:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-        st.markdown("#### 🧭 Trip Parameters")
+        st.markdown("#### 🧭 Trip Specifications")
 
         default_dest = st.session_state.get("quick_dest", "Kyoto, Japan")
         default_days = st.session_state.get("quick_days", 3)
@@ -467,7 +530,7 @@ elif "Planner" in st.session_state.nav_page:
         with col_c:
             currency = st.selectbox("Currency", ["USD ($)", "INR (₹)", "EUR (€)", "GBP (£)", "JPY (¥)"])
         with col_a:
-            budget_amount = st.text_input("Cap Amount (Optional)", placeholder="e.g. 500 or 25000")
+            budget_amount = st.text_input("Cap Limit (Optional)", placeholder="e.g. 500 or 25000")
 
         selected_interests = st.multiselect(
             "❤️ Vibe & Interests",
@@ -475,7 +538,7 @@ elif "Planner" in st.session_state.nav_page:
             default=["Street Food", "History & Shrines"]
         )
 
-        must_visit = st.text_input("📍 Must-Visit Place (Optional)", placeholder="e.g. Fushimi Inari Taisha")
+        must_visit = st.text_input("📍 Must-Visit Landmark (Optional)", placeholder="e.g. Fushimi Inari Taisha")
 
         col_p, col_acc = st.columns(2)
         with col_p:
@@ -484,7 +547,7 @@ elif "Planner" in st.session_state.nav_page:
             accommodation = st.selectbox("🏨 Stay Style", ["Hostel Dorm", "Private Hostel", "Airbnb", "Budget Hotel"])
 
         st.markdown("<br>", unsafe_allow_html=True)
-        generate_clicked = st.button("🚀 Generate Itinerary", use_container_width=True)
+        generate_clicked = st.button("🚀 Generate AI Itinerary", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
     with col_view:
@@ -567,7 +630,7 @@ elif "Planner" in st.session_state.nav_page:
             <div class="glass-card" style="text-align: center; padding: 60px 20px;">
                 <span style="font-size: 48px;">🗺️</span>
                 <h3 style="color: #FFFFFF; margin-top: 10px;">Your Custom Itinerary Awaits</h3>
-                <p style="color: #9CA3AF; font-size: 13px;">Choose your destination on the left and click "Generate Itinerary".</p>
+                <p style="color: #9CA3AF; font-size: 13px;">Choose your destination on the left and click "Generate AI Itinerary".</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -577,12 +640,13 @@ elif "Planner" in st.session_state.nav_page:
 # ----------------------------------------------------
 elif "Budget" in st.session_state.nav_page:
     st.markdown("## 💰 Student Trip Budget Calculator")
-    st.caption("Estimate and balance your travel expenses so you never run out of funds abroad.")
+    st.caption("Estimate, customize, and balance your trip expenses so you never run out of cash abroad.")
 
     b_col1, b_col2 = st.columns([5, 5], gap="large")
 
     with b_col1:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        st.markdown("#### ⚙️ Expense Breakdown")
         calc_days = st.number_input("📅 Trip Duration (Days)", min_value=1, max_value=30, value=4)
         curr_sym = st.selectbox("Currency", ["$", "₹", "€", "£", "¥"])
 
