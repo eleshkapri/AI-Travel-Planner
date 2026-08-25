@@ -11,10 +11,10 @@ from geopy.geocoders import Nominatim
 app = FastAPI(
     title="RoamAI • AI Student Travel Planner",
     description="Next-Gen 3D Modern Student Travel Planner powered by Groq AI",
-    version="2.0.0"
+    version="2.1.0"
 )
 
-# Enable CORS for seamless client-server interaction
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,6 +29,7 @@ class TripRequest(BaseModel):
     budget_level: str = "Student (Low)"
     budget_amount: Optional[str] = ""
     currency: Optional[str] = "USD"
+    region: Optional[str] = "Global / USD"
     interests: List[str] = []
     must_visit: Optional[str] = ""
     travel_pace: Optional[str] = "Balanced"
@@ -49,7 +50,7 @@ def health_check():
     return {
         "status": "ok",
         "service": "RoamAI FastAPI Backend",
-        "version": "2.0.0",
+        "version": "2.1.0",
         "models": ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "llama-3.1-8b-instant", "qwen/qwen3.6-27b"]
     }
 
@@ -65,7 +66,8 @@ def generate_itinerary(req: TripRequest):
     client = Groq(api_key=api_key)
 
     curr = req.currency or "USD"
-    budget_text = f"{req.budget_level} Tier ({curr})"
+    region_info = req.region or "Global"
+    budget_text = f"{req.budget_level} Tier ({curr}) for {region_info} traveler"
     if req.budget_amount:
         budget_text += f" with strict limit of {req.budget_amount} {curr}"
 
@@ -83,7 +85,8 @@ def generate_itinerary(req: TripRequest):
     Travel Parameters:
     - Destination: {req.destination}
     - Duration: {req.days} Days
-    - Budget: {budget_text}
+    - Traveler Region/Currency: {region_info} ({curr})
+    - Budget Level: {budget_text}
     - Specific Interests: {interests_string}
     - {pace_text}
     - {must_visit_instruction}
@@ -92,11 +95,11 @@ def generate_itinerary(req: TripRequest):
     # 🌍 [Catchy Trip Title & Emoji]
 
     ## 💰 Estimated Student Budget Breakdown ({curr})
-    - 🏨 **Accommodation ({req.accommodation_style or 'Hostel'}):** [Estimated cost per night & total]
-    - 🍜 **Food & Street Eats:** [Daily & total food estimate]
-    - 🚇 **Local Transport:** [Passes/Subway/Bus estimates]
-    - 🎟️ **Activities & Entry Fees:** [Cost estimates for attractions]
-    - 💡 **Student Savings Tip:** [1 high-impact money-saving hack]
+    - 🏨 **Accommodation ({req.accommodation_style or 'Hostel'}):** [Estimated cost per night & total in {curr}]
+    - 🍜 **Food & Street Eats:** [Daily & total food estimate in {curr}]
+    - 🚇 **Local Transport:** [Passes/Subway/Bus estimates in {curr}]
+    - 🎟️ **Activities & Entry Fees:** [Cost estimates for attractions in {curr}]
+    - 💡 **Region-Specific Student Savings Tip:** [1 high-impact money-saving hack tailored for students]
 
     ## 🗓️ Day-by-Day Itinerary
 
@@ -107,8 +110,8 @@ def generate_itinerary(req: TripRequest):
 
     (Repeat detailed ### Day X format for all {req.days} days)
 
-    ## 🎒 Essential Student Tips
-    - 3 practical tips for safety, SIM cards, or student discounts in {req.destination}.
+    ## 🎒 Essential Student Tips for {req.destination}
+    - 3 practical tips for safety, local transit apps, SIM cards, or student discounts.
 
     LANDMARKS: Place 1, Place 2, Place 3
     """
@@ -186,6 +189,7 @@ def generate_itinerary(req: TripRequest):
             "days": req.days,
             "budget_level": req.budget_level,
             "currency": curr,
+            "region": region_info,
             "interests": req.interests
         }
     }
@@ -254,19 +258,21 @@ HTML_CONTENT = """<!DOCTYPE html>
       top: 0; left: 0; width: 100vw; height: 100vh;
       z-index: -1; pointer-events: none;
       background: 
-        radial-gradient(circle at 15% 15%, rgba(255, 94, 54, 0.14) 0%, transparent 45%),
-        radial-gradient(circle at 85% 25%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
-        radial-gradient(circle at 50% 85%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
+        radial-gradient(circle at 12% 15%, rgba(255, 94, 54, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 88% 22%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 88%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
     }
     .glass-card {
-      background: rgba(18, 24, 38, 0.8);
+      background: rgba(18, 24, 38, 0.85);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       transition: all 0.3s ease;
     }
     .glass-card:hover {
       border-color: rgba(255, 94, 54, 0.35);
+      transform: translateY(-2px);
     }
     .btn-gradient {
       background: linear-gradient(135deg, #FF5E36 0%, #FFA000 100%);
@@ -334,10 +340,12 @@ HTML_CONTENT = """<!DOCTYPE html>
 <body class="min-h-screen flex flex-col antialiased">
   <div class="bg-mesh"></div>
 
-  <!-- Header -->
-  <header class="sticky top-0 z-50 backdrop-blur-xl bg-spaceDark/85 border-b border-cardBorder">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <div class="flex items-center gap-3 cursor-pointer" onclick="switchPage('home')">
+  <!-- ==================== PROPERLY DESIGNED NAVBAR WITH REGION SELECTOR ==================== -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-spaceDark/90 border-b border-cardBorder shadow-2xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo (Left) -->
+      <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="switchPage('home')">
         <div class="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-coralPrimary to-amberAccent p-0.5 shadow-lg shadow-coralPrimary/30">
           <div class="w-full h-full bg-spaceDark rounded-[14px] flex items-center justify-center">
             <span class="text-2xl">✈️</span>
@@ -352,24 +360,74 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
       </div>
 
-      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
-        <button onclick="switchPage('home')" id="tab-home" class="nav-tab active hover:text-white flex items-center gap-1.5"><span>🌟</span> Discover</button>
-        <button onclick="switchPage('planner')" id="tab-planner" class="nav-tab hover:text-white flex items-center gap-1.5"><span>🚀</span> AI Planner</button>
-        <button onclick="switchPage('budget')" id="tab-budget" class="nav-tab hover:text-white flex items-center gap-1.5"><span>💰</span> Budget Calc</button>
-        <button onclick="switchPage('packing')" id="tab-packing" class="nav-tab hover:text-white flex items-center gap-1.5"><span>🎒</span> Packing List</button>
-        <button onclick="switchPage('saved')" id="tab-saved" class="nav-tab hover:text-white flex items-center gap-1.5"><span>📂</span> Saved Trips (<span id="savedCount">0</span>)</button>
+      <!-- Navigation Tabs (Center) -->
+      <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-gray-300">
+        <button onclick="switchPage('home')" id="tab-home" class="nav-tab active hover:text-white flex items-center gap-1.5 transition"><span>🌟</span> Discover</button>
+        <button onclick="switchPage('planner')" id="tab-planner" class="nav-tab hover:text-white flex items-center gap-1.5 transition"><span>🚀</span> AI Planner</button>
+        <button onclick="switchPage('budget')" id="tab-budget" class="nav-tab hover:text-white flex items-center gap-1.5 transition"><span>💰</span> Budget Calc</button>
+        <button onclick="switchPage('packing')" id="tab-packing" class="nav-tab hover:text-white flex items-center gap-1.5 transition"><span>🎒</span> Packing List</button>
+        <button onclick="switchPage('saved')" id="tab-saved" class="nav-tab hover:text-white flex items-center gap-1.5 transition"><span>📂</span> Saved (<span id="savedCount">0</span>)</button>
       </nav>
 
-      <div>
-        <button onclick="switchPage('planner')" class="btn-gradient text-xs sm:text-sm px-5 py-2.5 rounded-xl flex items-center gap-2">
-          <span>⚡ Plan a Trip</span>
+      <!-- Region Selector & CTA (Right) -->
+      <div class="flex items-center gap-3 shrink-0">
+        
+        <!-- Region & Currency Selector -->
+        <div class="relative flex items-center">
+          <span class="absolute left-3 text-sm pointer-events-none" id="navRegionFlag">🇮🇳</span>
+          <select
+            id="navRegionSelector"
+            onchange="onRegionChange(this.value)"
+            class="pl-8 pr-8 py-2 bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-coralPrimary cursor-pointer shadow-sm transition"
+          >
+            <option value="INR" data-flag="🇮🇳" data-curr="INR" data-sym="₹" data-name="India" selected>🇮🇳 India (INR ₹)</option>
+            <option value="USD" data-flag="🇺🇸" data-curr="USD" data-sym="$" data-name="United States">🇺🇸 USA (USD $)</option>
+            <option value="EUR" data-flag="🇪🇺" data-curr="EUR" data-sym="€" data-name="Europe">🇪🇺 Europe (EUR €)</option>
+            <option value="GBP" data-flag="🇬🇧" data-curr="GBP" data-sym="£" data-name="United Kingdom">🇬🇧 UK (GBP £)</option>
+            <option value="JPY" data-flag="🇯🇵" data-curr="JPY" data-sym="¥" data-name="Japan">🇯🇵 Japan (JPY ¥)</option>
+            <option value="AUD" data-flag="🇦🇺" data-curr="AUD" data-sym="A$" data-name="Australia">🇦🇺 Australia (AUD A$)</option>
+            <option value="CAD" data-flag="🇨🇦" data-curr="CAD" data-sym="C$" data-name="Canada">🇨🇦 Canada (CAD C$)</option>
+            <option value="AED" data-flag="🇦🇪" data-curr="AED" data-sym="AED" data-name="UAE">🇦🇪 UAE (AED)</option>
+            <option value="THB" data-flag="🇹🇭" data-curr="THB" data-sym="฿" data-name="Thailand">🇹🇭 Thailand (THB ฿)</option>
+          </select>
+        </div>
+
+        <!-- Plan Button -->
+        <button onclick="switchPage('planner')" class="btn-gradient text-xs sm:text-sm px-4 sm:px-5 py-2.5 rounded-xl flex items-center gap-1.5 whitespace-nowrap">
+          <span>⚡ Plan Trip</span>
         </button>
       </div>
+
+    </div>
+
+    <!-- Mobile Sub-Nav -->
+    <div class="lg:hidden flex items-center justify-around py-2.5 px-2 bg-cardDark/95 border-t border-cardBorder text-xs text-gray-400">
+      <button onclick="switchPage('home')" id="mob-home" class="text-coralPrimary font-bold flex flex-col items-center"><span>🌟</span>Home</button>
+      <button onclick="switchPage('planner')" id="mob-planner" class="flex flex-col items-center"><span>🚀</span>Planner</button>
+      <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center"><span>💰</span>Budget</button>
+      <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center"><span>🎒</span>Packing</button>
+      <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center"><span>📂</span>Saved</button>
     </div>
   </header>
 
-  <!-- Main Content -->
+  <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Region Information Alert Banner -->
+    <div id="regionInfoBanner" class="mb-8 p-4 rounded-2xl bg-gradient-to-r from-coralPrimary/10 via-amberAccent/10 to-cyanAccent/10 border border-coralPrimary/30 flex items-center justify-between text-xs sm:text-sm text-gray-200">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl" id="bannerFlag">🇮🇳</span>
+        <div>
+          <span class="font-bold text-amberAccent" id="bannerRegionTitle">Active Region: India (INR ₹)</span>
+          <p class="text-xs text-gray-400" id="bannerRegionTip">
+            Student Perks: Use IRCTC student concessions for rail travel & Google Pay/UPI for zero-fee local food stalls.
+          </p>
+        </div>
+      </div>
+      <button onclick="switchPage('planner')" class="hidden sm:inline-block px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition">
+        Explore Plans →
+      </button>
+    </div>
     
     <!-- PAGE 1: DISCOVER -->
     <section id="page-home" class="space-y-16">
@@ -405,7 +463,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- Hotspot Cards Grid -->
+      <!-- Hotspot Cards Grid with Regionally Synced Budgets -->
       <div class="space-y-6">
         <h2 class="text-2xl sm:text-3xl font-extrabold text-white">🔥 Trending Student Destinations</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -416,7 +474,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               <p class="text-xs text-gray-400 mt-1">Neon street alleys, futuristic tech, and incredible cheap ramen.</p>
             </div>
             <div class="flex justify-between items-center pt-2 border-t border-white/5">
-              <span class="text-xs font-bold text-amberAccent">💰 ~$50/day</span>
+              <span class="text-xs font-bold text-amberAccent" id="hotspotTokyoCost">💰 ~₹4,000 / day</span>
               <span class="text-xs font-bold text-coralPrimary">Plan Trip →</span>
             </div>
           </div>
@@ -428,7 +486,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               <p class="text-xs text-gray-400 mt-1">Lush waterfalls, surf beaches, and budget student hostels.</p>
             </div>
             <div class="flex justify-between items-center pt-2 border-t border-white/5">
-              <span class="text-xs font-bold text-cyanAccent">💰 ~$30/day</span>
+              <span class="text-xs font-bold text-cyanAccent" id="hotspotBaliCost">💰 ~₹2,500 / day</span>
               <span class="text-xs font-bold text-coralPrimary">Plan Trip →</span>
             </div>
           </div>
@@ -440,7 +498,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               <p class="text-xs text-gray-400 mt-1">Colosseum tours, Trevi fountain wishes, and authentic pasta.</p>
             </div>
             <div class="flex justify-between items-center pt-2 border-t border-white/5">
-              <span class="text-xs font-bold text-coralPrimary">💰 ~$60/day</span>
+              <span class="text-xs font-bold text-coralPrimary" id="hotspotRomeCost">💰 ~₹5,000 / day</span>
               <span class="text-xs font-bold text-coralPrimary">Plan Trip →</span>
             </div>
           </div>
@@ -452,7 +510,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               <p class="text-xs text-gray-400 mt-1">Historic canals, cycling tours, museums, and student vibes.</p>
             </div>
             <div class="flex justify-between items-center pt-2 border-t border-white/5">
-              <span class="text-xs font-bold text-purpleAccent">💰 ~$65/day</span>
+              <span class="text-xs font-bold text-purpleAccent" id="hotspotAmsterdamCost">💰 ~₹5,500 / day</span>
               <span class="text-xs font-bold text-coralPrimary">Plan Trip →</span>
             </div>
           </div>
@@ -464,7 +522,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               <p class="text-xs text-gray-400 mt-1">Sun-kissed beaches, night shacks, and seafood markets.</p>
             </div>
             <div class="flex justify-between items-center pt-2 border-t border-white/5">
-              <span class="text-xs font-bold text-emeraldAccent">💰 ~$25/day</span>
+              <span class="text-xs font-bold text-emeraldAccent" id="hotspotGoaCost">💰 ~₹2,000 / day</span>
               <span class="text-xs font-bold text-coralPrimary">Plan Trip →</span>
             </div>
           </div>
@@ -476,7 +534,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               <p class="text-xs text-gray-400 mt-1">Golden pavilions, bamboo groves, and torii gates.</p>
             </div>
             <div class="flex justify-between items-center pt-2 border-t border-white/5">
-              <span class="text-xs font-bold text-amberAccent">💰 ~$45/day</span>
+              <span class="text-xs font-bold text-amberAccent" id="hotspotKyotoCost">💰 ~₹3,800 / day</span>
               <span class="text-xs font-bold text-coralPrimary">Plan Trip →</span>
             </div>
           </div>
@@ -491,12 +549,12 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="glass-card p-6 sm:p-7 rounded-3xl border border-white/10 space-y-5 shadow-2xl">
             <div class="flex items-center justify-between pb-3 border-b border-white/10">
               <h2 class="text-lg font-bold text-white flex items-center gap-2"><span>🧭</span> Trip Architect</h2>
-              <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emeraldAccent/20 text-emeraldAccent">AI Active</span>
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emeraldAccent/20 text-emeraldAccent" id="activeRegionBadge">🇮🇳 INR Active</span>
             </div>
 
             <div class="space-y-1.5">
               <label class="block text-xs font-bold uppercase text-gray-300">📍 Destination</label>
-              <input type="text" id="plannerDest" placeholder="e.g. Kyoto, Japan" class="w-full px-4 py-3 bg-spaceDark border border-white/15 rounded-xl text-sm text-white focus:outline-none focus:border-coralPrimary shadow-inner" />
+              <input type="text" id="plannerDest" placeholder="e.g. Kyoto, Japan or Manali, India" class="w-full px-4 py-3 bg-spaceDark border border-white/15 rounded-xl text-sm text-white focus:outline-none focus:border-coralPrimary shadow-inner" />
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -520,17 +578,11 @@ HTML_CONTENT = """<!DOCTYPE html>
             <div class="grid grid-cols-3 gap-3">
               <div class="space-y-1">
                 <label class="text-[11px] font-bold text-gray-400">Currency</label>
-                <select id="plannerCurr" class="w-full px-2.5 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white">
-                  <option value="USD">USD ($)</option>
-                  <option value="INR">INR (₹)</option>
-                  <option value="EUR">EUR (€)</option>
-                  <option value="GBP">GBP (£)</option>
-                  <option value="JPY">JPY (¥)</option>
-                </select>
+                <input type="text" id="plannerCurr" readonly value="INR (₹)" class="w-full px-2.5 py-2.5 bg-spaceDark/60 border border-white/10 rounded-xl text-xs text-amberAccent font-bold" />
               </div>
               <div class="col-span-2 space-y-1">
                 <label class="text-[11px] font-bold text-gray-400">Cap Budget (Optional)</label>
-                <input type="text" id="plannerBudgetCap" placeholder="e.g. 500 or 25000" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
+                <input type="text" id="plannerBudgetCap" placeholder="e.g. 20000 or 500" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
               </div>
             </div>
 
@@ -582,7 +634,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div id="plannerLoading" class="hidden glass-card rounded-3xl p-12 text-center space-y-4 border border-coralPrimary/30">
             <div class="w-14 h-14 border-4 border-coralPrimary/20 border-t-coralPrimary rounded-full animate-spin mx-auto"></div>
             <h3 class="text-xl font-bold text-white">Architecting Your Trip...</h3>
-            <p class="text-xs text-coralPrimary animate-pulse">Calculating budget breakdowns and geocoding landmark pins...</p>
+            <p class="text-xs text-coralPrimary animate-pulse">Calculating regional budget breakdowns and geocoding landmark pins...</p>
           </div>
 
           <div id="plannerResults" class="hidden space-y-6">
@@ -611,32 +663,32 @@ HTML_CONTENT = """<!DOCTYPE html>
     <section id="page-budget" class="hidden space-y-8 max-w-4xl mx-auto">
       <div class="text-center space-y-2">
         <h2 class="text-3xl font-extrabold text-white">💰 Student Trip Budget Calculator</h2>
-        <p class="text-gray-400 text-sm">Estimate and balance your trip expenses so you never run out of funds abroad.</p>
+        <p class="text-gray-400 text-sm">Estimate and balance your trip expenses synced to your selected region currency.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div class="md:col-span-7 glass-card p-6 sm:p-8 rounded-3xl border border-white/10 space-y-5">
           <div class="grid grid-cols-2 gap-4">
             <div><label class="text-xs font-bold text-gray-300">Days</label><input type="number" id="bDays" value="4" class="w-full px-3 py-2 bg-spaceDark border border-white/15 rounded-xl text-sm text-white" oninput="calcBudget()" /></div>
-            <div><label class="text-xs font-bold text-gray-300">Currency</label><select id="bCurr" class="w-full px-3 py-2 bg-spaceDark border border-white/15 rounded-xl text-sm text-white" onchange="calcBudget()"><option value="$">$ (USD)</option><option value="₹">₹ (INR)</option><option value="€">€ (EUR)</option></select></div>
+            <div><label class="text-xs font-bold text-gray-300">Region Currency</label><input type="text" id="bCurrDisplay" readonly value="INR (₹)" class="w-full px-3 py-2 bg-spaceDark/60 border border-white/10 rounded-xl text-sm text-amberAccent font-bold" /></div>
           </div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🚆 Flights / Trains</span><span id="bValTrans">$120</span></div><input type="range" id="bTrans" min="0" max="1000" step="10" value="120" class="w-full accent-coralPrimary cursor-pointer" oninput="calcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🏨 Hostel (Per Night)</span><span id="bValStay">$25</span></div><input type="range" id="bStay" min="5" max="200" step="5" value="25" class="w-full accent-cyanAccent cursor-pointer" oninput="calcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🍜 Food (Per Day)</span><span id="bValFood">$20</span></div><input type="range" id="bFood" min="5" max="150" step="5" value="20" class="w-full accent-amberAccent cursor-pointer" oninput="calcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🎟️ Activities (Per Day)</span><span id="bValAct">$15</span></div><input type="range" id="bAct" min="0" max="100" step="5" value="15" class="w-full accent-emeraldAccent cursor-pointer" oninput="calcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🛡️ Emergency Buffer</span><span id="bValBuf">$50</span></div><input type="range" id="bBuf" min="0" max="300" step="10" value="50" class="w-full accent-purpleAccent cursor-pointer" oninput="calcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🚆 Flights / Trains</span><span id="bValTrans">₹3,000</span></div><input type="range" id="bTrans" min="0" max="50000" step="500" value="3000" class="w-full accent-coralPrimary cursor-pointer" oninput="calcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🏨 Hostel (Per Night)</span><span id="bValStay">₹800</span></div><input type="range" id="bStay" min="200" max="10000" step="100" value="800" class="w-full accent-cyanAccent cursor-pointer" oninput="calcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🍜 Food (Per Day)</span><span id="bValFood">₹600</span></div><input type="range" id="bFood" min="100" max="8000" step="100" value="600" class="w-full accent-amberAccent cursor-pointer" oninput="calcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🎟️ Activities (Per Day)</span><span id="bValAct">₹400</span></div><input type="range" id="bAct" min="0" max="5000" step="100" value="400" class="w-full accent-emeraldAccent cursor-pointer" oninput="calcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🛡️ Emergency Buffer</span><span id="bValBuf">₹1,500</span></div><input type="range" id="bBuf" min="0" max="15000" step="250" value="1500" class="w-full accent-purpleAccent cursor-pointer" oninput="calcBudget()" /></div>
         </div>
 
         <div class="md:col-span-5 glass-card p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col justify-between">
           <div class="space-y-3">
             <span class="text-xs font-bold text-gray-400 uppercase">Estimated Total</span>
-            <h1 class="text-5xl font-extrabold text-white" id="bTotal">$410</h1>
-            <p class="text-xs text-cyanAccent font-semibold" id="bAvg">Avg $102.50 / day</p>
+            <h1 class="text-5xl font-extrabold text-white" id="bTotal">₹10,500</h1>
+            <p class="text-xs text-cyanAccent font-semibold" id="bAvg">Avg ₹2,625 / day</p>
           </div>
-          <div class="pt-4 border-t border-white/10 space-y-1 text-[11px] text-gray-400">
-            <h4 class="font-bold text-amberAccent">💡 Student Savings Hacks:</h4>
-            <p>• Flash your Student ID for 20-50% off museums.</p>
-            <p>• Book night trains to save 1 night of hostel fees.</p>
+          <div class="pt-4 border-t border-white/10 space-y-2 text-[11px] text-gray-400" id="budgetRegionalTips">
+            <h4 class="font-bold text-amberAccent">💡 Student Regional Hacks:</h4>
+            <p>• Book Indian Railway tickets in advance or look for Tatkal/student quotas.</p>
+            <p>• Use youth hostels (Zostel/Hosteller) for budget social stays.</p>
           </div>
         </div>
       </div>
@@ -677,15 +729,183 @@ HTML_CONTENT = """<!DOCTYPE html>
   </main>
 
   <footer class="mt-20 border-t border-cardBorder bg-spaceDark/90 py-8 text-center text-xs text-gray-500">
-    RoamAI • AI Student Travel Planner • Powered by Groq AI & FastAPI
+    RoamAI • AI Student Travel Planner • Multi-Region Support • Powered by Groq AI & FastAPI
   </footer>
 
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
-    let activePage = 'home';
-    let selectedInterests = ['Street Food', 'History & Shrines'];
+    // Region Configuration Database
+    const REGIONS = {
+      INR: {
+        flag: "🇮🇳", name: "India", curr: "INR", sym: "₹", multiplier: 80,
+        tip: "Student Perks: Use IRCTC student concessions for rail travel & UPI / Google Pay for zero-fee local food carts.",
+        budgetTips: [
+          "• Book Indian Railway tickets in advance or look for Tatkal/student quotas.",
+          "• Stay in verified youth backpacker hostels (Zostel, Hosteller, goSTOPS).",
+          "• Eat at local thali joints and morning street food stalls."
+        ],
+        defaults: { trans: 3000, stay: 800, food: 600, act: 400, buf: 1500, maxTrans: 40000, maxStay: 8000, maxFood: 6000, maxAct: 4000, maxBuf: 10000, step: 100 },
+        hotspots: { tokyo: "₹4,000", bali: "₹2,500", rome: "₹5,000", amsterdam: "₹5,500", goa: "₹2,000", kyoto: "₹3,800" }
+      },
+      USD: {
+        flag: "🇺🇸", name: "United States", curr: "USD", sym: "$", multiplier: 1,
+        tip: "Student Perks: Use Amtrak student discounts (15% off) & Unisdays / StudentBeans for museum passes.",
+        budgetTips: [
+          "• Flash your student ID for 20-50% off museums and galleries.",
+          "• Take Megabus or Flixbus for cheap inter-city travel.",
+          "• Use grocery store delis and campus dining deals."
+        ],
+        defaults: { trans: 120, stay: 30, food: 25, act: 15, buf: 50, maxTrans: 1000, maxStay: 200, maxFood: 150, maxAct: 100, maxBuf: 300, step: 5 },
+        hotspots: { tokyo: "$50", bali: "$30", rome: "$60", amsterdam: "$65", goa: "$25", kyoto: "$45" }
+      },
+      EUR: {
+        flag: "🇪🇺", name: "Europe", curr: "EUR", sym: "€", multiplier: 0.92,
+        tip: "Student Perks: EU students under 26 get FREE entry to Louvre, Colosseum, and many state monuments!",
+        budgetTips: [
+          "• Book Eurail / Interrail Youth Passes for unlimited train travel.",
+          "• Look for 'First Sunday of the month' free museum entries across Europe.",
+          "• Buy fresh baguettes, cheese, and fruit from local market stalls."
+        ],
+        defaults: { trans: 100, stay: 25, food: 20, act: 12, buf: 45, maxTrans: 900, maxStay: 180, maxFood: 140, maxAct: 90, maxBuf: 250, step: 5 },
+        hotspots: { tokyo: "€45", bali: "€28", rome: "€55", amsterdam: "€60", goa: "€22", kyoto: "€40" }
+      },
+      GBP: {
+        flag: "🇬🇧", name: "United Kingdom", curr: "GBP", sym: "£", multiplier: 0.79,
+        tip: "Student Perks: Get a 16-25 Railcard for 1/3 off all UK train fares & free entry to all major London museums!",
+        budgetTips: [
+          "• Major national museums in London/Edinburgh have 100% free permanent exhibits.",
+          "• Grab 'Meal Deals' at Tesco/Sainsbury's for under £4.",
+          "• Book National Express coach tickets early for £5 intercity routes."
+        ],
+        defaults: { trans: 85, stay: 22, food: 18, act: 10, buf: 40, maxTrans: 800, maxStay: 160, maxFood: 120, maxAct: 80, maxBuf: 220, step: 5 },
+        hotspots: { tokyo: "£40", bali: "£24", rome: "£48", amsterdam: "£52", goa: "£20", kyoto: "£36" }
+      },
+      JPY: {
+        flag: "🇯🇵", name: "Japan", curr: "JPY", sym: "¥", multiplier: 155,
+        tip: "Student Perks: Load a Suica/Pasmo IC card for easy subway transit & look for 100-yen convenience stores.",
+        budgetTips: [
+          "• Eat hot delicious meals at 7-Eleven, Lawson, and FamilyMart for under ¥600.",
+          "• Buy regional JR passes if traveling between Tokyo, Kyoto, and Osaka.",
+          "• Visit shrine grounds which are almost always completely free to explore."
+        ],
+        defaults: { trans: 18000, stay: 4500, food: 3500, act: 2000, buf: 7500, maxTrans: 150000, maxStay: 30000, maxFood: 25000, maxAct: 15000, maxBuf: 45000, step: 500 },
+        hotspots: { tokyo: "¥7,500", bali: "¥4,500", rome: "¥9,000", amsterdam: "¥10,000", goa: "¥3,500", kyoto: "¥6,800" }
+      },
+      AUD: {
+        flag: "🇦🇺", name: "Australia", curr: "AUD", sym: "A$", multiplier: 1.52,
+        tip: "Student Perks: Use student concession Opal/Myki cards & cook in hostel communal kitchens.",
+        budgetTips: [
+          "• Major Australian state galleries and botanical gardens are 100% free.",
+          "• Shop at ALDI or local fruit markets for budget meal prep.",
+          "• Utilize free city center trams in Melbourne and Adelaide."
+        ],
+        defaults: { trans: 180, stay: 45, food: 35, act: 20, buf: 75, maxTrans: 1500, maxStay: 300, maxFood: 220, maxAct: 150, maxBuf: 450, step: 5 },
+        hotspots: { tokyo: "A$75", bali: "A$45", rome: "A$90", amsterdam: "A$95", goa: "A$38", kyoto: "A$68" }
+      },
+      CAD: {
+        flag: "🇨🇦", name: "Canada", curr: "CAD", sym: "C$", multiplier: 1.36,
+        tip: "Student Perks: Use Via Rail youth passes and SPC card for student retail & food discounts.",
+        budgetTips: [
+          "• Free entry to Canadian National Parks for youth under 17.",
+          "• Use Megabus/Rider Express for budget travel across Ontario/Quebec.",
+          "• Eat at student food co-ops and local poutine joints."
+        ],
+        defaults: { trans: 160, stay: 40, food: 32, act: 18, buf: 65, maxTrans: 1300, maxStay: 260, maxFood: 200, maxAct: 130, maxBuf: 400, step: 5 },
+        hotspots: { tokyo: "C$68", bali: "C$40", rome: "C$80", amsterdam: "C$85", goa: "C$34", kyoto: "C$60" }
+      },
+      AED: {
+        flag: "🇦🇪", name: "UAE", curr: "AED", sym: "AED", multiplier: 3.67,
+        tip: "Student Perks: Use the Nol Silver card on Dubai Metro & look for student discounts at museums.",
+        budgetTips: [
+          "• Ride the 1-dirham traditional Abra boat across Dubai Creek.",
+          "• Explore Old Dubai (Al Fahidi, Deira Spice Souk) which are free to visit.",
+          "• Eat delicious shawarma and street falafels for under 10 AED."
+        ],
+        defaults: { trans: 440, stay: 110, food: 90, act: 55, buf: 180, maxTrans: 3600, maxStay: 750, maxFood: 550, maxAct: 350, maxBuf: 1100, step: 10 },
+        hotspots: { tokyo: "180 AED", bali: "110 AED", rome: "220 AED", amsterdam: "240 AED", goa: "90 AED", kyoto: "165 AED" }
+      },
+      THB: {
+        flag: "🇹🇭", name: "Thailand", curr: "THB", sym: "฿", multiplier: 36.5,
+        tip: "Student Perks: Use the BTS Skytrain / MRT Rabbit student card & eat at world-famous night markets.",
+        budgetTips: [
+          "• Eat authentic Pad Thai and Mango Sticky Rice at night markets for 50-80 THB.",
+          "• Use the Chao Phraya Express Boat for 15-30 THB scenic river transit.",
+          "• Stay in stylish social backpacker hostels for under 400 THB/night."
+        ],
+        defaults: { trans: 4000, stay: 900, food: 700, act: 500, buf: 1800, maxTrans: 35000, maxStay: 7000, maxFood: 5500, maxAct: 3500, maxBuf: 10000, step: 50 },
+        hotspots: { tokyo: "฿1,800", bali: "฿1,100", rome: "฿2,200", amsterdam: "฿2,400", goa: "฿900", kyoto: "฿1,650" }
+      }
+    };
+
+    let activeRegionKey = "INR";
+    let activePage = "home";
+    let selectedInterests = ["Street Food", "History & Shrines"];
     let currentTrip = null;
     let mapInstance = null;
     let markersLayer = null;
+
+    // --- On Region Change Handler ---
+    function onRegionChange(regionKey) {
+      activeRegionKey = regionKey;
+      const reg = REGIONS[regionKey] || REGIONS.INR;
+
+      // Update Navbar Flag
+      document.getElementById('navRegionFlag').innerText = reg.flag;
+
+      // Update Banner
+      document.getElementById('bannerFlag').innerText = reg.flag;
+      document.getElementById('bannerRegionTitle').innerText = `Active Region: ${reg.name} (${reg.curr} ${reg.sym})`;
+      document.getElementById('bannerRegionTip').innerText = reg.tip;
+
+      // Update Planner Region Badge & Currency
+      document.getElementById('activeRegionBadge').innerText = `${reg.flag} ${reg.curr} Active`;
+      document.getElementById('plannerCurr').value = `${reg.curr} (${reg.sym})`;
+
+      // Update Hotspot Cards Costs
+      document.getElementById('hotspotTokyoCost').innerText = `💰 ~${reg.hotspots.tokyo} / day`;
+      document.getElementById('hotspotBaliCost').innerText = `💰 ~${reg.hotspots.bali} / day`;
+      document.getElementById('hotspotRomeCost').innerText = `💰 ~${reg.hotspots.rome} / day`;
+      document.getElementById('hotspotAmsterdamCost').innerText = `💰 ~${reg.hotspots.amsterdam} / day`;
+      document.getElementById('hotspotGoaCost').innerText = `💰 ~${reg.hotspots.goa} / day`;
+      document.getElementById('hotspotKyotoCost').innerText = `💰 ~${reg.hotspots.kyoto} / day`;
+
+      // Update Budget Calculator Inputs & Sliders
+      document.getElementById('bCurrDisplay').value = `${reg.curr} (${reg.sym})`;
+      
+      const bTrans = document.getElementById('bTrans');
+      const bStay = document.getElementById('bStay');
+      const bFood = document.getElementById('bFood');
+      const bAct = document.getElementById('bAct');
+      const bBuf = document.getElementById('bBuf');
+
+      bTrans.max = reg.defaults.maxTrans;
+      bTrans.step = reg.defaults.step;
+      bTrans.value = reg.defaults.trans;
+
+      bStay.max = reg.defaults.maxStay;
+      bStay.step = reg.defaults.step;
+      bStay.value = reg.defaults.stay;
+
+      bFood.max = reg.defaults.maxFood;
+      bFood.step = reg.defaults.step;
+      bFood.value = reg.defaults.food;
+
+      bAct.max = reg.defaults.maxAct;
+      bAct.step = reg.defaults.step;
+      bAct.value = reg.defaults.act;
+
+      bBuf.max = reg.defaults.maxBuf;
+      bBuf.step = reg.defaults.step;
+      bBuf.value = reg.defaults.buf;
+
+      // Update Budget Tips
+      document.getElementById('budgetRegionalTips').innerHTML = `
+        <h4 class="font-bold text-amberAccent">💡 Student ${reg.name} Hacks:</h4>
+        ${reg.budgetTips.map(t => `<p>${t}</p>`).join('')}
+      `;
+
+      calcBudget();
+    }
 
     function switchPage(page) {
       activePage = page;
@@ -732,7 +952,8 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       const days = parseInt(document.getElementById('plannerDays').value) || 3;
       const budgetTier = document.getElementById('plannerTier').value;
-      const currency = document.getElementById('plannerCurr').value;
+      const reg = REGIONS[activeRegionKey] || REGIONS.INR;
+      const currency = reg.curr;
       const budgetAmount = document.getElementById('plannerBudgetCap').value.trim();
       const mustVisit = document.getElementById('plannerMustVisit').value.trim();
       const pace = document.getElementById('plannerPace').value;
@@ -748,7 +969,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             destination, days, budget_level: budgetTier, budget_amount: budgetAmount,
-            currency, interests: selectedInterests, must_visit: mustVisit, travel_pace: pace
+            currency, region: reg.name, interests: selectedInterests, must_visit: mustVisit, travel_pace: pace
           })
         });
 
@@ -875,33 +1096,35 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     function calcBudget() {
+      const reg = REGIONS[activeRegionKey] || REGIONS.INR;
+      const sym = reg.sym;
+
       const days = parseInt(document.getElementById('bDays').value) || 1;
-      const curr = document.getElementById('bCurr').value;
       const trans = parseFloat(document.getElementById('bTrans').value) || 0;
       const stay = parseFloat(document.getElementById('bStay').value) || 0;
       const food = parseFloat(document.getElementById('bFood').value) || 0;
       const act = parseFloat(document.getElementById('bAct').value) || 0;
       const buf = parseFloat(document.getElementById('bBuf').value) || 0;
 
-      document.getElementById('bValTrans').innerText = `${curr}${trans}`;
-      document.getElementById('bValStay').innerText = `${curr}${stay}/night`;
-      document.getElementById('bValFood').innerText = `${curr}${food}/day`;
-      document.getElementById('bValAct').innerText = `${curr}${act}/day`;
-      document.getElementById('bValBuf').innerText = `${curr}${buf}`;
+      document.getElementById('bValTrans').innerText = `${sym}${trans.toLocaleString()}`;
+      document.getElementById('bValStay').innerText = `${sym}${stay.toLocaleString()}/night`;
+      document.getElementById('bValFood').innerText = `${sym}${food.toLocaleString()}/day`;
+      document.getElementById('bValAct').innerText = `${sym}${act.toLocaleString()}/day`;
+      document.getElementById('bValBuf').innerText = `${sym}${buf.toLocaleString()}`;
 
       const total = trans + (stay * Math.max(days - 1, 1)) + (food * days) + (act * days) + buf;
-      document.getElementById('bTotal').innerText = `${curr}${total.toFixed(0)}`;
-      document.getElementById('bAvg').innerText = `Avg ${curr}${(total / days).toFixed(2)} / day`;
+      document.getElementById('bTotal').innerText = `${sym}${Math.round(total).toLocaleString()}`;
+      document.getElementById('bAvg').innerText = `Avg ${sym}${Math.round(total / days).toLocaleString()} / day`;
     }
 
     const packItems = [
-      { id: 1, name: 'Passport / Student ID', checked: true },
+      { id: 1, name: 'Passport & Student ID Card', checked: true },
       { id: 2, name: 'Zero-Forex Travel Card & Cash', checked: true },
-      { id: 3, name: 'Universal Power Adapter', checked: true },
-      { id: 4, name: 'Power Bank (10,000mAh)', checked: false },
+      { id: 3, name: 'Universal Travel Power Adapter', checked: true },
+      { id: 4, name: 'Power Bank (10,000mAh+)', checked: false },
       { id: 5, name: 'Comfortable Walking Sneakers', checked: true },
-      { id: 6, name: 'Quick-dry Hostel Towel', checked: false },
-      { id: 7, name: 'First Aid & Meds', checked: false }
+      { id: 6, name: 'Quick-dry Microfiber Hostel Towel', checked: false },
+      { id: 7, name: 'First Aid Kit & Prescription Meds', checked: false }
     ];
 
     function renderPacking() {
@@ -932,7 +1155,7 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      calcBudget();
+      onRegionChange('INR');
       renderPacking();
       const trips = JSON.parse(localStorage.getItem('saved_trips') || '[]');
       document.getElementById('savedCount').innerText = trips.length;
