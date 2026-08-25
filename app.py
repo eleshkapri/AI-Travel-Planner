@@ -844,9 +844,16 @@ HTML_CONTENT = """<!DOCTYPE html>
     let mapInstance = null;
     let markersLayer = null;
 
-    // --- On Region Change Handler ---
-    function onRegionChange(regionKey) {
+    // --- On Region Change Handler with Persistence ---
+    function onRegionChange(regionKey, savePreference = true) {
       activeRegionKey = regionKey;
+      if (savePreference) {
+        try { localStorage.setItem('roamai_selected_region', regionKey); } catch (e) {}
+      }
+      const selector = document.getElementById('navRegionSelector');
+      if (selector && selector.value !== regionKey) {
+        selector.value = regionKey;
+      }
       const reg = REGIONS[regionKey] || REGIONS.INR;
 
       // Update Navbar Flag
@@ -907,12 +914,24 @@ HTML_CONTENT = """<!DOCTYPE html>
       calcBudget();
     }
 
-    function switchPage(page) {
+    function switchPage(page, saveState = true) {
       activePage = page;
+      if (saveState) {
+        try {
+          localStorage.setItem('roamai_active_page', page);
+          history.replaceState(null, null, '#' + page);
+        } catch (e) {}
+      }
       ['home', 'planner', 'budget', 'packing', 'saved'].forEach(p => {
-        document.getElementById(`page-${p}`).classList.toggle('hidden', p !== page);
+        const pageEl = document.getElementById(`page-${p}`);
+        if (pageEl) pageEl.classList.toggle('hidden', p !== page);
         const t = document.getElementById(`tab-${p}`);
         if (t) t.classList.toggle('active', p === page);
+        const m = document.getElementById(`mob-${p}`);
+        if (m) {
+          m.classList.toggle('text-coralPrimary', p === page);
+          m.classList.toggle('font-bold', p === page);
+        }
       });
       if (page === 'saved') renderSaved();
       if (page === 'packing') renderPacking();
@@ -1155,7 +1174,15 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      onRegionChange('INR');
+      // 1. Restore saved region (prevent resetting to INR on reload)
+      const savedRegion = localStorage.getItem('roamai_selected_region') || 'INR';
+      onRegionChange(savedRegion, false);
+
+      // 2. Restore saved active page (prevent automatically resetting to home on reload)
+      const hashPage = window.location.hash.replace('#', '');
+      const savedPage = hashPage || localStorage.getItem('roamai_active_page') || 'home';
+      switchPage(savedPage, false);
+
       renderPacking();
       const trips = JSON.parse(localStorage.getItem('saved_trips') || '[]');
       document.getElementById('savedCount').innerText = trips.length;
