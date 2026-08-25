@@ -4,7 +4,7 @@ A smart, budget-friendly travel itinerary generator built for students. This app
 
 ## ✨ Features
 
-* **🤖 AI-Powered Itineraries:** Generates detailed, day-by-day trip plans based on your destination, budget, and interests using the Llama 3.3 model.
+* **🤖 AI-Powered Itineraries:** Generates detailed, day-by-day trip plans based on your destination, budget, and interests using the Llama 3.1 70B model.
 * **📍 Interactive Map:** Automatically pins your destination, specific "Must Visit" spots, and AI-suggested landmarks on a dynamic map.
 * **💰 Budget Management:** Input your budget tier (Student, Moderate, Luxury) or a specific amount, and get a breakdown of estimated costs.
 * **⬇️ Export Options:** Download your complete itinerary as a formatted **Text file** (best for keeping emojis) or a clean **PDF**.
@@ -13,7 +13,7 @@ A smart, budget-friendly travel itinerary generator built for students. This app
 ## 🛠️ Tech Stack
 
 * **Frontend:** [Streamlit](https://streamlit.io/)
-* **AI Model:** Llama 3.3 (via [Groq API](https://groq.com/))
+* **AI Model:** Llama 3.1 70B (via [Groq API](https://groq.com/))
 * **Mapping:** Folium & Streamlit-Folium
 * **Geocoding:** Geopy (Nominatim API)
 * **PDF Generation:** FPDF
