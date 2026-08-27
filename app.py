@@ -1493,38 +1493,9 @@ HTML_CONTENT = """<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- ==================== DISTINCT MINIMALIST MODERN FOOTER ==================== -->
-  <footer class="mt-24 pb-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-3xl mx-auto glass-card p-6 sm:p-8 rounded-3xl border border-white/10 text-center space-y-4 shadow-2xl relative overflow-hidden">
-      
-      <!-- Subtle Ambient Glow Behind Footer -->
-      <div class="absolute inset-0 bg-gradient-to-r from-coralPrimary/5 via-amberAccent/5 to-cyanAccent/5 pointer-events-none"></div>
-
-      <!-- Centered Brand & Status Pill -->
-      <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-white shadow-inner">
-        <span class="text-coralPrimary text-base">✈️</span>
-        <span class="font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-coralPrimary">RoamAI</span>
-        <span class="text-gray-500">•</span>
-        <span class="flex items-center gap-1.5 text-emeraldAccent font-bold text-[11px]">
-          <span class="w-1.5 h-1.5 rounded-full bg-emeraldAccent animate-pulse"></span> Free for Students
-        </span>
-      </div>
-
-      <!-- Inspirational Travel Micro-Copy -->
-      <p class="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed max-w-lg mx-auto">
-        "Go further, spend smarter, explore everywhere."
-      </p>
-
-      <!-- Bottom Metadata Badges -->
-      <div class="pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-4 text-[11px] text-gray-400 font-medium">
-        <span class="flex items-center gap-1"><span>🌍</span> 9-Region Currency Engine</span>
-        <span class="text-gray-600">•</span>
-        <span class="flex items-center gap-1"><span>⚡</span> Sub-Second AI Planning</span>
-        <span class="text-gray-600">•</span>
-        <span class="flex items-center gap-1"><span>🎒</span> Smart Packing Architect</span>
-      </div>
-
-    </div>
+  <!-- ==================== SIMPLE FOOTER ==================== -->
+  <footer class="mt-20 border-t border-cardBorder bg-spaceDark/90 py-8 text-center text-xs sm:text-sm text-gray-400">
+    <p>© 2026 RoamAI • Built with ❤️ by <span class="font-bold text-coralPrimary">Elesh Kapri</span> for students worldwide</p>
   </footer>
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
