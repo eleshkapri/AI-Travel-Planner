@@ -1007,6 +1007,10 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <input
                   type="text"
                   id="heroDestInput"
+                  autocomplete="off"
+                  spellcheck="false"
+                  autocorrect="off"
+                  autocapitalize="off"
                   placeholder="Where to? (e.g. Tokyo, Bali, Rome, Goa, Manali)"
                   class="flex-grow px-5 py-4 bg-spaceDark/90 border border-white/20 hover:border-coralPrimary/50 rounded-2xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-coralPrimary shadow-inner transition"
                   onkeypress="if(event.key === 'Enter') startQuickTrip()"
@@ -1684,7 +1688,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             <div class="space-y-4 pt-3">
               <div class="space-y-1.5">
                 <label class="block text-xs font-bold uppercase text-gray-300">📍 Destination</label>
-                <input type="text" id="plannerDest" placeholder="e.g. Kyoto, Japan or Rome, Italy" class="w-full px-4 py-3 bg-spaceDark border border-white/15 rounded-xl text-sm text-white focus:outline-none focus:border-coralPrimary shadow-inner" />
+                <input type="text" id="plannerDest" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="e.g. Kyoto, Japan or Rome, Italy" class="w-full px-4 py-3 bg-spaceDark border border-white/15 rounded-xl text-sm text-white focus:outline-none focus:border-coralPrimary shadow-inner" />
               </div>
 
               <div class="grid grid-cols-2 gap-4">
@@ -1712,7 +1716,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 </div>
                 <div class="col-span-2 space-y-1">
                   <label class="text-[11px] font-bold text-gray-400">Cap Budget (Optional)</label>
-                  <input type="text" id="plannerBudgetCap" placeholder="e.g. 20000 or 500" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
+                  <input type="text" id="plannerBudgetCap" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="e.g. 20000 or 500" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
                 </div>
               </div>
 
@@ -1731,7 +1735,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
                   <label class="text-[11px] font-bold text-gray-400">Must-Visit</label>
-                  <input type="text" id="plannerMustVisit" placeholder="e.g. Colosseum" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
+                  <input type="text" id="plannerMustVisit" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" placeholder="e.g. Colosseum" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
                 </div>
                 <div class="space-y-1">
                   <label class="text-[11px] font-bold text-gray-400">Pace</label>
@@ -1960,6 +1964,10 @@ HTML_CONTENT = """<!DOCTYPE html>
           <input
             type="text"
             id="customPackInput"
+            autocomplete="off"
+            spellcheck="false"
+            autocorrect="off"
+            autocapitalize="off"
             placeholder="e.g. GoPro Hero 12, Extra Contact Lenses, Power Strip, Sunglasses..."
             class="flex-grow px-4 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emeraldAccent shadow-inner"
             onkeypress="if(event.key === 'Enter') addCustomPackingItem()"
