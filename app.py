@@ -1045,7 +1045,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="space-y-1">
             <div class="flex items-center gap-2">
               <span class="text-xs font-bold uppercase tracking-wider text-coralPrimary">Curated For Students</span>
-              <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">14 Destinations</span>
+              <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">16 Destinations</span>
             </div>
             <h2 class="text-2xl sm:text-3xl font-extrabold text-white">🔥 Trending Student Destinations</h2>
             <p class="text-gray-400 text-xs sm:text-sm">Classified by National (India) and International hotspots with auto-converting student budgets.</p>
@@ -1061,7 +1061,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 onclick="setHotspotScope('all')"
                 class="hotspot-scope-btn active text-xs px-4 py-2 rounded-full border border-transparent bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-extrabold transition shadow-md flex items-center gap-1.5"
               >
-                <span>🌍</span> All (14)
+                <span>🌍</span> All (16)
               </button>
               <button
                 type="button"
@@ -1069,7 +1069,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 onclick="setHotspotScope('national')"
                 class="hotspot-scope-btn text-xs px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300 hover:text-white hover:border-white/20 transition flex items-center gap-1.5"
               >
-                <span>🇮🇳</span> National (6)
+                <span>🇮🇳</span> National (8)
               </button>
               <button
                 type="button"
@@ -1171,7 +1171,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="adventure mountain" data-cost-inr="1600" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Rishikesh, Uttarakhand, India', 3, 'Student (Low)', ['Adventure', 'Nature', 'Culture'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1600100397608-f010e4708704?auto=format&fit=crop&w=600&q=80" alt="Rishikesh River" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=600&q=80" alt="Rishikesh River & Bridges" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1193,7 +1193,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="culture" data-cost-inr="1400" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Varanasi, Uttar Pradesh, India', 3, 'Student (Low)', ['History', 'Culture', 'Street Food'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=600&q=80" alt="Varanasi Ghats" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1571536802807-30451e3955d8?auto=format&fit=crop&w=600&q=80" alt="Varanasi Ganga Ghats" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -1233,11 +1233,55 @@ HTML_CONTENT = """<!DOCTYPE html>
             </div>
           </div>
 
+          <!-- 7. Leh-Ladakh -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="mountain adventure nature" data-cost-inr="2400" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Leh Ladakh, India', 5, 'Student (Low)', ['Adventure', 'Nature', 'Hiking'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=600&q=80" alt="Leh Ladakh Pangong Lake" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyanAccent/20 text-cyanAccent border border-cyanAccent/30">Himalayan Passes & Lakes</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Leh-Ladakh, India</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Pangong Tso blue waters, Khardung La pass, Magnetic Hill, and ancient Buddhist monastery trails.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-cyanAccent hotspot-cost-val">💰 ~₹2,400 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 8. Shillong & Meghalaya -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="nature adventure" data-cost-inr="1900" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Shillong, Meghalaya, India', 4, 'Student (Low)', ['Nature', 'Adventure', 'Photography'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80" alt="Meghalaya Living Root Bridge & Waterfalls" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">Living Root Bridges & Caves</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Shillong & Meghalaya</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Living root bridges, glass-clear Umngot river boating, Nohkalikai waterfalls, and live music cafes.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-emeraldAccent hotspot-cost-val">💰 ~₹1,900 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
           <!-- ============================================ -->
           <!-- ✈️ INTERNATIONAL DESTINATIONS (GLOBAL) -->
           <!-- ============================================ -->
 
-          <!-- 7. Tokyo -->
+          <!-- 9. Tokyo -->
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture nightlife" data-cost-inr="4200" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Tokyo, Japan', 4, 'Student (Low)', ['Street Food', 'Anime & Pop Culture', 'History'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
