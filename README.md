@@ -5,187 +5,106 @@
 [![Groq LPU](https://img.shields.io/badge/AI-Groq%20LPU%20Ultra--Fast-F55036.svg)](https://groq.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **RoamAI** is an ultra-fast, intelligent travel architect engineered specifically for students, backpackers, and budget-conscious explorers. Powered by high-speed **Groq LPUs**, RoamAI generates comprehensive, day-by-day hour-by-hour itineraries with live GPS maps, tailored packing checklists, multi-currency budget breakdowns, and offline PDF exports in sub-seconds.
+**RoamAI** is an ultra-fast, intelligent travel architect engineered specifically for students, backpackers, and budget-conscious explorers. Built with high-speed **Groq LPUs**, RoamAI delivers complete day-by-day itineraries, interactive GPS maps, adaptive packing checklists, regional currency budgeting, and offline PDF exports in seconds.
 
 ---
 
-## ✨ Key Features & Capabilities
+## 🎯 Why RoamAI?
+
+Planning student trips often comes with unique challenges: strict financial limits, scattered recommendations, packing uncertainty, and disconnected transit routes. **RoamAI solves this end-to-end**:
+
+- **Zero Overspending**: Realistic student budgets with smart regional hacks and multi-currency conversion.
+- **No Planning Fatigue**: Instant hour-by-hour schedules with real coordinates and landmark descriptions.
+- **Smart Gear Planning**: Checklist automatically aligns with your trip style (beach, mountain, temples, or hostel dorms).
+- **Travel Anywhere Offline**: Save your trips to an offline browser vault or download formatted print-ready PDFs.
+
+---
+
+## ✨ Core Features & Highlights
 
 ### ⚡ 1. Sub-Second AI Trip Architect
-- **Lightning Fast**: Powered by Groq LPUs (Llama 3.3 70B / DeepSeek / GPT OSS) delivering structured plans in under 1.5 seconds.
-- **Student-Tailored Constraints**: Select between *Student (Low)*, *Backpacker Moderate*, or *Comfort Luxury* tiers with custom budget caps.
-- **Personalized Vibes**: Customize with tags (e.g., *Street Food*, *Anime & Pop Culture*, *Temple Culture*, *Trekking*, *Nightlife*).
-- **Auto-Save Drafts & Reset All**: Inputs and generated blueprints persist across browser reloads, with a one-click `🔄 Reset All` option.
+- **Lightning-Fast Generation**: Powered by Groq LPUs for rapid, structured itinerary generation.
+- **Budget Tiers**: Choose between *Student (Low)*, *Backpacker Moderate*, or *Comfort Luxury* with custom budget caps.
+- **Custom Vibes & Tags**: Filter by *Street Food*, *Anime & Pop Culture*, *Temple Culture*, *Trekking*, *Nightlife*, and more.
+- **Draft Auto-Save & Reset**: Form inputs and generated plans persist across tab reloads, with a 1-click `🔄 Reset All` button.
 
-### 📍 2. Interactive Live GPS Mapping
-- **OpenStreetMap & Leaflet.js**: Automatic geocoding of destination coordinates, student hostels, landmarks, and transit hubs.
-- **Awaiting Destination State**: Clean interactive template placeholder before trip generation seamlessly morphing into interactive GPS pinpoints.
-- **Split & Fullscreen View Modes**: Switch effortlessly between Side-by-Side, Itinerary Only, and Fullscreen Map views.
+### 📍 2. Interactive GPS Mapping
+- **Dynamic Leaflet & OpenStreetMap**: Automatic geocoding of landmarks, transit stations, and backpacker hostels.
+- **Awaiting Destination State**: Clean guidance template that transitions into live GPS markers upon generation.
+- **Flexible View Modes**: Switch between Split Screen, Itinerary Only, and Fullscreen Map.
 
-### 🎒 3. Smart Vibe-Adaptive Packing Checklist
-- **Dynamic Vibe Adaptation**: Checklist automatically configures gear based on destination style:
-  - 🏖️ *Beach, Island & Coastal* (Swimwear, reef-safe sunscreen, waterproof pouches)
-  - 🏔️ *Mountains & Trekking* (Trail grip shoes, thermal base layers, headlamps)
-  - 🏯 *Culture & Shrines* (Slip-on footwear, modest wraps, IC metro passes)
-  - 🏙️ *City Sightseeing* (Anti-theft daypacks, RFID sleeves, walking socks)
-  - ❄️ *Cold Weather & Snow* (Heavy parkas, touch-gloves, self-heating packs)
-  - 🎒 *Classic Backpacker Dorm* (TSA padlocks, power strips, mesh caddies)
-- **Fresh 0% Unchecked Defaults**: Starts clean and tracks packing progress in real time with custom item addition and local persistence.
+### 🎒 3. Vibe-Adaptive Smart Packing Checklist
+- **Dynamic Style Alignment**: Auto-configures gear tailored to your destination:
+  - 🏖️ **Beach & Coastal**: Quick-dry swimwear, reef-safe sunscreen, waterproof pouches
+  - 🏔️ **Mountains & Trekking**: Trail grip footwear, thermal layers, LED headlamps
+  - 🏯 **Culture & Shrines**: Modest wraps, slip-on shoes, coin pouches
+  - 🏙️ **City Sightseeing**: Anti-theft daypacks, RFID transit sleeves, walking socks
+  - ❄️ **Winter & Snow**: Insulated parkas, touchscreen gloves, thermal warmers
+  - 🎒 **Hostel Backpacker**: TSA locker padlocks, power strips, mesh shower caddies
+- **Clean 0% Unchecked Defaults**: Starts fresh and tracks progress in real time with custom item support.
 
-### 💱 4. Multi-Currency Global Budget Calculator
-- **9 Auto-Converting World Currencies**: Full support for `₹ INR`, `$ USD`, `€ EUR`, `£ GBP`, `¥ JPY`, `A$ AUD`, `C$ CAD`, `AED`, and `฿ THB`.
-- **Granular Expense Sliders**: Customize Transit, Lodging/Hostel, Street Food, Activities, and Emergency Buffer.
-- **Student Regional Hacks**: In-app tips for student rail concessions (IRCTC, Eurail, Amtrak, JR Pass), free museum days, and food co-ops.
+### 💱 4. Multi-Currency Budget Optimizer
+- **9 Global Currencies**: Real-time conversion across `₹ INR`, `$ USD`, `€ EUR`, `£ GBP`, `¥ JPY`, `A$ AUD`, `C$ CAD`, `AED`, and `฿ THB`.
+- **Granular Category Breakdown**: Interactive sliders for Transit, Hostels, Street Food, Activities, and Emergency Buffers.
+- **Student Regional Hacks**: In-app tips for student rail passes (IRCTC, Eurail, Amtrak, JR Pass), free museum days, and affordable food stalls.
 
-### 📂 5. Offline Vault & High-Definition PDF Export
-- **Local Trip Vault**: Save favorite generated itineraries to browser memory for offline access during flights or train journeys.
-- **Single-Click PDF Downloader**: Clean, formatted print-ready PDF export preserving emojis, markdown tables, and daily schedules.
+### 📂 5. Offline Vault & High-Definition PDF Downloader
+- **Persistent Offline Vault**: Save itineraries directly to your device for offline reference during transit.
+- **Formatted PDF Export**: Clean, print-ready document downloads preserving emojis, schedules, and budgets.
 
-### 🔥 6. 16 Curated Trending Student Hotspots
-- **Classified Scope Filters**: Toggle between **`🌍 All (16)`**, **`🇮🇳 National (8)`**, and **`✈️ International (8)`** hotspots.
+### 🔥 6. 16 Curated Trending Student Destinations
+- **Classified Scope Filters**: Toggle between **`🌍 All (16)`**, **`🇮🇳 National (8)`**, and **`✈️ International (8)`** hotspots:
   - **🇮🇳 National**: *Goa, Manali & Kasol, Jaipur & Udaipur, Rishikesh, Varanasi, Munnar & Kochi, Leh-Ladakh, Shillong & Meghalaya*.
   - **✈️ International**: *Tokyo, Bali, Bangkok & Phuket, Rome, Amsterdam, Kyoto, Paris, Dubai*.
-- **Live Currency Costs**: Hotspot daily estimates automatically adjust to your active region currency.
+- **Live Localized Costs**: Estimated daily costs automatically recalculate in your active currency.
 
-### 🌓 7. Premium Adaptive UI & Animations
-- **Zero-Flicker Page Router**: Pre-paint synchronous routing preventing page jumps or theme flashes on reload.
-- **Glassmorphic Navbar**: Translucent backdrop with spring auto-hide on scroll-down and reveal on scroll-up.
-- **Constellation Canvas**: Animated background starfield and particle sky dynamics.
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technology |
-|---|---|
-| **Backend Framework** | [FastAPI](https://fastapi.tiangolo.com/) (Asynchronous Python Web Framework) |
-| **ASGI Server** | [Uvicorn](https://www.uvicorn.org/) |
-| **AI Inference** | [Groq Cloud API](https://groq.com/) (Llama-3.3-70b-versatile) |
-| **Geocoding** | [Geopy](https://geopy.readthedocs.io/) (Nominatim OpenStreetMap API) |
-| **Validation** | [Pydantic v2](https://docs.pydantic.dev/) |
-| **Frontend Architecture**| Vanilla JS Single-Page Application (SPA) |
-| **Styling & Theme** | [Tailwind CSS v3](https://tailwindcss.com/) + Custom Glassmorphism & Light/Dark themes |
-| **Maps & Tiles** | [Leaflet.js](https://leafletjs.com/) & OpenStreetMap CartoDB tiles |
-| **Markdown & PDF** | [Marked.js](https://marked.js.org/) & [html2pdf.js](https://github.com/eKoopmans/html2pdf.js) |
+### 🌓 7. Zero-Flicker Pre-Paint UI & Glassmorphism
+- **Seamless Page Router**: Pre-paint theme & page detection eliminates layout shifts or tab flashes on reload.
+- **Frosted Glass Navbar**: Translucent backdrop with directional auto-hide on scroll-down and spring reveal on scroll-up.
 
 ---
 
-## 📂 Project Structure
+## 🛠️ Tech Stack
 
-```text
-AI-Travel-Planner/
-├── .devcontainer/
-│   └── devcontainer.json    # VS Code / GitHub Codespaces environment
-├── .gitignore               # Clean git exclusion rules
-├── LICENSE                  # MIT Open Source License
-├── README.md                # Comprehensive Project Documentation
-├── app.py                   # Complete Application (FastAPI backend + Modern SPA Frontend)
-└── requirements.txt         # Production Python dependencies
-```
+- **Backend**: FastAPI (Python 3.10+), Uvicorn ASGI, Pydantic v2
+- **AI Engine**: Groq Cloud API (Llama 3.3 70B / Fast LPUs)
+- **Geocoding & Maps**: Geopy (Nominatim API), Leaflet.js, OpenStreetMap
+- **Frontend**: Single-Page Application (SPA), Tailwind CSS, Marked.js, html2pdf.js
 
 ---
 
 ## 🚀 Quickstart & Installation
 
-Follow these steps to run RoamAI locally on your machine:
-
-### 1. Clone the Repository
+### 1. Clone & Setup
 ```bash
 git clone https://github.com/eleshkapri/AI-Travel-Planner.git
 cd AI-Travel-Planner
-```
-
-### 2. Create and Activate a Virtual Environment
-**On Windows (PowerShell):**
-```powershell
 python -m venv venv
-.\venv\Scripts\activate
 ```
 
-**On macOS / Linux:**
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
+### 2. Activate Virtual Environment
+- **Windows**: `.\venv\Scripts\activate`
+- **macOS / Linux**: `source venv/bin/activate`
 
-### 3. Install Dependencies
+### 3. Install Dependencies & Set Key
 ```bash
 pip install -r requirements.txt
 ```
+Set your free API key from [Groq Console](https://console.groq.com/keys):
+- **Windows**: `$env:GROQ_API_KEY="your_api_key_here"`
+- **macOS / Linux**: `export GROQ_API_KEY="your_api_key_here"`
 
-### 4. Set Your Groq API Key
-Obtain a free API key from [Groq Cloud Console](https://console.groq.com/keys).
-
-**On Windows (PowerShell):**
-```powershell
-$env:GROQ_API_KEY="gsk_your_actual_api_key_here"
-```
-
-**On macOS / Linux:**
-```bash
-export GROQ_API_KEY="gsk_your_actual_api_key_here"
-```
-
-*(Alternatively, you can create a `.env` file in the root directory containing `GROQ_API_KEY=gsk_your_key_here`)*
-
-### 5. Launch the Server
+### 4. Run Application
 ```bash
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
-
-Open your browser and navigate to **`http://localhost:8000`** to start planning your next journey!
-
----
-
-## 🌐 API Reference
-
-### `POST /api/generate`
-Generates a structured itinerary, budget breakdown, and landmark coordinates.
-
-**Request Body:**
-```json
-{
-  "destination": "Kyoto, Japan",
-  "days": 4,
-  "budget_level": "Student (Low)",
-  "budget_amount": "50000",
-  "currency": "INR",
-  "region": "India",
-  "interests": ["History & Shrines", "Street Food"],
-  "must_visit": "Fushimi Inari, Arashiyama",
-  "travel_pace": "Balanced"
-}
-```
-
-**Response:**
-```json
-{
-  "itinerary": "# 4-Day Kyoto Student Adventure...",
-  "destination_coords": [35.0116, 135.7681],
-  "markers": [
-    { "name": "Fushimi Inari Taisha", "lat": 34.9671, "lon": 135.7727, "desc": "Iconic thousand red torii gates" },
-    { "name": "Arashiyama Bamboo Grove", "lat": 35.0170, "lon": 135.6713, "desc": "Scenic towering bamboo paths" }
-  ],
-  "budget_breakdown": {
-    "transit": "₹8,000",
-    "stay": "₹12,000",
-    "food": "₹9,000",
-    "activities": "₹6,000",
-    "buffer": "₹5,000",
-    "total": "₹40,000"
-  },
-  "trip_summary": {
-    "destination": "Kyoto, Japan",
-    "days": 4
-  }
-}
-```
+Navigate to **`http://localhost:8000`** in your browser.
 
 ---
 
 ## 📄 License
 
-This project is distributed under the **MIT License**. See the [LICENSE](LICENSE) file for more information.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
