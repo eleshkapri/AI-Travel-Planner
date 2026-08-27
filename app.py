@@ -627,6 +627,22 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #0B132B !important;
       border-color: #CBD5E1 !important;
     }
+    .light-theme .nav-tab {
+      color: #475569 !important;
+    }
+    .light-theme .nav-tab:hover {
+      color: #FF5E36 !important;
+    }
+    .light-theme .nav-tab.active {
+      color: #FF5E36 !important;
+    }
+    .light-theme #mob-home,
+    .light-theme #mob-planner,
+    .light-theme #mob-budget,
+    .light-theme #mob-packing,
+    .light-theme #mob-saved {
+      color: #475569;
+    }
     .light-theme .travel-sky-pattern {
       background: radial-gradient(circle at 15% 15%, rgba(255, 94, 54, 0.12) 0%, transparent 55%),
                   radial-gradient(circle at 85% 25%, rgba(2, 132, 199, 0.14) 0%, transparent 50%),
@@ -2781,15 +2797,15 @@ HTML_CONTENT = """<!DOCTYPE html>
       });
 
       // 1. Cruising Airplanes with Contrails
-      const planeCount = 5;
+      const planeCount = 8;
       const planes = [];
       for (let i = 0; i < planeCount; i++) {
         planes.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          speed: Math.random() * 0.7 + 0.5,
+          speed: Math.random() * 0.8 + 0.6,
           angle: (Math.random() * Math.PI * 0.6) - 0.3,
-          size: Math.random() * 3 + 10,
+          size: Math.random() * 4 + 12,
           history: [],
           color: i % 2 === 0 ? '#FF5E36' : '#06B6D4'
         });
@@ -2797,33 +2813,34 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       // 2. Floating Hot Air Balloons
       const balloons = [
-        { x: width * 0.15, y: height * 0.45, vy: -0.22, vx: 0.12, radius: 10, hue: '#FFA000', phase: 0 },
-        { x: width * 0.82, y: height * 0.75, vy: -0.18, vx: -0.08, radius: 12, hue: '#FF5E36', phase: 1.5 },
-        { x: width * 0.55, y: height * 0.85, vy: -0.25, vx: 0.1, radius: 9, hue: '#8B5CF6', phase: 3 }
+        { x: width * 0.12, y: height * 0.40, vy: -0.25, vx: 0.12, radius: 13, hue: '#FFA000', phase: 0 },
+        { x: width * 0.85, y: height * 0.70, vy: -0.20, vx: -0.08, radius: 15, hue: '#FF5E36', phase: 1.5 },
+        { x: width * 0.50, y: height * 0.82, vy: -0.28, vx: 0.10, radius: 12, hue: '#8B5CF6', phase: 3 },
+        { x: width * 0.28, y: height * 0.90, vy: -0.22, vx: -0.12, radius: 14, hue: '#06B6D4', phase: 4.5 }
       ];
 
       // 3. Shimmering Compass Stars & Firefly Embers
-      const starCount = 45;
+      const starCount = 55;
       const stars = [];
       for (let i = 0; i < starCount; i++) {
         stars.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.25,
-          vy: (Math.random() - 0.5) * 0.25,
-          size: Math.random() * 2.5 + 1.2,
-          isCompass: Math.random() > 0.65,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 3 + 1.5,
+          isCompass: Math.random() > 0.6,
           color: Math.random() > 0.5 ? 'rgba(255, 160, 0, ' : 'rgba(6, 182, 212, ',
-          alpha: Math.random() * 0.6 + 0.2,
+          alpha: Math.random() * 0.6 + 0.3,
           pulse: Math.random() * 0.03 + 0.015
         });
       }
 
       // 4. Destination Waypoint Radars
       const waypoints = [
-        { x: width * 0.22, y: height * 0.28, name: "Tokyo", pulseRadius: 0 },
-        { x: width * 0.75, y: height * 0.35, name: "Rome", pulseRadius: 15 },
-        { x: width * 0.45, y: height * 0.68, name: "Goa", pulseRadius: 30 }
+        { x: width * 0.20, y: height * 0.25, name: "Tokyo", pulseRadius: 0 },
+        { x: width * 0.78, y: height * 0.32, name: "Rome", pulseRadius: 15 },
+        { x: width * 0.45, y: height * 0.65, name: "Goa", pulseRadius: 30 }
       ];
 
       let mouse = { x: null, y: null, ripple: 0 };
@@ -2842,27 +2859,27 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.translate(p.x, p.y);
         ctx.rotate(p.angle);
 
-        const planeColor = isLight ? (p.color === '#06B6D4' ? '#0284C7' : '#E11D48') : p.color;
+        const planeColor = isLight ? (p.color === '#06B6D4' ? '#0284C7' : '#EA580C') : p.color;
         ctx.fillStyle = planeColor;
-        ctx.shadowColor = isLight ? 'rgba(15, 23, 42, 0.3)' : planeColor;
-        ctx.shadowBlur = isLight ? 4 : 8;
+        ctx.shadowColor = isLight ? 'rgba(2, 132, 199, 0.4)' : planeColor;
+        ctx.shadowBlur = isLight ? 6 : 10;
         ctx.beginPath();
         // Nose
-        ctx.moveTo(p.size, 0);
+        ctx.moveTo(p.size * 1.1, 0);
         // Right wing
-        ctx.lineTo(-p.size * 0.4, p.size * 0.85);
+        ctx.lineTo(-p.size * 0.4, p.size * 0.9);
         // Right body indent
         ctx.lineTo(-p.size * 0.2, p.size * 0.2);
         // Tail wing right
-        ctx.lineTo(-p.size * 0.85, p.size * 0.45);
+        ctx.lineTo(-p.size * 0.85, p.size * 0.5);
         // Tail tip
         ctx.lineTo(-p.size * 0.7, 0);
         // Tail wing left
-        ctx.lineTo(-p.size * 0.85, -p.size * 0.45);
+        ctx.lineTo(-p.size * 0.85, -p.size * 0.5);
         // Left body indent
         ctx.lineTo(-p.size * 0.2, -p.size * 0.2);
         // Left wing
-        ctx.lineTo(-p.size * 0.4, -p.size * 0.85);
+        ctx.lineTo(-p.size * 0.4, -p.size * 0.9);
         ctx.closePath();
         ctx.fill();
 
@@ -2875,8 +2892,8 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         // Balloon envelope
         ctx.fillStyle = b.hue;
-        ctx.shadowColor = isLight ? 'rgba(0,0,0,0.15)' : b.hue;
-        ctx.shadowBlur = 8;
+        ctx.shadowColor = isLight ? 'rgba(0,0,0,0.2)' : b.hue;
+        ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.arc(0, 0, b.radius, 0, Math.PI, true);
         ctx.quadraticCurveTo(-b.radius * 0.9, b.radius * 1.1, 0, b.radius * 1.4);
@@ -2884,12 +2901,12 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.fill();
 
         // Basket
-        ctx.fillStyle = isLight ? '#475569' : 'rgba(255, 255, 255, 0.7)';
+        ctx.fillStyle = isLight ? '#334155' : 'rgba(255, 255, 255, 0.8)';
         ctx.fillRect(-b.radius * 0.25, b.radius * 1.65, b.radius * 0.5, b.radius * 0.35);
 
         // Strings
-        ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.45)' : 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.55)' : 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 0.9;
         ctx.beginPath();
         ctx.moveTo(-b.radius * 0.3, b.radius * 1.4);
         ctx.lineTo(-b.radius * 0.2, b.radius * 1.65);
@@ -2907,12 +2924,12 @@ HTML_CONTENT = """<!DOCTYPE html>
           ? (s.color.includes('255, 160') ? 'rgba(217, 119, 6, ' : 'rgba(2, 132, 199, ')
           : s.color;
         ctx.fillStyle = starColor + alpha + ')';
-        ctx.shadowColor = isLight ? 'rgba(217, 119, 6, 0.6)' : starColor + '0.8)';
-        ctx.shadowBlur = 6;
+        ctx.shadowColor = isLight ? 'rgba(217, 119, 6, 0.7)' : starColor + '0.8)';
+        ctx.shadowBlur = 8;
 
         ctx.beginPath();
-        const rOuter = s.size * 2.2;
-        const rInner = s.size * 0.5;
+        const rOuter = s.size * 2.3;
+        const rInner = s.size * 0.55;
         for (let i = 0; i < 4; i++) {
           const a = (i * Math.PI) / 2;
           ctx.lineTo(Math.cos(a) * rOuter, Math.sin(a) * rOuter);
@@ -2930,15 +2947,15 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         // 1. Draw Global Great-Circle Flight Arcs
         ctx.save();
-        ctx.setLineDash([6, 12]);
-        ctx.lineWidth = isLight ? 1.5 : 1;
-        ctx.strokeStyle = isLight ? 'rgba(234, 88, 12, 0.40)' : 'rgba(255, 160, 0, 0.12)';
+        ctx.setLineDash([8, 14]);
+        ctx.lineWidth = isLight ? 2 : 1;
+        ctx.strokeStyle = isLight ? 'rgba(234, 88, 12, 0.45)' : 'rgba(255, 160, 0, 0.15)';
         ctx.beginPath();
         ctx.moveTo(0, height * 0.3);
         ctx.quadraticCurveTo(width * 0.5, height * 0.1, width, height * 0.45);
         ctx.stroke();
 
-        ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.40)' : 'rgba(6, 182, 212, 0.10)';
+        ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.45)' : 'rgba(6, 182, 212, 0.12)';
         ctx.beginPath();
         ctx.moveTo(0, height * 0.7);
         ctx.quadraticCurveTo(width * 0.4, height * 0.85, width, height * 0.6);
@@ -2947,16 +2964,16 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         // 2. Draw Destination Waypoint Pulses
         waypoints.forEach(wp => {
-          wp.pulseRadius = (wp.pulseRadius + 0.3) % 45;
-          const pAlpha = (1 - wp.pulseRadius / 45) * (isLight ? 0.6 : 0.35);
+          wp.pulseRadius = (wp.pulseRadius + 0.35) % 50;
+          const pAlpha = (1 - wp.pulseRadius / 50) * (isLight ? 0.7 : 0.4);
           ctx.beginPath();
           ctx.arc(wp.x, wp.y, wp.pulseRadius, 0, Math.PI * 2);
           ctx.strokeStyle = isLight ? `rgba(2, 132, 199, ${pAlpha})` : `rgba(6, 182, 212, ${pAlpha})`;
-          ctx.lineWidth = isLight ? 1.5 : 1;
+          ctx.lineWidth = isLight ? 1.8 : 1;
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.arc(wp.x, wp.y, 3, 0, Math.PI * 2);
+          ctx.arc(wp.x, wp.y, 3.5, 0, Math.PI * 2);
           ctx.fillStyle = isLight ? '#0284C7' : '#06B6D4';
           ctx.fill();
         });
@@ -2970,8 +2987,8 @@ HTML_CONTENT = """<!DOCTYPE html>
           if (s.y < 0) s.y = height;
           if (s.y > height) s.y = 0;
 
-          s.alpha += Math.sin(Date.now() * s.pulse) * 0.006;
-          const curAlpha = Math.max(0.25, Math.min(0.9, s.alpha));
+          s.alpha += Math.sin(Date.now() * s.pulse) * 0.007;
+          const curAlpha = Math.max(0.3, Math.min(0.95, s.alpha));
 
           if (s.isCompass) {
             drawCompassStar(s, curAlpha, isLight);
@@ -2991,8 +3008,8 @@ HTML_CONTENT = """<!DOCTYPE html>
           b.phase += 0.02;
           b.y += b.vy;
           b.x += b.vx + Math.sin(b.phase) * 0.15;
-          if (b.y < -30) {
-            b.y = height + 30;
+          if (b.y < -40) {
+            b.y = height + 40;
             b.x = Math.random() * width;
           }
           drawBalloon(b, isLight);
@@ -3003,16 +3020,17 @@ HTML_CONTENT = """<!DOCTYPE html>
           p.x += Math.cos(p.angle) * p.speed;
           p.y += Math.sin(p.angle) * p.speed;
 
+          // Record contrail point
           p.history.push({ x: p.x, y: p.y });
-          if (p.history.length > 35) p.history.shift();
+          if (p.history.length > 40) p.history.shift();
 
           // Draw jet contrail
           if (p.history.length > 2) {
             ctx.save();
-            ctx.setLineDash([3, 5]);
-            ctx.lineWidth = isLight ? 1.6 : 1.2;
+            ctx.setLineDash([4, 6]);
+            ctx.lineWidth = isLight ? 2 : 1.2;
             for (let i = 0; i < p.history.length - 1; i++) {
-              const trailAlpha = (i / p.history.length) * (isLight ? 0.6 : 0.35);
+              const trailAlpha = (i / p.history.length) * (isLight ? 0.7 : 0.4);
               ctx.strokeStyle = isLight 
                 ? `rgba(2, 132, 199, ${trailAlpha})`
                 : `rgba(255, 255, 255, ${trailAlpha})`;
@@ -3025,17 +3043,17 @@ HTML_CONTENT = """<!DOCTYPE html>
           }
 
           // Screen wrapping
-          if (p.x > width + 50) {
-            p.x = -50;
+          if (p.x > width + 60) {
+            p.x = -60;
             p.y = Math.random() * height;
             p.history = [];
           }
-          if (p.y > height + 50) {
-            p.y = -50;
+          if (p.y > height + 60) {
+            p.y = -60;
             p.history = [];
           }
-          if (p.y < -50) {
-            p.y = height + 50;
+          if (p.y < -60) {
+            p.y = height + 60;
             p.history = [];
           }
 
