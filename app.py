@@ -304,13 +304,11 @@ HTML_CONTENT = """<!DOCTYPE html>
       filter: blur(90px); z-index: -2; pointer-events: none;
       animation: floatOrb3 20s ease-in-out infinite;
     }
-    .grid-pattern {
+    .travel-sky-pattern {
       position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-      background-size: 44px 44px;
-      mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
-      -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+      background: radial-gradient(circle at 20% 15%, rgba(255, 94, 54, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 45%),
+                  radial-gradient(circle at 50% 80%, rgba(255, 160, 0, 0.06) 0%, transparent 60%);
     }
 
     .glass-card {
@@ -474,12 +472,12 @@ HTML_CONTENT = """<!DOCTYPE html>
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
-  <!-- Dynamic Animated Background Canvas, Floating Ambient Orbs & Cosmic Grid Pattern -->
+  <!-- Dynamic Animated Wanderlust Sky Canvas, Floating Ambient Glow & Travel Texture -->
   <canvas id="bgParticleCanvas" class="fixed inset-0 pointer-events-none z-[-1]"></canvas>
   <div class="orb-1"></div>
   <div class="orb-2"></div>
   <div class="orb-3"></div>
-  <div class="grid-pattern"></div>
+  <div class="travel-sky-pattern"></div>
 
   <!-- ==================== PROPERLY DESIGNED NAVBAR WITH REGION SELECTOR ==================== -->
   <header class="sticky top-0 z-50 backdrop-blur-xl bg-spaceDark/90 border-b border-cardBorder shadow-2xl">
@@ -2493,6 +2491,7 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     // --- Dynamic Moving Interactive Canvas Background ---
+    // --- Authentic Wanderlust Travel Sky & Radar Flight Background ---
     function initBackgroundCanvas() {
       const canvas = document.getElementById('bgParticleCanvas');
       if (!canvas) return;
@@ -2507,92 +2506,274 @@ HTML_CONTENT = """<!DOCTYPE html>
         height = canvas.height = window.innerHeight;
       });
 
-      const particles = [];
-      const particleCount = Math.min(Math.floor((width * height) / 18000), 75);
-
-      const colors = [
-        'rgba(255, 94, 54, ',   // Coral
-        'rgba(6, 182, 212, ',   // Cyan
-        'rgba(255, 160, 0, ',   // Amber
-        'rgba(139, 92, 246, '   // Purple
-      ];
-
-      for (let i = 0; i < particleCount; i++) {
-        particles.push({
+      // 1. Cruising Airplanes with Contrails
+      const planeCount = 5;
+      const planes = [];
+      for (let i = 0; i < planeCount; i++) {
+        planes.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.65,
-          vy: (Math.random() - 0.5) * 0.65,
-          radius: Math.random() * 2.2 + 1,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          alpha: Math.random() * 0.6 + 0.2,
-          pulseSpeed: Math.random() * 0.02 + 0.01
+          speed: Math.random() * 0.7 + 0.5,
+          angle: (Math.random() * Math.PI * 0.6) - 0.3,
+          size: Math.random() * 3 + 10,
+          history: [],
+          color: i % 2 === 0 ? '#FF5E36' : '#06B6D4'
         });
       }
 
-      let mouse = { x: null, y: null, radius: 140 };
+      // 2. Floating Hot Air Balloons
+      const balloons = [
+        { x: width * 0.15, y: height * 0.45, vy: -0.22, vx: 0.12, radius: 10, hue: '#FFA000', phase: 0 },
+        { x: width * 0.82, y: height * 0.75, vy: -0.18, vx: -0.08, radius: 12, hue: '#FF5E36', phase: 1.5 },
+        { x: width * 0.55, y: height * 0.85, vy: -0.25, vx: 0.1, radius: 9, hue: '#8B5CF6', phase: 3 }
+      ];
 
+      // 3. Shimmering Compass Stars & Firefly Embers
+      const starCount = 45;
+      const stars = [];
+      for (let i = 0; i < starCount; i++) {
+        stars.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25,
+          size: Math.random() * 2.5 + 1.2,
+          isCompass: Math.random() > 0.65,
+          color: Math.random() > 0.5 ? 'rgba(255, 160, 0, ' : 'rgba(6, 182, 212, ',
+          alpha: Math.random() * 0.6 + 0.2,
+          pulse: Math.random() * 0.03 + 0.015
+        });
+      }
+
+      // 4. Destination Waypoint Radars
+      const waypoints = [
+        { x: width * 0.22, y: height * 0.28, name: "Tokyo", pulseRadius: 0 },
+        { x: width * 0.75, y: height * 0.35, name: "Rome", pulseRadius: 15 },
+        { x: width * 0.45, y: height * 0.68, name: "Goa", pulseRadius: 30 }
+      ];
+
+      let mouse = { x: null, y: null, ripple: 0 };
       window.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
+        mouse.ripple = (mouse.ripple + 1) % 50;
       });
-
       window.addEventListener('mouseleave', () => {
         mouse.x = null;
         mouse.y = null;
       });
 
+      function drawPlane(p) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        // Nose
+        ctx.moveTo(p.size, 0);
+        // Right wing
+        ctx.lineTo(-p.size * 0.4, p.size * 0.85);
+        // Right body indent
+        ctx.lineTo(-p.size * 0.2, p.size * 0.2);
+        // Tail wing right
+        ctx.lineTo(-p.size * 0.85, p.size * 0.45);
+        // Tail tip
+        ctx.lineTo(-p.size * 0.7, 0);
+        // Tail wing left
+        ctx.lineTo(-p.size * 0.85, -p.size * 0.45);
+        // Left body indent
+        ctx.lineTo(-p.size * 0.2, -p.size * 0.2);
+        // Left wing
+        ctx.lineTo(-p.size * 0.4, -p.size * 0.85);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function drawBalloon(b) {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+
+        // Balloon envelope
+        ctx.fillStyle = b.hue;
+        ctx.shadowColor = b.hue;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(0, 0, b.radius, 0, Math.PI, true);
+        ctx.quadraticCurveTo(-b.radius * 0.9, b.radius * 1.1, 0, b.radius * 1.4);
+        ctx.quadraticCurveTo(b.radius * 0.9, b.radius * 1.1, b.radius, 0);
+        ctx.fill();
+
+        // Basket
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fillRect(-b.radius * 0.25, b.radius * 1.65, b.radius * 0.5, b.radius * 0.35);
+
+        // Strings
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(-b.radius * 0.3, b.radius * 1.4);
+        ctx.lineTo(-b.radius * 0.2, b.radius * 1.65);
+        ctx.moveTo(b.radius * 0.3, b.radius * 1.4);
+        ctx.lineTo(b.radius * 0.2, b.radius * 1.65);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawCompassStar(s, alpha) {
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.fillStyle = s.color + alpha + ')';
+        ctx.shadowColor = s.color + '0.8)';
+        ctx.shadowBlur = 6;
+
+        ctx.beginPath();
+        const rOuter = s.size * 2.2;
+        const rInner = s.size * 0.5;
+        for (let i = 0; i < 4; i++) {
+          const a = (i * Math.PI) / 2;
+          ctx.lineTo(Math.cos(a) * rOuter, Math.sin(a) * rOuter);
+          const aMid = a + Math.PI / 4;
+          ctx.lineTo(Math.cos(aMid) * rInner, Math.sin(aMid) * rInner);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
       function animate() {
         ctx.clearRect(0, 0, width, height);
 
-        // Update & draw particles
-        for (let i = 0; i < particles.length; i++) {
-          const p = particles[i];
+        // 1. Draw Global Great-Circle Flight Arcs
+        ctx.save();
+        ctx.setLineDash([6, 12]);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(255, 160, 0, 0.12)';
+        ctx.beginPath();
+        ctx.moveTo(0, height * 0.3);
+        ctx.quadraticCurveTo(width * 0.5, height * 0.1, width, height * 0.45);
+        ctx.stroke();
 
-          p.x += p.vx;
-          p.y += p.vy;
+        ctx.strokeStyle = 'rgba(6, 182, 212, 0.10)';
+        ctx.beginPath();
+        ctx.moveTo(0, height * 0.7);
+        ctx.quadraticCurveTo(width * 0.4, height * 0.85, width, height * 0.6);
+        ctx.stroke();
+        ctx.restore();
 
-          if (p.x < 0) p.x = width;
-          if (p.x > width) p.x = 0;
-          if (p.y < 0) p.y = height;
-          if (p.y > height) p.y = 0;
-
-          // Mouse repulsion
-          if (mouse.x !== null && mouse.y !== null) {
-            const dx = mouse.x - p.x;
-            const dy = mouse.y - p.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < mouse.radius) {
-              const force = (mouse.radius - dist) / mouse.radius;
-              p.x -= (dx / dist) * force * 3;
-              p.y -= (dy / dist) * force * 3;
-            }
-          }
-
-          // Pulsing opacity
-          p.alpha += Math.sin(Date.now() * p.pulseSpeed) * 0.005;
-          const currentAlpha = Math.max(0.15, Math.min(0.85, p.alpha));
-
-          // Draw particle
+        // 2. Draw Destination Waypoint Pulses
+        waypoints.forEach(wp => {
+          wp.pulseRadius = (wp.pulseRadius + 0.3) % 45;
+          const pAlpha = (1 - wp.pulseRadius / 45) * 0.35;
           ctx.beginPath();
-          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-          ctx.fillStyle = p.color + currentAlpha + ')';
-          ctx.fill();
+          ctx.arc(wp.x, wp.y, wp.pulseRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(6, 182, 212, ${pAlpha})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
 
-          // Connect nearby particles
-          for (let j = i + 1; j < particles.length; j++) {
-            const p2 = particles[j];
-            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-            if (dist < 110) {
-              const lineAlpha = (1 - dist / 110) * 0.18;
+          ctx.beginPath();
+          ctx.arc(wp.x, wp.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#06B6D4';
+          ctx.fill();
+        });
+
+        // 3. Update & Draw Stars / Compass Points
+        stars.forEach(s => {
+          s.x += s.vx;
+          s.y += s.vy;
+          if (s.x < 0) s.x = width;
+          if (s.x > width) s.x = 0;
+          if (s.y < 0) s.y = height;
+          if (s.y > height) s.y = 0;
+
+          s.alpha += Math.sin(Date.now() * s.pulse) * 0.006;
+          const curAlpha = Math.max(0.2, Math.min(0.85, s.alpha));
+
+          if (s.isCompass) {
+            drawCompassStar(s, curAlpha);
+          } else {
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fillStyle = s.color + curAlpha + ')';
+            ctx.fill();
+          }
+        });
+
+        // 4. Update & Draw Hot Air Balloons
+        balloons.forEach(b => {
+          b.phase += 0.02;
+          b.y += b.vy;
+          b.x += b.vx + Math.sin(b.phase) * 0.15;
+          if (b.y < -30) {
+            b.y = height + 30;
+            b.x = Math.random() * width;
+          }
+          drawBalloon(b);
+        });
+
+        // 5. Update & Draw Cruising Planes with Contrails
+        planes.forEach(p => {
+          p.x += Math.cos(p.angle) * p.speed;
+          p.y += Math.sin(p.angle) * p.speed;
+
+          p.history.push({ x: p.x, y: p.y });
+          if (p.history.length > 35) p.history.shift();
+
+          // Draw jet contrail
+          if (p.history.length > 2) {
+            ctx.save();
+            ctx.setLineDash([3, 5]);
+            ctx.lineWidth = 1.2;
+            for (let i = 0; i < p.history.length - 1; i++) {
+              const trailAlpha = (i / p.history.length) * 0.35;
+              ctx.strokeStyle = `rgba(255, 255, 255, ${trailAlpha})`;
               ctx.beginPath();
-              ctx.moveTo(p.x, p.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
-              ctx.lineWidth = 0.75;
+              ctx.moveTo(p.history[i].x, p.history[i].y);
+              ctx.lineTo(p.history[i + 1].x, p.history[i + 1].y);
               ctx.stroke();
             }
+            ctx.restore();
           }
+
+          // Screen wrapping
+          if (p.x > width + 50) {
+            p.x = -50;
+            p.y = Math.random() * height;
+            p.history = [];
+          }
+          if (p.y > height + 50) {
+            p.y = -50;
+            p.history = [];
+          }
+          if (p.y < -50) {
+            p.y = height + 50;
+            p.history = [];
+          }
+
+          drawPlane(p);
+        });
+
+        // 6. Interactive Mouse Compass Radar Ring
+        if (mouse.x !== null && mouse.y !== null) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(mouse.x, mouse.y, 45, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(255, 94, 54, 0.25)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4, 4]);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(mouse.x, mouse.y, 20, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(255, 160, 0, 0.35)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
         }
 
         requestAnimationFrame(animate);
