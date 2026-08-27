@@ -2645,33 +2645,45 @@ HTML_CONTENT = """<!DOCTYPE html>
     const DESTINATION_VIBE_ITEMS = {
       beach: [
         { id: 'v_beach_1', cat: 'dest', name: 'Quick-dry Swimwear & Beach Boardshorts', defaultChecked: false },
-        { id: 'v_beach_2', cat: 'dest', name: 'Waterproof Dry Bag / Phone Pouch', defaultChecked: false },
-        { id: 'v_beach_3', cat: 'dest', name: 'Polarized UV Sunglasses & Beach Sun Hat', defaultChecked: false },
-        { id: 'v_beach_4', cat: 'dest', name: 'Reef-Safe Sunscreen & Soothing Aloe Vera Gel', defaultChecked: false }
+        { id: 'v_beach_2', cat: 'dest', name: 'Waterproof Dry Bag / Underwater Phone Pouch', defaultChecked: false },
+        { id: 'v_beach_3', cat: 'dest', name: 'Polarized UV Sunglasses & Wide-Brim Sun Hat', defaultChecked: false },
+        { id: 'v_beach_4', cat: 'dest', name: 'Reef-Safe Sunscreen SPF 50+ & Aloe Vera Gel', defaultChecked: false },
+        { id: 'v_beach_5', cat: 'dest', name: 'Lightweight Sand-Free Microfiber Beach Mat', defaultChecked: false }
       ],
       mountain: [
         { id: 'v_mount_1', cat: 'dest', name: 'Trekking / Trail Grip Shoes with Ankle Support', defaultChecked: false },
         { id: 'v_mount_2', cat: 'dest', name: 'Thermal Base Layers & Breathable Fleece Jacket', defaultChecked: false },
         { id: 'v_mount_3', cat: 'dest', name: 'Heavy-Duty Insect & Mosquito Repellent Spray', defaultChecked: false },
-        { id: 'v_mount_4', cat: 'dest', name: 'Reusable Insulated Hydration Flask (1L)', defaultChecked: false }
+        { id: 'v_mount_4', cat: 'dest', name: 'Reusable Insulated Hydration Flask (1L)', defaultChecked: false },
+        { id: 'v_mount_5', cat: 'dest', name: 'Mini LED Headlamp or Pocket Flashlight', defaultChecked: false }
+      ],
+      culture: [
+        { id: 'v_cult_1', cat: 'dest', name: 'Comfortable Slip-On Shoes (for Temples / Shrines)', defaultChecked: true },
+        { id: 'v_cult_2', cat: 'dest', name: 'Modest Cover-Up Scarf / Shoulder Wrap', defaultChecked: false },
+        { id: 'v_cult_3', cat: 'dest', name: 'Coin Pouch (for Temple Donations & Vending)', defaultChecked: false },
+        { id: 'v_cult_4', cat: 'dest', name: 'Local Transit / IC Metro Card & Pass Holder', defaultChecked: false },
+        { id: 'v_cult_5', cat: 'dest', name: 'Foldable Rain Umbrella / UV Sun Parasol', defaultChecked: false }
       ],
       city: [
         { id: 'v_city_1', cat: 'dest', name: 'Compact Anti-Theft Daypack (15-20L)', defaultChecked: false },
         { id: 'v_city_2', cat: 'dest', name: 'RFID-Blocking Transit / Metro Card Holder', defaultChecked: false },
-        { id: 'v_city_3', cat: 'dest', name: 'Modest Cover-up Attire for Shrines & Churches', defaultChecked: false },
-        { id: 'v_city_4', cat: 'dest', name: 'International eSIM / Local SIM Card Ejector Pin', defaultChecked: false }
+        { id: 'v_city_3', cat: 'dest', name: 'Comfortable Breathable Walking Socks (3+ pairs)', defaultChecked: false },
+        { id: 'v_city_4', cat: 'dest', name: 'International eSIM / Local SIM Card Ejector Pin', defaultChecked: false },
+        { id: 'v_city_5', cat: 'dest', name: 'Foldable Reusable Shopping Tote Bag', defaultChecked: false }
       ],
       winter: [
         { id: 'v_win_1', cat: 'dest', name: 'Heavy Insulated Winter Parka / Down Jacket', defaultChecked: false },
         { id: 'v_win_2', cat: 'dest', name: 'Thermal Woolen Socks, Touchscreen Gloves & Beanie', defaultChecked: false },
         { id: 'v_win_3', cat: 'dest', name: 'Intense Moisturizing Cold Cream & Lip Balm', defaultChecked: false },
-        { id: 'v_win_4', cat: 'dest', name: 'Waterproof Snow / Winter Grip Boots', defaultChecked: false }
+        { id: 'v_win_4', cat: 'dest', name: 'Waterproof Snow / Winter Grip Boots', defaultChecked: false },
+        { id: 'v_win_5', cat: 'dest', name: 'Self-Heating Hand / Foot Warmer Packs', defaultChecked: false }
       ],
       hostel: [
         { id: 'v_host_1', cat: 'dest', name: 'TSA 3-Dial Combination Padlock (for Lockers)', defaultChecked: true },
         { id: 'v_host_2', cat: 'dest', name: 'Multi-Outlet Compact Power Extension Strip', defaultChecked: false },
         { id: 'v_host_3', cat: 'dest', name: 'Hanging Mesh Shower / Toiletries Caddy', defaultChecked: false },
-        { id: 'v_host_4', cat: 'dest', name: 'Collapsible Breathable Laundry Bag', defaultChecked: false }
+        { id: 'v_host_4', cat: 'dest', name: 'Collapsible Breathable Laundry Bag', defaultChecked: false },
+        { id: 'v_host_5', cat: 'dest', name: 'Quick-Drying Shower Slides / Flip-Flops', defaultChecked: true }
       ]
     };
 
@@ -2716,19 +2728,61 @@ HTML_CONTENT = """<!DOCTYPE html>
         destStr = (document.getElementById('plannerDest')?.value || '').toLowerCase();
       }
 
-      if (destStr.includes('goa') || destStr.includes('bali') || destStr.includes('beach') || destStr.includes('phuket') || destStr.includes('maldives') || destStr.includes('cancun') || destStr.includes('island') || destStr.includes('coastal')) {
+      if (destStr.includes('goa') || destStr.includes('bali') || destStr.includes('beach') || destStr.includes('phuket') || destStr.includes('maldives') || destStr.includes('cancun') || destStr.includes('island') || destStr.includes('coastal') || destStr.includes('surf') || destStr.includes('scuba')) {
         return 'beach';
       }
-      if (destStr.includes('manali') || destStr.includes('leh') || destStr.includes('ladakh') || destStr.includes('himalaya') || destStr.includes('alps') || destStr.includes('banff') || destStr.includes('trek') || destStr.includes('hiking') || destStr.includes('mountain')) {
+      if (destStr.includes('manali') || destStr.includes('leh') || destStr.includes('ladakh') || destStr.includes('himalaya') || destStr.includes('alps') || destStr.includes('banff') || destStr.includes('trek') || destStr.includes('hiking') || destStr.includes('mountain') || destStr.includes('camp')) {
         return 'mountain';
       }
       if (destStr.includes('sapporo') || destStr.includes('snow') || destStr.includes('kashmir') || destStr.includes('winter') || destStr.includes('iceland') || destStr.includes('ski')) {
         return 'winter';
       }
+      if (destStr.includes('kyoto') || destStr.includes('temple') || destStr.includes('shrine') || destStr.includes('museum') || destStr.includes('history') || destStr.includes('heritage') || destStr.includes('culture') || destStr.includes('rome') || destStr.includes('monument')) {
+        return 'culture';
+      }
       if (destStr.includes('hostel') || destStr.includes('backpack') || destStr.includes('dorm')) {
         return 'hostel';
       }
       return 'city';
+    }
+
+    function getAllCurrentPackItems() {
+      const base = [...DEFAULT_BASE_ITEMS];
+      const vibeKey = getActiveVibeKey();
+      const vibeItems = DESTINATION_VIBE_ITEMS[vibeKey] || DESTINATION_VIBE_ITEMS.city || [];
+      const customItems = getStoredCustomItems();
+
+      // Dynamic trip-specific landmark & student pass items
+      const dynamicTripItems = [];
+      let targetTrip = null;
+      if (selectedPackVibe && selectedPackVibe.startsWith('saved:')) {
+        const tripId = selectedPackVibe.replace('saved:', '');
+        const savedTrips = getSavedTrips();
+        targetTrip = savedTrips.find(t => String(t.id) === String(tripId));
+      } else if (currentTrip && currentTrip.trip_summary) {
+        targetTrip = {
+          destination: currentTrip.trip_summary.destination,
+          days: currentTrip.trip_summary.days
+        };
+      }
+
+      if (targetTrip && targetTrip.destination) {
+        const destName = targetTrip.destination.split(',')[0].trim();
+        dynamicTripItems.push({
+          id: `dyn_dest_${targetTrip.id || 'curr'}_1`,
+          cat: 'dest',
+          name: `${destName} Offline Map & Metro Transit App Bookmarked`,
+          defaultChecked: false
+        });
+        dynamicTripItems.push({
+          id: `dyn_dest_${targetTrip.id || 'curr'}_2`,
+          cat: 'dest',
+          name: `${destName} Student Discounts & Local Currency Cash`,
+          defaultChecked: false
+        });
+      }
+
+      return [...base, ...vibeItems, ...dynamicTripItems, ...customItems];
     }
 
     function renderPackingVibeDropdown() {
@@ -2756,7 +2810,8 @@ HTML_CONTENT = """<!DOCTYPE html>
         <optgroup label="✨ Preset Travel Styles & Vibes">
           <option value="beach" ${currentVal === 'beach' ? 'selected' : ''}>🏖️ Beach, Island & Coastal (Goa, Bali, Phuket)</option>
           <option value="mountain" ${currentVal === 'mountain' ? 'selected' : ''}>🏔️ Mountains, Hiking & Trekking (Manali, Alps)</option>
-          <option value="city" ${currentVal === 'city' ? 'selected' : ''}>🏙️ City Sightseeing & Culture (Tokyo, Rome, London)</option>
+          <option value="culture" ${currentVal === 'culture' ? 'selected' : ''}>🏯 Culture, Temples & Shrines (Kyoto, Rome, Varanasi)</option>
+          <option value="city" ${currentVal === 'city' ? 'selected' : ''}>🏙️ City Sightseeing & Tech (Tokyo, London, NYC)</option>
           <option value="winter" ${currentVal === 'winter' ? 'selected' : ''}>❄️ Cold Weather & Snow (Alps, Sapporo, Kashmir)</option>
           <option value="hostel" ${currentVal === 'hostel' ? 'selected' : ''}>🎒 Classic Backpacker & Hostel Dorm</option>
         </optgroup>
@@ -2766,7 +2821,7 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     function getActiveVibeKey() {
-      if (selectedPackVibe === 'auto') {
+      if (!selectedPackVibe || selectedPackVibe === 'auto') {
         return detectItineraryVibe();
       }
       if (selectedPackVibe.startsWith('saved:')) {
