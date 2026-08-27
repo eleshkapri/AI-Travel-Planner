@@ -285,52 +285,53 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     /* ========================================================
-       ULTRA-THIN & ELEGANT CUSTOM SCROLLBAR (GLOBAL & CONTAINERS)
+       STUDENTFIT-STYLE MODERN INSET PILL SCROLLBAR
        ======================================================== */
     /* Firefox */
     * {
       scrollbar-width: thin;
-      scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+      scrollbar-color: #374151 #080C14;
     }
     html.light-theme * {
-      scrollbar-color: rgba(15, 23, 42, 0.25) transparent;
+      scrollbar-color: #94A3B8 #EEF4FB;
     }
 
     /* WebKit (Chrome, Edge, Safari, Brave, Opera) */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 10px;
+      height: 10px;
     }
     ::-webkit-scrollbar-track {
-      background: transparent;
-      border-radius: 9999px;
+      background: #080C14;
+    }
+    html.light-theme ::-webkit-scrollbar-track {
+      background: #EEF4FB;
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.22);
+      background-color: #374151;
       border-radius: 9999px;
-      border: 1px solid transparent;
-      background-clip: content-box;
-      transition: background 0.25s ease;
+      border: 3px solid #080C14;
+      background-clip: padding-box;
+      transition: background-color 0.2s ease;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 94, 54, 0.7);
-    }
-    ::-webkit-scrollbar-thumb:active {
-      background: #FF5E36;
+      background-color: #FF5E36;
     }
     ::-webkit-scrollbar-corner {
-      background: transparent;
+      background: #080C14;
     }
 
-    /* Light Theme Custom Scrollbar */
+    /* Light Theme Inset Pill */
     html.light-theme ::-webkit-scrollbar-thumb {
-      background: rgba(15, 23, 42, 0.25);
+      background-color: #94A3B8;
+      border: 3px solid #EEF4FB;
+      background-clip: padding-box;
     }
     html.light-theme ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 94, 54, 0.75);
+      background-color: #FF5E36;
     }
-    html.light-theme ::-webkit-scrollbar-thumb:active {
-      background: #FF5E36;
+    html.light-theme ::-webkit-scrollbar-corner {
+      background: #EEF4FB;
     }
 
     /* Pre-Paint Instant Zero-Flicker Page View Router */
