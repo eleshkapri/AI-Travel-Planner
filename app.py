@@ -552,10 +552,10 @@ HTML_CONTENT = """<!DOCTYPE html>
       -webkit-text-fill-color: transparent;
     }
     .light-theme .glass-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.78) 100%);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.82) 100%);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.9);
+      border: 1px solid #E2E8F0;
       box-shadow: 0 15px 35px -10px rgba(11, 19, 43, 0.07), 0 0 0 1px rgba(226, 232, 240, 0.8);
     }
     .light-theme .glass-card:hover {
@@ -563,8 +563,24 @@ HTML_CONTENT = """<!DOCTYPE html>
       box-shadow: 0 20px 40px -10px rgba(255, 94, 54, 0.15), 0 0 0 1px rgba(255, 94, 54, 0.3);
       transform: translateY(-4px);
     }
+    
+    /* Light Theme Typography & Global High Contrast */
+    .light-theme h1,
+    .light-theme h2,
+    .light-theme h3,
+    .light-theme h4,
+    .light-theme h5 {
+      color: #0F172A !important;
+    }
+    .light-theme p {
+      color: #334155;
+    }
+    .light-theme label {
+      color: #1E293B !important;
+      font-weight: 600;
+    }
     .light-theme .text-white {
-      color: #0B132B !important;
+      color: #0F172A !important;
     }
     .light-theme .text-gray-300 {
       color: #334155 !important;
@@ -575,11 +591,62 @@ HTML_CONTENT = """<!DOCTYPE html>
     .light-theme .text-gray-200 {
       color: #1E293B !important;
     }
+    .light-theme .text-coralPrimary {
+      color: #EA580C !important;
+    }
+    .light-theme .text-amberAccent {
+      color: #D97706 !important;
+    }
+    .light-theme .text-cyanAccent {
+      color: #0284C7 !important;
+    }
+    .light-theme .text-emeraldAccent {
+      color: #059669 !important;
+    }
+
+    /* Light Theme Map Placeholder & Frame Fix */
+    .light-theme .map-frame-box,
+    .light-theme #mapPlaceholder {
+      background: linear-gradient(135deg, #F8FAFC 0%, #EEF2F6 100%) !important;
+      border-color: #CBD5E1 !important;
+    }
+    .light-theme #mapPlaceholder h4 {
+      color: #0F172A !important;
+      font-weight: 800;
+    }
+    .light-theme #mapPlaceholder p {
+      color: #475569 !important;
+    }
+    .light-theme .map-pill-badge {
+      background-color: #FFFFFF !important;
+      border-color: #CBD5E1 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .light-theme .map-pill-badge span {
+      color: #0F172A !important;
+      font-weight: 700;
+    }
+    .light-theme #plannerPlaceholder {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%) !important;
+      border-color: #E2E8F0 !important;
+    }
+    .light-theme #plannerPlaceholder h3 {
+      color: #0F172A !important;
+    }
+    .light-theme #plannerPlaceholder p {
+      color: #475569 !important;
+    }
+
     .light-theme .bg-spaceDark {
       background-color: rgba(255, 255, 255, 0.92) !important;
     }
     .light-theme .bg-cardDark {
       background-color: rgba(241, 245, 249, 0.92) !important;
+    }
+    .light-theme [class*="border-white/10"],
+    .light-theme [class*="border-white/5"],
+    .light-theme .border-cardBorder {
+      border-color: #E2E8F0 !important;
     }
     .light-theme input,
     .light-theme select {
@@ -1314,7 +1381,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             <span class="text-xs text-amberAccent font-semibold px-2.5 py-0.5 rounded-full bg-amberAccent/10 border border-amberAccent/20" id="mapStatusBadge">Awaiting Destination</span>
           </div>
           
-          <div class="flex-grow w-full rounded-2xl overflow-hidden mt-4 relative bg-spaceDark/60 border border-white/10 min-h-[440px] flex items-center justify-center">
+          <div class="map-frame-box flex-grow w-full rounded-2xl overflow-hidden mt-4 relative bg-spaceDark/60 border border-white/10 min-h-[440px] flex items-center justify-center">
             <!-- Sleek Interactive Map Filler / Template State -->
             <div id="mapPlaceholder" class="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-4">
               <div class="relative flex items-center justify-center">
@@ -1334,16 +1401,16 @@ HTML_CONTENT = """<!DOCTYPE html>
               </div>
 
               <div class="grid grid-cols-2 gap-2.5 w-full max-w-xs pt-2 text-[11px] text-gray-400">
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                <div class="map-pill-badge p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
                   <span class="text-base">📍</span> <span>Landmark Pins</span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                <div class="map-pill-badge p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
                   <span class="text-base">🧭</span> <span>Route Guidance</span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                <div class="map-pill-badge p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
                   <span class="text-base">🍜</span> <span>Food Hubs</span>
                 </div>
-                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                <div class="map-pill-badge p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
                   <span class="text-base">🎟️</span> <span>Student Deals</span>
                 </div>
               </div>
