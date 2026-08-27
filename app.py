@@ -2785,19 +2785,19 @@ HTML_CONTENT = """<!DOCTYPE html>
 
     const DEFAULT_BASE_ITEMS = [
       // Documents & Finance
-      { id: 'b_doc_1', cat: 'docs', name: 'Passport & Student ID Card (or ISIC Card)', defaultChecked: true },
-      { id: 'b_doc_2', cat: 'docs', name: 'Zero-Forex Travel Card & Emergency Local Cash', defaultChecked: true },
+      { id: 'b_doc_1', cat: 'docs', name: 'Passport & Student ID Card (or ISIC Card)', defaultChecked: false },
+      { id: 'b_doc_2', cat: 'docs', name: 'Zero-Forex Travel Card & Emergency Local Cash', defaultChecked: false },
       { id: 'b_doc_3', cat: 'docs', name: 'Travel Insurance Certificate & Visa Copies', defaultChecked: false },
       { id: 'b_doc_4', cat: 'docs', name: 'Offline / Printed Flight & Hostel Booking PDFs', defaultChecked: false },
 
       // Tech & Gadgets
-      { id: 'b_tech_1', cat: 'tech', name: 'Universal Travel Power Adapter (All-in-One)', defaultChecked: true },
-      { id: 'b_tech_2', cat: 'tech', name: 'High-Capacity Power Bank (10,000mAh+)', defaultChecked: true },
+      { id: 'b_tech_1', cat: 'tech', name: 'Universal Travel Power Adapter (All-in-One)', defaultChecked: false },
+      { id: 'b_tech_2', cat: 'tech', name: 'High-Capacity Power Bank (10,000mAh+)', defaultChecked: false },
       { id: 'b_tech_3', cat: 'tech', name: 'Noise-Cancelling Earbuds / Headphones', defaultChecked: false },
       { id: 'b_tech_4', cat: 'tech', name: 'Extra Long USB-C / Lightning Cables', defaultChecked: false },
 
       // Clothing & Footwear
-      { id: 'b_cloth_1', cat: 'clothing', name: 'Comfortable Walking Sneakers (15k+ daily steps)', defaultChecked: true },
+      { id: 'b_cloth_1', cat: 'clothing', name: 'Comfortable Walking Sneakers (15k+ daily steps)', defaultChecked: false },
       { id: 'b_cloth_2', cat: 'clothing', name: 'Quick-dry Microfiber Hostel Towel', defaultChecked: false },
       { id: 'b_cloth_3', cat: 'clothing', name: 'Lightweight Packable Rain Jacket / Windbreaker', defaultChecked: false },
       { id: 'b_cloth_4', cat: 'clothing', name: 'Breathable Day Outfits + 1 Evening Look', defaultChecked: false },
@@ -2807,7 +2807,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       { id: 'b_hlth_1', cat: 'health', name: 'First Aid Kit, Pain Relievers & Band-Aids', defaultChecked: false },
       { id: 'b_hlth_2', cat: 'health', name: 'Personal Prescription Medications + Motion Pills', defaultChecked: false },
       { id: 'b_hlth_3', cat: 'health', name: 'Travel-size Sunscreen SPF 50+ & Deodorant', defaultChecked: false },
-      { id: 'b_hlth_4', cat: 'health', name: 'Sleep Eye Mask & Noise-Blocking Earplugs', defaultChecked: true }
+      { id: 'b_hlth_4', cat: 'health', name: 'Sleep Eye Mask & Noise-Blocking Earplugs', defaultChecked: false }
     ];
 
     const DESTINATION_VIBE_ITEMS = {
@@ -2826,7 +2826,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         { id: 'v_mount_5', cat: 'dest', name: 'Mini LED Headlamp or Pocket Flashlight', defaultChecked: false }
       ],
       culture: [
-        { id: 'v_cult_1', cat: 'dest', name: 'Comfortable Slip-On Shoes (for Temples / Shrines)', defaultChecked: true },
+        { id: 'v_cult_1', cat: 'dest', name: 'Comfortable Slip-On Shoes (for Temples / Shrines)', defaultChecked: false },
         { id: 'v_cult_2', cat: 'dest', name: 'Modest Cover-Up Scarf / Shoulder Wrap', defaultChecked: false },
         { id: 'v_cult_3', cat: 'dest', name: 'Coin Pouch (for Temple Donations & Vending)', defaultChecked: false },
         { id: 'v_cult_4', cat: 'dest', name: 'Local Transit / IC Metro Card & Pass Holder', defaultChecked: false },
@@ -2847,11 +2847,11 @@ HTML_CONTENT = """<!DOCTYPE html>
         { id: 'v_win_5', cat: 'dest', name: 'Self-Heating Hand / Foot Warmer Packs', defaultChecked: false }
       ],
       hostel: [
-        { id: 'v_host_1', cat: 'dest', name: 'TSA 3-Dial Combination Padlock (for Lockers)', defaultChecked: true },
+        { id: 'v_host_1', cat: 'dest', name: 'TSA 3-Dial Combination Padlock (for Lockers)', defaultChecked: false },
         { id: 'v_host_2', cat: 'dest', name: 'Multi-Outlet Compact Power Extension Strip', defaultChecked: false },
         { id: 'v_host_3', cat: 'dest', name: 'Hanging Mesh Shower / Toiletries Caddy', defaultChecked: false },
         { id: 'v_host_4', cat: 'dest', name: 'Collapsible Breathable Laundry Bag', defaultChecked: false },
-        { id: 'v_host_5', cat: 'dest', name: 'Quick-Drying Shower Slides / Flip-Flops', defaultChecked: true }
+        { id: 'v_host_5', cat: 'dest', name: 'Quick-Drying Shower Slides / Flip-Flops', defaultChecked: false }
       ]
     };
 
@@ -3088,34 +3088,27 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       // Render Category Cards Grid
       const container = document.getElementById('packingListContainer');
-      const catsToDisplay = activePackFilter === 'all' ? Object.keys(PACK_CATEGORIES) : [activePackFilter];
+      const catsToDisplay = activePackFilter === 'all' 
+        ? Object.keys(PACK_CATEGORIES).filter(k => (grouped[k] || []).length > 0)
+        : [activePackFilter];
+
+      if (catsToDisplay.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full glass-card p-10 rounded-3xl border border-dashed border-white/15 text-center space-y-3 shadow-lg">
+            <span class="text-3xl">🎒</span>
+            <h4 class="text-base font-bold text-white">No Items in this Category</h4>
+            <p class="text-xs text-gray-400">Select another category filter or add custom items above!</p>
+          </div>
+        `;
+        return;
+      }
 
       container.innerHTML = catsToDisplay.map(catKey => {
         const catInfo = PACK_CATEGORIES[catKey];
         const items = grouped[catKey] || [];
-        if (items.length === 0) {
-          if (catKey === 'dest') {
-            return `
-              <div class="glass-card p-6 rounded-3xl border border-dashed border-white/15 space-y-4 shadow-md flex flex-col justify-between opacity-85 hover:opacity-100 transition">
-                <div class="space-y-2">
-                  <div class="flex items-center gap-2">
-                    <span class="text-xl">📍</span>
-                    <h4 class="text-sm font-extrabold text-white">Destination-Specific Gear</h4>
-                  </div>
-                  <p class="text-xs text-gray-400 leading-relaxed">
-                    No destination is currently active in <button onclick="switchPage('planner')" class="text-coralPrimary font-bold hover:underline">Trip Architect</button>. Enter a destination or select a preset style from the dropdown above to unlock customized destination packing items.
-                  </p>
-                </div>
-                <button onclick="switchPage('planner')" class="btn-secondary py-2 rounded-xl text-xs font-semibold text-coralPrimary flex items-center justify-center gap-1">
-                  <span>🚀 Go to Trip Architect →</span>
-                </button>
-              </div>
-            `;
-          }
-          if (activePackFilter === 'all') return '';
-        }
+        if (items.length === 0) return '';
 
-        const catPacked = items.filter(it => (checks[it.id] !== undefined ? checks[it.id] : it.defaultChecked)).length;
+        const catPacked = items.filter(it => (checks[it.id] !== undefined ? checks[it.id] : (it.defaultChecked || false))).length;
         const catTotal = items.length;
         const catPct = catTotal > 0 ? Math.round((catPacked / catTotal) * 100) : 0;
 
@@ -3133,9 +3126,7 @@ HTML_CONTENT = """<!DOCTYPE html>
               </div>
 
               <div class="space-y-1.5">
-                ${items.length === 0 ? `
-                  <p class="text-xs text-gray-500 italic py-2">No items in this category yet. Add one above!</p>
-                ` : items.map(item => {
+                ${items.map(item => {
                   const isChecked = checks[item.id] !== undefined ? checks[item.id] : (item.defaultChecked || false);
                   const isCustom = item.isCustom || String(item.id).startsWith('c_');
                   return `
@@ -3180,7 +3171,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         ...Object.keys(PACK_CATEGORIES).map(k => {
           const count = allItems.filter(i => (i.cat || 'custom') === k).length;
           return { key: k, label: PACK_CATEGORIES[k].name.split(' ')[0], icon: PACK_CATEGORIES[k].icon, count };
-        })
+        }).filter(p => p.count > 0)
       ];
 
       pillContainer.innerHTML = pills.map(p => `
