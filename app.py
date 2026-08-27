@@ -695,23 +695,107 @@ HTML_CONTENT = """<!DOCTYPE html>
     </section>
 
     <!-- PAGE 4: PACKING CHECKLIST -->
-    <section id="page-packing" class="hidden space-y-8 max-w-4xl mx-auto">
+    <section id="page-packing" class="hidden space-y-8 max-w-5xl mx-auto">
       <div class="text-center space-y-2">
-        <h2 class="text-3xl font-extrabold text-white">🎒 Smart Student Packing Checklist</h2>
-        <p class="text-gray-400 text-sm">Interactive checklist saved automatically to your device.</p>
+        <span class="text-xs font-bold uppercase tracking-wider text-emeraldAccent">🎒 Never Forget Essentials</span>
+        <h2 class="text-3xl font-extrabold text-white">Smart Student Packing Checklist</h2>
+        <p class="text-gray-400 text-sm max-w-lg mx-auto">
+          Customized checklist tailored to your planned destination, itinerary vibe, and personal essentials.
+        </p>
       </div>
 
-      <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-3">
-        <div class="flex justify-between text-xs font-bold">
-          <span class="text-gray-300">Packing Progress</span>
-          <span class="text-emeraldAccent" id="packProgressText">0% Packed</span>
+      <!-- Overall Progress & Vibe Selector Toolbar -->
+      <div class="glass-card p-6 sm:p-7 rounded-3xl border border-white/10 space-y-5 shadow-xl">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">📍</span>
+            <div>
+              <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Itinerary & Destination Vibe</span>
+              <div class="flex items-center gap-2 mt-0.5">
+                <select
+                  id="packVibeSelector"
+                  onchange="onPackVibeChange(this.value)"
+                  class="px-3 py-1.5 bg-spaceDark border border-white/15 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-emeraldAccent"
+                >
+                  <option value="auto">📍 Auto-detect from Itinerary / Planner</option>
+                  <option value="beach">🏖️ Beach, Island & Coastal (Goa, Bali, Phuket)</option>
+                  <option value="mountain">🏔️ Mountains, Hiking & Trekking (Manali, Alps)</option>
+                  <option value="city">🏙️ City Sightseeing & Culture (Tokyo, Rome, London)</option>
+                  <option value="winter">❄️ Cold Weather & Snow (Alps, Sapporo, Kashmir)</option>
+                  <option value="hostel">🎒 Classic Backpacker & Hostel Dorm</option>
+                </select>
+                <span id="packVibeBadge" class="text-[10px] font-bold px-2 py-1 rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">Auto Active</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="checkAllPacking(true)" class="btn-secondary px-3 py-1.5 rounded-xl text-xs font-semibold">
+              ✅ Check All
+            </button>
+            <button onclick="checkAllPacking(false)" class="btn-secondary px-3 py-1.5 rounded-xl text-xs font-semibold">
+              🔄 Uncheck All
+            </button>
+            <button onclick="resetPackingDefaults()" class="p-1.5 rounded-xl text-xs text-gray-400 hover:text-red-400 hover:bg-white/5 transition" title="Reset to Defaults">
+              🗑️
+            </button>
+          </div>
         </div>
-        <div class="h-3 w-full bg-gray-800 rounded-full overflow-hidden">
-          <div id="packProgressBar" style="width: 0%" class="h-full bg-gradient-to-r from-coralPrimary to-emeraldAccent transition-all duration-300"></div>
+
+        <!-- Progress Bar -->
+        <div class="space-y-2 pt-2 border-t border-white/10">
+          <div class="flex justify-between text-xs font-bold">
+            <span class="text-gray-300">Total Packing Progress</span>
+            <span class="text-emeraldAccent font-extrabold" id="packProgressText">0% Packed</span>
+          </div>
+          <div class="h-3 w-full bg-gray-800 rounded-full overflow-hidden">
+            <div id="packProgressBar" style="width: 0%" class="h-full bg-gradient-to-r from-coralPrimary via-amberAccent to-emeraldAccent transition-all duration-300"></div>
+          </div>
         </div>
       </div>
 
-      <div id="packingListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+      <!-- Add Custom Item Card -->
+      <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>➕</span> Add Custom Item
+        </h3>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            id="customPackInput"
+            placeholder="e.g. GoPro Hero 12, Extra Contact Lenses, Power Strip, Sunglasses..."
+            class="flex-grow px-4 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emeraldAccent shadow-inner"
+            onkeypress="if(event.key === 'Enter') addCustomPackingItem()"
+          />
+          <select
+            id="customPackCategory"
+            class="px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-emeraldAccent"
+          >
+            <option value="custom">✨ Custom Personal Items</option>
+            <option value="docs">📄 Documents & Finance</option>
+            <option value="tech">🔌 Tech & Gadgets</option>
+            <option value="clothing">👕 Clothing & Footwear</option>
+            <option value="health">💊 Toiletries & Health</option>
+            <option value="dest">📍 Destination Specific</option>
+          </select>
+          <button
+            onclick="addCustomPackingItem()"
+            class="btn-gradient px-5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 whitespace-nowrap"
+          >
+            <span>+ Add to List</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="flex flex-wrap gap-2 items-center" id="packCategoryFilterPills">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- Categorized Grid Cards -->
+      <div id="packingListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Injected via JS -->
+      </div>
     </section>
 
     <!-- PAGE 5: SAVED TRIPS -->
@@ -1136,41 +1220,339 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('bAvg').innerText = `Avg ${sym}${Math.round(total / days).toLocaleString()} / day`;
     }
 
-    const packItems = [
-      { id: 1, name: 'Passport & Student ID Card', checked: true },
-      { id: 2, name: 'Zero-Forex Travel Card & Cash', checked: true },
-      { id: 3, name: 'Universal Travel Power Adapter', checked: true },
-      { id: 4, name: 'Power Bank (10,000mAh+)', checked: false },
-      { id: 5, name: 'Comfortable Walking Sneakers', checked: true },
-      { id: 6, name: 'Quick-dry Microfiber Hostel Towel', checked: false },
-      { id: 7, name: 'First Aid Kit & Prescription Meds', checked: false }
+    // ========================================================
+    // SMART PACKING CHECKLIST SYSTEM
+    // ========================================================
+    const PACK_CATEGORIES = {
+      docs: { name: "Documents & Travel Finance", icon: "📄", color: "text-amberAccent" },
+      tech: { name: "Tech, Gadgets & Gear", icon: "🔌", color: "text-cyanAccent" },
+      clothing: { name: "Clothing & Footwear", icon: "👕", color: "text-coralPrimary" },
+      health: { name: "Toiletries & Health Care", icon: "💊", color: "text-emeraldAccent" },
+      dest: { name: "Destination & Itinerary Essentials", icon: "📍", color: "text-purpleAccent" },
+      custom: { name: "Custom Personal Items", icon: "✨", color: "text-amberAccent" }
+    };
+
+    const DEFAULT_BASE_ITEMS = [
+      // Documents & Finance
+      { id: 'b_doc_1', cat: 'docs', name: 'Passport & Student ID Card (or ISIC Card)', defaultChecked: true },
+      { id: 'b_doc_2', cat: 'docs', name: 'Zero-Forex Travel Card & Emergency Local Cash', defaultChecked: true },
+      { id: 'b_doc_3', cat: 'docs', name: 'Travel Insurance Certificate & Visa Copies', defaultChecked: false },
+      { id: 'b_doc_4', cat: 'docs', name: 'Offline / Printed Flight & Hostel Booking PDFs', defaultChecked: false },
+
+      // Tech & Gadgets
+      { id: 'b_tech_1', cat: 'tech', name: 'Universal Travel Power Adapter (All-in-One)', defaultChecked: true },
+      { id: 'b_tech_2', cat: 'tech', name: 'High-Capacity Power Bank (10,000mAh+)', defaultChecked: true },
+      { id: 'b_tech_3', cat: 'tech', name: 'Noise-Cancelling Earbuds / Headphones', defaultChecked: false },
+      { id: 'b_tech_4', cat: 'tech', name: 'Extra Long USB-C / Lightning Cables', defaultChecked: false },
+
+      // Clothing & Footwear
+      { id: 'b_cloth_1', cat: 'clothing', name: 'Comfortable Walking Sneakers (15k+ daily steps)', defaultChecked: true },
+      { id: 'b_cloth_2', cat: 'clothing', name: 'Quick-dry Microfiber Hostel Towel', defaultChecked: false },
+      { id: 'b_cloth_3', cat: 'clothing', name: 'Lightweight Packable Rain Jacket / Windbreaker', defaultChecked: false },
+      { id: 'b_cloth_4', cat: 'clothing', name: 'Breathable Day Outfits + 1 Evening Look', defaultChecked: false },
+      { id: 'b_cloth_5', cat: 'clothing', name: 'Flip-Flops / Slides for Hostel Showers', defaultChecked: false },
+
+      // Toiletries & Health
+      { id: 'b_hlth_1', cat: 'health', name: 'First Aid Kit, Pain Relievers & Band-Aids', defaultChecked: false },
+      { id: 'b_hlth_2', cat: 'health', name: 'Personal Prescription Medications + Motion Pills', defaultChecked: false },
+      { id: 'b_hlth_3', cat: 'health', name: 'Travel-size Sunscreen SPF 50+ & Deodorant', defaultChecked: false },
+      { id: 'b_hlth_4', cat: 'health', name: 'Sleep Eye Mask & Noise-Blocking Earplugs', defaultChecked: true }
     ];
 
-    function renderPacking() {
-      const container = document.getElementById('packingListContainer');
-      const total = packItems.length;
-      const checked = packItems.filter(i => i.checked).length;
-      const pct = Math.round((checked / total) * 100);
+    const DESTINATION_VIBE_ITEMS = {
+      beach: [
+        { id: 'v_beach_1', cat: 'dest', name: 'Quick-dry Swimwear & Beach Boardshorts', defaultChecked: false },
+        { id: 'v_beach_2', cat: 'dest', name: 'Waterproof Dry Bag / Phone Pouch', defaultChecked: false },
+        { id: 'v_beach_3', cat: 'dest', name: 'Polarized UV Sunglasses & Beach Sun Hat', defaultChecked: false },
+        { id: 'v_beach_4', cat: 'dest', name: 'Reef-Safe Sunscreen & Soothing Aloe Vera Gel', defaultChecked: false }
+      ],
+      mountain: [
+        { id: 'v_mount_1', cat: 'dest', name: 'Trekking / Trail Grip Shoes with Ankle Support', defaultChecked: false },
+        { id: 'v_mount_2', cat: 'dest', name: 'Thermal Base Layers & Breathable Fleece Jacket', defaultChecked: false },
+        { id: 'v_mount_3', cat: 'dest', name: 'Heavy-Duty Insect & Mosquito Repellent Spray', defaultChecked: false },
+        { id: 'v_mount_4', cat: 'dest', name: 'Reusable Insulated Hydration Flask (1L)', defaultChecked: false }
+      ],
+      city: [
+        { id: 'v_city_1', cat: 'dest', name: 'Compact Anti-Theft Daypack (15-20L)', defaultChecked: false },
+        { id: 'v_city_2', cat: 'dest', name: 'RFID-Blocking Transit / Metro Card Holder', defaultChecked: false },
+        { id: 'v_city_3', cat: 'dest', name: 'Modest Cover-up Attire for Shrines & Churches', defaultChecked: false },
+        { id: 'v_city_4', cat: 'dest', name: 'International eSIM / Local SIM Card Ejector Pin', defaultChecked: false }
+      ],
+      winter: [
+        { id: 'v_win_1', cat: 'dest', name: 'Heavy Insulated Winter Parka / Down Jacket', defaultChecked: false },
+        { id: 'v_win_2', cat: 'dest', name: 'Thermal Woolen Socks, Touchscreen Gloves & Beanie', defaultChecked: false },
+        { id: 'v_win_3', cat: 'dest', name: 'Intense Moisturizing Cold Cream & Lip Balm', defaultChecked: false },
+        { id: 'v_win_4', cat: 'dest', name: 'Waterproof Snow / Winter Grip Boots', defaultChecked: false }
+      ],
+      hostel: [
+        { id: 'v_host_1', cat: 'dest', name: 'TSA 3-Dial Combination Padlock (for Lockers)', defaultChecked: true },
+        { id: 'v_host_2', cat: 'dest', name: 'Multi-Outlet Compact Power Extension Strip', defaultChecked: false },
+        { id: 'v_host_3', cat: 'dest', name: 'Hanging Mesh Shower / Toiletries Caddy', defaultChecked: false },
+        { id: 'v_host_4', cat: 'dest', name: 'Collapsible Breathable Laundry Bag', defaultChecked: false }
+      ]
+    };
 
-      document.getElementById('packProgressText').innerText = `${pct}% Packed (${checked}/${total})`;
+    let activePackFilter = 'all';
+    let selectedPackVibe = 'auto';
+
+    function getStoredCustomItems() {
+      try {
+        return JSON.parse(localStorage.getItem('roamai_custom_pack_items') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCustomItems(items) {
+      try {
+        localStorage.setItem('roamai_custom_pack_items', JSON.stringify(items));
+      } catch (e) {}
+    }
+
+    function getStoredCheckedState() {
+      try {
+        return JSON.parse(localStorage.getItem('roamai_pack_checked_state') || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveCheckedState(state) {
+      try {
+        localStorage.setItem('roamai_pack_checked_state', JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function detectItineraryVibe() {
+      const destStr = ((currentTrip && currentTrip.trip_summary && currentTrip.trip_summary.destination) || document.getElementById('plannerDest')?.value || '').toLowerCase();
+      if (destStr.includes('goa') || destStr.includes('bali') || destStr.includes('beach') || destStr.includes('phuket') || destStr.includes('maldives') || destStr.includes('cancun')) {
+        return 'beach';
+      }
+      if (destStr.includes('manali') || destStr.includes('leh') || destStr.includes('ladakh') || destStr.includes('himalaya') || destStr.includes('alps') || destStr.includes('banff') || destStr.includes('trek')) {
+        return 'mountain';
+      }
+      if (destStr.includes('sapporo') || destStr.includes('snow') || destStr.includes('kashmir') || destStr.includes('winter') || destStr.includes('iceland')) {
+        return 'winter';
+      }
+      if (destStr.includes('hostel') || destStr.includes('backpack')) {
+        return 'hostel';
+      }
+      return 'city';
+    }
+
+    function getActiveVibeKey() {
+      if (selectedPackVibe === 'auto') {
+        return detectItineraryVibe();
+      }
+      return selectedPackVibe;
+    }
+
+    function getAllCurrentPackItems() {
+      const vibeKey = getActiveVibeKey();
+      const vibeItems = DESTINATION_VIBE_ITEMS[vibeKey] || DESTINATION_VIBE_ITEMS.city;
+      const customItems = getStoredCustomItems();
+      return [...DEFAULT_BASE_ITEMS, ...vibeItems, ...customItems];
+    }
+
+    function onPackVibeChange(vibeVal) {
+      selectedPackVibe = vibeVal;
+      try { localStorage.setItem('roamai_pack_selected_vibe', vibeVal); } catch (e) {}
+      
+      const badge = document.getElementById('packVibeBadge');
+      if (vibeVal === 'auto') {
+        const detected = detectItineraryVibe();
+        badge.innerText = `Auto: ${detected.toUpperCase()}`;
+      } else {
+        badge.innerText = `Manual: ${vibeVal.toUpperCase()}`;
+      }
+      renderPacking();
+    }
+
+    function renderPacking() {
+      const allItems = getAllCurrentPackItems();
+      const checks = getStoredCheckedState();
+      
+      // Calculate overall progress
+      const totalCount = allItems.length;
+      let packedCount = 0;
+
+      allItems.forEach(item => {
+        const isChecked = checks[item.id] !== undefined ? checks[item.id] : (item.defaultChecked || false);
+        if (isChecked) packedCount++;
+      });
+
+      const pct = totalCount > 0 ? Math.round((packedCount / totalCount) * 100) : 0;
+      document.getElementById('packProgressText').innerText = `${pct}% Packed (${packedCount}/${totalCount} items)`;
       document.getElementById('packProgressBar').style.width = `${pct}%`;
 
-      container.innerHTML = `
-        <div class="glass-card p-5 rounded-2xl border border-white/10 space-y-2 col-span-full">
-          ${packItems.map(item => `
-            <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/5 cursor-pointer">
-              <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="togglePack(${item.id})" class="accent-coralPrimary" />
-              <span class="text-xs ${item.checked ? 'line-through text-gray-500' : 'text-gray-200'}">${item.name}</span>
-            </label>
-          `).join('')}
-        </div>
-      `;
+      // Render Category Filter Pills
+      renderPackFilterPills(allItems, checks);
+
+      // Group items by category
+      const grouped = {};
+      Object.keys(PACK_CATEGORIES).forEach(k => { grouped[k] = []; });
+
+      allItems.forEach(item => {
+        const c = item.cat || 'custom';
+        if (!grouped[c]) grouped[c] = [];
+        grouped[c].push(item);
+      });
+
+      // Render Category Cards Grid
+      const container = document.getElementById('packingListContainer');
+      const catsToDisplay = activePackFilter === 'all' ? Object.keys(PACK_CATEGORIES) : [activePackFilter];
+
+      container.innerHTML = catsToDisplay.map(catKey => {
+        const catInfo = PACK_CATEGORIES[catKey];
+        const items = grouped[catKey] || [];
+        if (activePackFilter === 'all' && items.length === 0 && catKey !== 'dest') return '';
+
+        const catPacked = items.filter(it => (checks[it.id] !== undefined ? checks[it.id] : it.defaultChecked)).length;
+        const catTotal = items.length;
+        const catPct = catTotal > 0 ? Math.round((catPacked / catTotal) * 100) : 0;
+
+        return `
+          <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl flex flex-col justify-between">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">${catInfo.icon}</span>
+                  <h4 class="text-sm font-extrabold text-white">${catInfo.name}</h4>
+                </div>
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${catPacked === catTotal && catTotal > 0 ? 'bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30' : 'bg-white/5 text-gray-400 border border-white/10'}">
+                  ${catPacked}/${catTotal} (${catPct}%)
+                </span>
+              </div>
+
+              <div class="space-y-1.5">
+                ${items.length === 0 ? `
+                  <p class="text-xs text-gray-500 italic py-2">No items in this category yet. Add one above!</p>
+                ` : items.map(item => {
+                  const isChecked = checks[item.id] !== undefined ? checks[item.id] : (item.defaultChecked || false);
+                  const isCustom = item.isCustom || String(item.id).startsWith('c_');
+                  return `
+                    <div class="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition select-none group">
+                      <label class="flex items-center gap-3 flex-grow cursor-pointer" onclick="togglePack('${item.id}')">
+                        <input
+                          type="checkbox"
+                          ${isChecked ? 'checked' : ''}
+                          class="w-4 h-4 rounded accent-coralPrimary bg-gray-900 border-gray-700 cursor-pointer"
+                          onclick="event.stopPropagation(); togglePack('${item.id}')"
+                        />
+                        <span class="text-xs ${isChecked ? 'line-through text-gray-500' : 'text-gray-200 font-medium'}">
+                          ${item.name}
+                        </span>
+                      </label>
+                      ${isCustom ? `
+                        <button onclick="deleteCustomPackingItem('${item.id}')" class="text-xs text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition p-1" title="Delete Item">
+                          🗑️
+                        </button>
+                      ` : ''}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <div class="pt-2 text-[10px] text-gray-500 flex justify-between border-t border-white/5">
+              <span>RoamAI Smart Checklist</span>
+              <span class="text-emeraldAccent font-semibold">${catPacked === catTotal && catTotal > 0 ? 'All Packed!' : `${catTotal - catPacked} left`}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPackFilterPills(allItems, checks) {
+      const pillContainer = document.getElementById('packCategoryFilterPills');
+      if (!pillContainer) return;
+
+      const pills = [
+        { key: 'all', label: 'All Items', icon: '🎒', count: allItems.length },
+        ...Object.keys(PACK_CATEGORIES).map(k => {
+          const count = allItems.filter(i => (i.cat || 'custom') === k).length;
+          return { key: k, label: PACK_CATEGORIES[k].name.split(' ')[0], icon: PACK_CATEGORIES[k].icon, count };
+        })
+      ];
+
+      pillContainer.innerHTML = pills.map(p => `
+        <button
+          onclick="filterPackingCategory('${p.key}')"
+          class="text-xs px-3.5 py-1.5 rounded-full border transition flex items-center gap-1.5 ${activePackFilter === p.key ? 'bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-bold border-transparent shadow-md' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20'}"
+        >
+          <span>${p.icon}</span>
+          <span>${p.label}</span>
+          <span class="text-[10px] opacity-75">(${p.count})</span>
+        </button>
+      `).join('');
+    }
+
+    function filterPackingCategory(catKey) {
+      activePackFilter = catKey;
+      renderPacking();
     }
 
     function togglePack(id) {
-      const item = packItems.find(i => i.id === id);
-      if (item) item.checked = !item.checked;
+      const checks = getStoredCheckedState();
+      const allItems = getAllCurrentPackItems();
+      const it = allItems.find(i => i.id === id);
+      
+      const current = checks[id] !== undefined ? checks[id] : (it ? it.defaultChecked : false);
+      checks[id] = !current;
+      saveCheckedState(checks);
       renderPacking();
+    }
+
+    function addCustomPackingItem() {
+      const input = document.getElementById('customPackInput');
+      const catSelect = document.getElementById('customPackCategory');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const cat = catSelect.value || 'custom';
+      const customItems = getStoredCustomItems();
+
+      const newItem = {
+        id: 'c_' + Date.now(),
+        cat: cat,
+        name: val,
+        isCustom: true,
+        defaultChecked: false
+      };
+
+      customItems.push(newItem);
+      saveCustomItems(customItems);
+
+      input.value = '';
+      renderPacking();
+    }
+
+    function deleteCustomPackingItem(id) {
+      let customItems = getStoredCustomItems();
+      customItems = customItems.filter(i => i.id !== id);
+      saveCustomItems(customItems);
+
+      const checks = getStoredCheckedState();
+      delete checks[id];
+      saveCheckedState(checks);
+
+      renderPacking();
+    }
+
+    function checkAllPacking(checkBool) {
+      const allItems = getAllCurrentPackItems();
+      const checks = getStoredCheckedState();
+      allItems.forEach(i => { checks[i.id] = checkBool; });
+      saveCheckedState(checks);
+      renderPacking();
+    }
+
+    function resetPackingDefaults() {
+      if (confirm('Reset all packing items and checklist progress to defaults?')) {
+        localStorage.removeItem('roamai_pack_checked_state');
+        localStorage.removeItem('roamai_custom_pack_items');
+        renderPacking();
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
