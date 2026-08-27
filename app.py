@@ -1607,12 +1607,6 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.documentElement.classList.toggle('light-theme', isLight);
       document.body.classList.toggle('light-theme', isLight);
 
-      const deskIcon = document.getElementById('themeToggleIcon');
-      if (deskIcon) deskIcon.innerText = isLight ? '☀️' : '🌙';
-
-      const mobIcon = document.getElementById('mobThemeToggleIcon');
-      if (mobIcon) mobIcon.innerText = isLight ? '☀️' : '🌙';
-
       const btn = document.getElementById('themeToggleBtn');
       if (btn) {
         btn.title = isLight ? 'Switch to Dark Mode (🌙)' : 'Switch to Light Mode (☀️)';
