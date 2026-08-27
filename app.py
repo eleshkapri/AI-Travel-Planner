@@ -502,9 +502,6 @@ HTML_CONTENT = """<!DOCTYPE html>
               <span class="text-gray-400">•</span>
               <span>Sub-Second AI Engine</span>
             </div>
-              <span class="text-gray-400">•</span>
-              <span>Sub-Second AI Engine</span>
-            </div>
 
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
               Plan Epic Student Adventures <br/>
