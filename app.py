@@ -962,25 +962,25 @@ HTML_CONTENT = """<!DOCTYPE html>
 
   <!-- ==================== PROPERLY DESIGNED NAVBAR WITH REGION SELECTOR ==================== -->
   <header id="mainHeader" class="sticky top-0 z-50 backdrop-blur-xl border-b border-cardBorder shadow-2xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
       
       <!-- Brand Logo (Left) -->
-      <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="switchPage('home')">
-        <div class="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-coralPrimary to-amberAccent p-0.5 shadow-lg shadow-coralPrimary/30">
-          <div class="w-full h-full bg-spaceDark rounded-[14px] flex items-center justify-center">
-            <span class="text-2xl">✈️</span>
+      <div class="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onclick="switchPage('home')">
+        <div class="flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coralPrimary to-amberAccent p-0.5 shadow-lg shadow-coralPrimary/30">
+          <div class="w-full h-full bg-spaceDark rounded-[10px] sm:rounded-[14px] flex items-center justify-center">
+            <span class="text-xl sm:text-2xl">✈️</span>
           </div>
         </div>
         <div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-xl font-extrabold tracking-tight brand-logo-title">RoamAI</span>
-            <span class="text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase">Student</span>
+          <div class="flex items-center gap-1 sm:gap-1.5">
+            <span class="text-lg sm:text-xl font-extrabold tracking-tight brand-logo-title">RoamAI</span>
+            <span class="text-[9px] sm:text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase">Student</span>
           </div>
-          <p class="text-[11px] text-gray-400 font-medium">Smart AI Travel Architect</p>
+          <p class="hidden sm:block text-[11px] text-gray-400 font-medium">Smart AI Travel Architect</p>
         </div>
       </div>
 
-      <!-- Navigation Tabs (Center) -->
+      <!-- Navigation Tabs (Center - Desktop) -->
       <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-gray-300">
         <button onclick="switchPage('home')" id="tab-home" class="nav-tab active hover:text-white flex items-center gap-1.5 transition"><span>🌟</span> Discover</button>
         <button onclick="switchPage('planner')" id="tab-planner" class="nav-tab hover:text-white flex items-center gap-1.5 transition"><span>🚀</span> AI Planner</button>
@@ -990,13 +990,13 @@ HTML_CONTENT = """<!DOCTYPE html>
       </nav>
 
       <!-- Theme Switcher, Region Selector & CTA (Right) -->
-      <div class="flex items-center gap-2.5 shrink-0">
+      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         
         <!-- Theme Mood Switcher (Dark / Light) -->
         <button
           id="themeToggleBtn"
           onclick="toggleThemeMood()"
-          class="w-9 h-9 rounded-xl bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 flex items-center justify-center text-sm text-gray-300 hover:text-white transition shadow-sm"
+          class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 flex items-center justify-center text-xs sm:text-sm text-gray-300 hover:text-white transition shadow-sm"
           title="Toggle Light / Dark Mode"
           aria-label="Toggle Theme Mood"
         >
@@ -1005,11 +1005,11 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         <!-- Region & Currency Selector -->
         <div class="relative flex items-center">
-          <span class="absolute left-3 text-sm pointer-events-none" id="navRegionFlag">🇮🇳</span>
+          <span class="absolute left-2.5 text-xs sm:text-sm pointer-events-none" id="navRegionFlag">🇮🇳</span>
           <select
             id="navRegionSelector"
             onchange="onRegionChange(this.value)"
-            class="pl-8 pr-7 py-2 max-w-[115px] sm:max-w-none truncate bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-coralPrimary cursor-pointer shadow-sm transition"
+            class="pl-7 sm:pl-8 pr-6 sm:pr-7 py-1.5 sm:py-2 max-w-[105px] sm:max-w-none truncate bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 rounded-xl text-[11px] sm:text-xs font-semibold text-white focus:outline-none focus:border-coralPrimary cursor-pointer shadow-sm transition"
           >
             <option value="INR" data-flag="🇮🇳" data-curr="INR" data-sym="₹" data-name="India" selected>🇮🇳 India (INR ₹)</option>
             <option value="USD" data-flag="🇺🇸" data-curr="USD" data-sym="$" data-name="United States">🇺🇸 USA (USD $)</option>
@@ -1024,26 +1024,40 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
 
         <!-- Plan Button -->
-        <button onclick="switchPage('planner')" class="btn-gradient text-xs sm:text-sm px-4 sm:px-5 py-2.5 rounded-xl flex items-center gap-1.5 whitespace-nowrap">
-          <span>⚡ Plan Trip</span>
+        <button onclick="switchPage('planner')" class="btn-gradient text-[11px] sm:text-sm px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-xl flex items-center gap-1 sm:gap-1.5 whitespace-nowrap shadow-md">
+          <span>⚡</span><span class="hidden xs:inline">Plan Trip</span><span class="xs:hidden">Plan</span>
         </button>
       </div>
 
     </div>
-
-    <!-- Mobile Sub-Nav -->
-    <div class="lg:hidden flex items-center justify-around py-2.5 px-2 bg-cardDark/95 border-t border-cardBorder text-xs text-gray-400">
-      <button onclick="switchPage('home')" id="mob-home" class="text-coralPrimary font-bold flex flex-col items-center"><span>🌟</span>Home</button>
-      <button onclick="switchPage('planner')" id="mob-planner" class="flex flex-col items-center"><span>🚀</span>Planner</button>
-      <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center"><span>💰</span>Budget</button>
-      <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center"><span>🎒</span>Packing</button>
-      <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center"><span>📂</span>Saved</button>
-      <button onclick="toggleThemeMood()" class="flex flex-col items-center"><span id="mobThemeToggleIcon" class="theme-icon inline-block"></span>Mood</button>
-    </div>
   </header>
 
+  <!-- Modern Mobile Bottom Navigation Bar (Docked / Thumb-Friendly) -->
+  <nav id="mobileBottomNav" class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-cardDark/95 backdrop-blur-2xl border-t border-cardBorder px-2 py-2 flex items-center justify-around text-xs shadow-2xl" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
+    <button onclick="switchPage('home')" id="mob-home" class="flex flex-col items-center gap-0.5 text-coralPrimary font-extrabold py-1 px-2.5 rounded-xl transition bg-white/5">
+      <span class="text-base leading-none">🌟</span>
+      <span class="text-[10px] leading-tight">Home</span>
+    </button>
+    <button onclick="switchPage('planner')" id="mob-planner" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2.5 rounded-xl transition">
+      <span class="text-base leading-none">🚀</span>
+      <span class="text-[10px] leading-tight">Planner</span>
+    </button>
+    <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2.5 rounded-xl transition">
+      <span class="text-base leading-none">💰</span>
+      <span class="text-[10px] leading-tight">Budget</span>
+    </button>
+    <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2.5 rounded-xl transition">
+      <span class="text-base leading-none">🎒</span>
+      <span class="text-[10px] leading-tight">Packing</span>
+    </button>
+    <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2.5 rounded-xl transition">
+      <span class="text-base leading-none">📂</span>
+      <span class="text-[10px] leading-tight">Saved (<span id="mobSavedCount">0</span>)</span>
+    </button>
+  </nav>
+
   <!-- ==================== MAIN CONTENT ==================== -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative" style="z-index: 10;">
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-28 lg:pb-12 relative" style="z-index: 10;">
 
     <!-- Region Information Alert Banner -->
     <div id="regionInfoBanner" class="mb-8 p-4 rounded-2xl bg-gradient-to-r from-coralPrimary/10 via-amberAccent/10 to-cyanAccent/10 border border-coralPrimary/30 flex items-center justify-between text-xs sm:text-sm text-gray-200">
@@ -1193,14 +1207,14 @@ HTML_CONTENT = """<!DOCTYPE html>
           </div>
 
           <!-- Scope & Theme Filters -->
-          <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
             <!-- National vs International Scope Toggle -->
-            <div class="p-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1 shadow-inner">
+            <div class="p-1 rounded-2xl sm:rounded-full bg-white/5 border border-white/10 flex flex-wrap sm:flex-nowrap items-center justify-center gap-1 shadow-inner w-full sm:w-auto">
               <button
                 type="button"
                 data-scope="all"
                 onclick="setHotspotScope('all')"
-                class="hotspot-scope-btn active text-xs px-4 py-2 rounded-full border border-transparent bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-extrabold transition shadow-md flex items-center gap-1.5"
+                class="hotspot-scope-btn active text-xs px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-full border border-transparent bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-extrabold transition shadow-md flex items-center gap-1.5 flex-1 sm:flex-initial justify-center"
               >
                 <span>🌍</span> All (16)
               </button>
@@ -1208,7 +1222,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 type="button"
                 data-scope="national"
                 onclick="setHotspotScope('national')"
-                class="hotspot-scope-btn text-xs px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300 hover:text-white hover:border-white/20 transition flex items-center gap-1.5"
+                class="hotspot-scope-btn text-xs px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-full border border-white/10 bg-white/5 text-gray-300 hover:text-white hover:border-white/20 transition flex items-center gap-1.5 flex-1 sm:flex-initial justify-center"
               >
                 <span>🇮🇳</span> National (8)
               </button>
@@ -1216,7 +1230,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 type="button"
                 data-scope="international"
                 onclick="setHotspotScope('international')"
-                class="hotspot-scope-btn text-xs px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300 hover:text-white hover:border-white/20 transition flex items-center gap-1.5"
+                class="hotspot-scope-btn text-xs px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-full border border-white/10 bg-white/5 text-gray-300 hover:text-white hover:border-white/20 transition flex items-center gap-1.5 flex-1 sm:flex-initial justify-center"
               >
                 <span>✈️</span> International (8)
               </button>
@@ -1225,14 +1239,14 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
 
         <!-- Secondary Theme Filter Pills -->
-        <div class="flex flex-wrap items-center gap-2" id="hotspotFilterPills">
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2" id="hotspotFilterPills">
           <span class="text-xs font-bold text-gray-400 mr-1 flex items-center gap-1"><span>✨</span> Vibe:</span>
-          <button type="button" data-cat="all" onclick="setHotspotCategory('all')" class="hotspot-filter-btn active text-xs px-3.5 py-1.5 rounded-full border border-transparent bg-white/20 text-white font-bold transition shadow-sm">All Vibes</button>
-          <button type="button" data-cat="beach" onclick="setHotspotCategory('beach')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏖️ Beach & Coastal</button>
-          <button type="button" data-cat="mountain" onclick="setHotspotCategory('mountain')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏔️ Mountains & Trekking</button>
-          <button type="button" data-cat="culture" onclick="setHotspotCategory('culture')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏛️ History & Culture</button>
-          <button type="button" data-cat="nightlife" onclick="setHotspotCategory('nightlife')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🎉 Nightlife & Food</button>
-          <button type="button" data-cat="adventure" onclick="setHotspotCategory('adventure')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">⚡ Adventure & Nature</button>
+          <button type="button" data-cat="all" onclick="setHotspotCategory('all')" class="hotspot-filter-btn active text-xs px-3 sm:px-3.5 py-1.5 rounded-full border border-transparent bg-white/20 text-white font-bold transition shadow-sm">All Vibes</button>
+          <button type="button" data-cat="beach" onclick="setHotspotCategory('beach')" class="hotspot-filter-btn text-xs px-3 sm:px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏖️ Beach</button>
+          <button type="button" data-cat="mountain" onclick="setHotspotCategory('mountain')" class="hotspot-filter-btn text-xs px-3 sm:px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏔️ Mountains</button>
+          <button type="button" data-cat="culture" onclick="setHotspotCategory('culture')" class="hotspot-filter-btn text-xs px-3 sm:px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏛️ History</button>
+          <button type="button" data-cat="nightlife" onclick="setHotspotCategory('nightlife')" class="hotspot-filter-btn text-xs px-3 sm:px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🎉 Nightlife</button>
+          <button type="button" data-cat="adventure" onclick="setHotspotCategory('adventure')" class="hotspot-filter-btn text-xs px-3 sm:px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">⚡ Adventure</button>
         </div>
 
         <!-- HOTSPOT CARDS GRID -->
@@ -1842,7 +1856,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
 
         <!-- Grid 2: Interactive Destination Map (Equal Height & Width with Grid 1) -->
-        <div class="glass-card p-6 rounded-3xl border border-white/10 flex flex-col justify-between shadow-2xl h-full min-h-[540px]" id="plannerMapCard">
+        <div class="glass-card p-4 sm:p-6 rounded-3xl border border-white/10 flex flex-col justify-between shadow-2xl h-full min-h-[360px] sm:min-h-[440px] lg:min-h-[540px]" id="plannerMapCard">
           <div class="flex items-center justify-between pb-3 border-b border-white/10">
             <div class="flex items-center gap-2">
               <span class="text-xl">📍</span>
@@ -2102,8 +2116,8 @@ HTML_CONTENT = """<!DOCTYPE html>
       </div>
     </section>
 
-  <!-- Toast Notification Container -->
-  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+  <!-- Toast Notification Container (Responsive Mobile Offset) -->
+  <div id="toastContainer" class="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 left-4 sm:left-auto z-50 flex flex-col gap-2.5 max-w-sm w-auto sm:w-full pointer-events-none"></div>
 
   <!-- Modern 3D Glass Confirmation Modal -->
   <div id="confirmModalBackdrop" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4 transition-opacity duration-300">
@@ -2132,7 +2146,7 @@ HTML_CONTENT = """<!DOCTYPE html>
   </div>
 
   <!-- ==================== DISTINCT MINIMALIST MODERN FOOTER ==================== -->
-  <footer class="mt-24 pb-12 px-4 sm:px-6 lg:px-8 relative" style="z-index: 10;">
+  <footer class="mt-12 sm:mt-24 pb-24 lg:pb-12 px-4 sm:px-6 lg:px-8 relative" style="z-index: 10;">
     <div class="max-w-3xl mx-auto glass-card p-6 sm:p-8 rounded-3xl border border-white/10 text-center space-y-4 shadow-2xl relative overflow-hidden">
       
       <!-- Subtle Ambient Glow Behind Footer -->
@@ -2569,8 +2583,11 @@ HTML_CONTENT = """<!DOCTYPE html>
         if (t) t.classList.toggle('active', p === page);
         const m = document.getElementById(`mob-${p}`);
         if (m) {
-          m.classList.toggle('text-coralPrimary', p === page);
-          m.classList.toggle('font-bold', p === page);
+          const isAct = (p === page);
+          m.classList.toggle('text-coralPrimary', isAct);
+          m.classList.toggle('font-extrabold', isAct);
+          m.classList.toggle('bg-white/5', isAct);
+          m.classList.toggle('text-gray-400', !isAct);
         }
       });
       if (page === 'saved') renderSaved();
@@ -3063,6 +3080,8 @@ HTML_CONTENT = """<!DOCTYPE html>
         const trips = getSavedTrips();
         const countEl = document.getElementById('savedCount');
         if (countEl) countEl.innerText = trips.length;
+        const mobCountEl = document.getElementById('mobSavedCount');
+        if (mobCountEl) mobCountEl.innerText = trips.length;
       } catch (e) {
         console.error('Error updating saved count', e);
       }
