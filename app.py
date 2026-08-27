@@ -604,6 +604,28 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #059669 !important;
     }
 
+    /* Floating Image Badges & Gradient Buttons ALWAYS keep pure white & bright gold text */
+    .light-theme [class*="bg-spaceDark/80"],
+    .light-theme [class*="bg-black/60"],
+    .light-theme [class*="bg-spaceDark/80"] *,
+    .light-theme [class*="bg-black/60"] *,
+    .light-theme .btn-gradient,
+    .light-theme .btn-gradient * {
+      color: #FFFFFF !important;
+    }
+    .light-theme [class*="bg-spaceDark/80"] {
+      background-color: rgba(11, 15, 25, 0.82) !important;
+      border-color: rgba(255, 255, 255, 0.20) !important;
+    }
+    .light-theme [class*="bg-black/60"] {
+      background-color: rgba(0, 0, 0, 0.70) !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+    }
+    .light-theme [class*="bg-black/60"].text-amberAccent,
+    .light-theme [class*="bg-spaceDark/80"].text-amberAccent {
+      color: #FFA000 !important;
+    }
+
     /* Light Theme Map Placeholder & Frame Fix */
     .light-theme .map-frame-box,
     .light-theme #mapPlaceholder {
