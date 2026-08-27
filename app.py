@@ -1311,11 +1311,46 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <p class="text-[11px] text-gray-400">Step 2: Explore Geo-Coordinates</p>
               </div>
             </div>
-            <span class="text-xs text-cyanAccent font-semibold px-2.5 py-0.5 rounded-full bg-cyanAccent/10 border border-cyanAccent/20">Live GPS Pins</span>
+            <span class="text-xs text-amberAccent font-semibold px-2.5 py-0.5 rounded-full bg-amberAccent/10 border border-amberAccent/20" id="mapStatusBadge">Awaiting Destination</span>
           </div>
           
-          <div class="flex-grow w-full rounded-2xl overflow-hidden mt-4 relative bg-spaceDark/60 border border-white/10 min-h-[440px]">
-            <div id="map" class="w-full h-full min-h-[440px]"></div>
+          <div class="flex-grow w-full rounded-2xl overflow-hidden mt-4 relative bg-spaceDark/60 border border-white/10 min-h-[440px] flex items-center justify-center">
+            <!-- Sleek Interactive Map Filler / Template State -->
+            <div id="mapPlaceholder" class="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-4">
+              <div class="relative flex items-center justify-center">
+                <div class="w-20 h-20 rounded-full bg-coralPrimary/10 border border-coralPrimary/20 flex items-center justify-center text-4xl shadow-inner animate-pulse">
+                  🗺️
+                </div>
+                <div class="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-tr from-coralPrimary to-amberAccent flex items-center justify-center text-xs text-white shadow-md animate-bounce">
+                  ✨
+                </div>
+              </div>
+
+              <div class="space-y-1.5 max-w-sm">
+                <h4 class="text-base font-bold text-white">Interactive Geo-Map Awaiting Coordinates</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">
+                  Enter your destination in <span class="text-coralPrimary font-semibold">Step 1</span> and generate your itinerary to plot real-time GPS landmarks, transport hubs, and student budget hotspots.
+                </p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2.5 w-full max-w-xs pt-2 text-[11px] text-gray-400">
+                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                  <span class="text-base">📍</span> <span>Landmark Pins</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                  <span class="text-base">🧭</span> <span>Route Guidance</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                  <span class="text-base">🍜</span> <span>Food Hubs</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
+                  <span class="text-base">🎟️</span> <span>Student Deals</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Leaflet Map (Hidden initially until trip coordinates are loaded) -->
+            <div id="map" class="hidden w-full h-full min-h-[440px]"></div>
           </div>
         </div>
 
@@ -1979,9 +2014,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       if (page === 'saved') renderSaved();
       if (page === 'packing') renderPacking();
       if (page === 'planner') {
-        if (!mapInstance) {
-          renderMap([35.6762, 139.6503], [{ coords: [35.6762, 139.6503], name: "World Explorer" }]);
-        } else {
+        if (mapInstance && currentTrip) {
           setTimeout(() => mapInstance.invalidateSize(), 200);
         }
       }
@@ -2178,7 +2211,18 @@ HTML_CONTENT = """<!DOCTYPE html>
       }
     }
 
-    function renderMap(center, markers) {
+    function renderMap(center, markers = []) {
+      const placeholder = document.getElementById('mapPlaceholder');
+      const mapEl = document.getElementById('map');
+      if (placeholder) placeholder.classList.add('hidden');
+      if (mapEl) mapEl.classList.remove('hidden');
+
+      const badge = document.getElementById('mapStatusBadge');
+      if (badge) {
+        badge.innerText = 'Live GPS Pins';
+        badge.className = 'text-xs text-cyanAccent font-semibold px-2.5 py-0.5 rounded-full bg-cyanAccent/10 border border-cyanAccent/20';
+      }
+
       const centerCoords = center || (markers.length > 0 ? markers[0].coords : [20, 0]);
       if (!mapInstance) {
         mapInstance = L.map('map').setView(centerCoords, 13);
@@ -2200,6 +2244,19 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       if (bounds.length > 1) mapInstance.fitBounds(bounds, { padding: [40, 40] });
       setTimeout(() => mapInstance.invalidateSize(), 300);
+    }
+
+    function resetMapPlaceholder() {
+      const placeholder = document.getElementById('mapPlaceholder');
+      const mapEl = document.getElementById('map');
+      if (placeholder) placeholder.classList.remove('hidden');
+      if (mapEl) mapEl.classList.add('hidden');
+
+      const badge = document.getElementById('mapStatusBadge');
+      if (badge) {
+        badge.innerText = 'Awaiting Destination';
+        badge.className = 'text-xs text-amberAccent font-semibold px-2.5 py-0.5 rounded-full bg-amberAccent/10 border border-amberAccent/20';
+      }
     }
 
     function copyTrip() {
