@@ -2896,6 +2896,10 @@ HTML_CONTENT = """<!DOCTYPE html>
         destStr = (document.getElementById('plannerDest')?.value || '').toLowerCase();
       }
 
+      if (!destStr || destStr.trim() === '') {
+        return null;
+      }
+
       if (destStr.includes('goa') || destStr.includes('bali') || destStr.includes('beach') || destStr.includes('phuket') || destStr.includes('maldives') || destStr.includes('cancun') || destStr.includes('island') || destStr.includes('coastal') || destStr.includes('surf') || destStr.includes('scuba')) {
         return 'beach';
       }
@@ -2917,7 +2921,7 @@ HTML_CONTENT = """<!DOCTYPE html>
     function getAllCurrentPackItems() {
       const base = [...DEFAULT_BASE_ITEMS];
       const vibeKey = getActiveVibeKey();
-      const vibeItems = DESTINATION_VIBE_ITEMS[vibeKey] || DESTINATION_VIBE_ITEMS.city || [];
+      const vibeItems = vibeKey ? (DESTINATION_VIBE_ITEMS[vibeKey] || []) : [];
       const customItems = getStoredCustomItems();
 
       // Dynamic trip-specific landmark & student pass items
@@ -2927,14 +2931,14 @@ HTML_CONTENT = """<!DOCTYPE html>
         const tripId = selectedPackVibe.replace('saved:', '');
         const savedTrips = getSavedTrips();
         targetTrip = savedTrips.find(t => String(t.id) === String(tripId));
-      } else if (currentTrip && currentTrip.trip_summary) {
+      } else if (currentTrip && currentTrip.trip_summary && currentTrip.trip_summary.destination) {
         targetTrip = {
           destination: currentTrip.trip_summary.destination,
           days: currentTrip.trip_summary.days
         };
       }
 
-      if (targetTrip && targetTrip.destination) {
+      if (targetTrip && targetTrip.destination && targetTrip.destination.trim() !== '') {
         const destName = targetTrip.destination.split(',')[0].trim();
         dynamicTripItems.push({
           id: `dyn_dest_${targetTrip.id || 'curr'}_1`,
@@ -2997,7 +3001,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         const savedTrips = getSavedTrips();
         const trip = savedTrips.find(t => String(t.id) === String(tripId));
         if (trip) {
-          return detectItineraryVibe(trip.destination + ' ' + (trip.itinerary || ''));
+          return detectItineraryVibe(trip.destination + ' ' + (trip.itinerary || '')) || 'city';
         }
         return 'city';
       }
@@ -3009,21 +3013,31 @@ HTML_CONTENT = """<!DOCTYPE html>
       try { localStorage.setItem('roamai_pack_selected_vibe', vibeVal); } catch (e) {}
       
       const badge = document.getElementById('packVibeBadge');
-      if (vibeVal === 'auto') {
-        const detected = detectItineraryVibe();
-        badge.innerText = `Auto: ${detected.toUpperCase()}`;
-        showToast(`Checklist adapted to current planner (${detected.toUpperCase()})`, 'info');
-      } else if (vibeVal.startsWith('saved:')) {
-        const tripId = vibeVal.replace('saved:', '');
-        const savedTrips = getSavedTrips();
-        const trip = savedTrips.find(t => String(t.id) === String(tripId));
-        const tripName = trip ? trip.destination : 'Saved Trip';
-        const detected = trip ? detectItineraryVibe(trip.destination + ' ' + (trip.itinerary || '')) : 'city';
-        badge.innerText = `Saved: ${tripName}`;
-        showToast(`Checklist adapted for saved itinerary "${tripName}" (${detected.toUpperCase()})!`, 'success');
-      } else {
-        badge.innerText = `Manual: ${vibeVal.toUpperCase()}`;
-        showToast(`Checklist vibe set to ${vibeVal.toUpperCase()}`, 'info');
+      if (badge) {
+        if (vibeVal === 'auto') {
+          const detected = detectItineraryVibe();
+          if (detected) {
+            badge.innerText = `Auto: ${detected.toUpperCase()}`;
+            badge.className = 'text-xs text-emeraldAccent font-semibold px-2.5 py-0.5 rounded-full bg-emeraldAccent/10 border border-emeraldAccent/20';
+            showToast(`Checklist adapted to current planner (${detected.toUpperCase()})`, 'info');
+          } else {
+            badge.innerText = `Auto: Standard Essentials`;
+            badge.className = 'text-xs text-gray-400 font-semibold px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10';
+          }
+        } else if (vibeVal.startsWith('saved:')) {
+          const tripId = vibeVal.replace('saved:', '');
+          const savedTrips = getSavedTrips();
+          const trip = savedTrips.find(t => String(t.id) === String(tripId));
+          const tripName = trip ? trip.destination : 'Saved Trip';
+          const detected = trip ? (detectItineraryVibe(trip.destination + ' ' + (trip.itinerary || '')) || 'city') : 'city';
+          badge.innerText = `Saved: ${tripName}`;
+          badge.className = 'text-xs text-cyanAccent font-semibold px-2.5 py-0.5 rounded-full bg-cyanAccent/10 border border-cyanAccent/20';
+          showToast(`Checklist adapted for saved itinerary "${tripName}" (${detected.toUpperCase()})!`, 'success');
+        } else {
+          badge.innerText = `Manual: ${vibeVal.toUpperCase()}`;
+          badge.className = 'text-xs text-amberAccent font-semibold px-2.5 py-0.5 rounded-full bg-amberAccent/10 border border-amberAccent/20';
+          showToast(`Checklist vibe set to ${vibeVal.toUpperCase()}`, 'info');
+        }
       }
       renderPacking();
     }
@@ -3033,6 +3047,19 @@ HTML_CONTENT = """<!DOCTYPE html>
       const allItems = getAllCurrentPackItems();
       const checks = getStoredCheckedState();
       
+      // Update badge label for auto-detect
+      const badge = document.getElementById('packVibeBadge');
+      if (badge && (!selectedPackVibe || selectedPackVibe === 'auto')) {
+        const detected = detectItineraryVibe();
+        if (detected) {
+          badge.innerText = `Auto: ${detected.toUpperCase()}`;
+          badge.className = 'text-xs text-emeraldAccent font-semibold px-2.5 py-0.5 rounded-full bg-emeraldAccent/10 border border-emeraldAccent/20';
+        } else {
+          badge.innerText = `Auto: Standard Essentials`;
+          badge.className = 'text-xs text-gray-400 font-semibold px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10';
+        }
+      }
+
       // Calculate overall progress
       const totalCount = allItems.length;
       let packedCount = 0;
@@ -3066,7 +3093,27 @@ HTML_CONTENT = """<!DOCTYPE html>
       container.innerHTML = catsToDisplay.map(catKey => {
         const catInfo = PACK_CATEGORIES[catKey];
         const items = grouped[catKey] || [];
-        if (activePackFilter === 'all' && items.length === 0 && catKey !== 'dest') return '';
+        if (items.length === 0) {
+          if (catKey === 'dest') {
+            return `
+              <div class="glass-card p-6 rounded-3xl border border-dashed border-white/15 space-y-4 shadow-md flex flex-col justify-between opacity-85 hover:opacity-100 transition">
+                <div class="space-y-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xl">📍</span>
+                    <h4 class="text-sm font-extrabold text-white">Destination-Specific Gear</h4>
+                  </div>
+                  <p class="text-xs text-gray-400 leading-relaxed">
+                    No destination is currently active in <button onclick="switchPage('planner')" class="text-coralPrimary font-bold hover:underline">Trip Architect</button>. Enter a destination or select a preset style from the dropdown above to unlock customized destination packing items.
+                  </p>
+                </div>
+                <button onclick="switchPage('planner')" class="btn-secondary py-2 rounded-xl text-xs font-semibold text-coralPrimary flex items-center justify-center gap-1">
+                  <span>🚀 Go to Trip Architect →</span>
+                </button>
+              </div>
+            `;
+          }
+          if (activePackFilter === 'all') return '';
+        }
 
         const catPacked = items.filter(it => (checks[it.id] !== undefined ? checks[it.id] : it.defaultChecked)).length;
         const catTotal = items.length;
