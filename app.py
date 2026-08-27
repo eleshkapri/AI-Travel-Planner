@@ -1693,7 +1693,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                     <span>📅 Duration</span>
                     <span id="daysDisp" class="text-coralPrimary">3 Days</span>
                   </div>
-                  <input type="range" id="plannerDays" min="1" max="14" value="3" class="w-full accent-coralPrimary cursor-pointer" oninput="document.getElementById('daysDisp').innerText = this.value + ' Days'" />
+                  <input type="range" id="plannerDays" min="1" max="90" value="3" class="w-full accent-coralPrimary cursor-pointer" oninput="document.getElementById('daysDisp').innerText = this.value + ' Days'" />
                 </div>
                 <div class="space-y-1.5">
                   <label class="block text-xs font-bold uppercase text-gray-300">💰 Tier</label>
@@ -1866,7 +1866,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div class="md:col-span-7 glass-card p-6 sm:p-8 rounded-3xl border border-white/10 space-y-5">
           <div class="grid grid-cols-2 gap-4">
-            <div><label class="text-xs font-bold text-gray-300">Days</label><input type="number" id="bDays" value="4" class="w-full px-3 py-2 bg-spaceDark border border-white/15 rounded-xl text-sm text-white" oninput="calcBudget()" /></div>
+            <div><label class="text-xs font-bold text-gray-300">Days</label><input type="number" id="bDays" value="4" min="1" max="90" class="w-full px-3 py-2 bg-spaceDark border border-white/15 rounded-xl text-sm text-white" oninput="calcBudget()" /></div>
             <div><label class="text-xs font-bold text-gray-300">Region Currency</label><input type="text" id="bCurrDisplay" readonly value="INR (₹)" class="w-full px-3 py-2 bg-spaceDark/60 border border-white/10 rounded-xl text-sm text-amberAccent font-bold" /></div>
           </div>
           <div><div class="flex justify-between text-xs text-gray-300"><span>🚆 Flights / Trains</span><span id="bValTrans">₹3,000</span></div><input type="range" id="bTrans" min="0" max="50000" step="500" value="3000" class="w-full accent-coralPrimary cursor-pointer" oninput="calcBudget()" /></div>
