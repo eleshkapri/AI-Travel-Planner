@@ -203,7 +203,7 @@ HTML_CONTENT = """<!DOCTYPE html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Instant Theme Engine (Executes BEFORE any styles/scripts to guarantee ZERO reload flicker) -->
+  <!-- Instant Pre-Paint Router & Theme Engine (Executes BEFORE styles/DOM to guarantee ZERO reload flicker) -->
   <script>
     (function() {
       try {
@@ -212,6 +212,11 @@ HTML_CONTENT = """<!DOCTYPE html>
         if (isLight) {
           document.documentElement.classList.add('light-theme');
         }
+
+        var rawHash = window.location.hash ? window.location.hash.replace('#', '') : (localStorage.getItem('roamai_active_page') || 'home');
+        var validPages = ['home', 'planner', 'budget', 'packing', 'saved'];
+        var activePage = validPages.indexOf(rawHash) !== -1 ? rawHash : 'home';
+        document.documentElement.setAttribute('data-active-page', activePage);
       } catch(e) {}
     })();
   </script>
@@ -278,6 +283,25 @@ HTML_CONTENT = """<!DOCTYPE html>
       background-color: #EEF4FB !important;
       color: #0B132B !important;
     }
+
+    /* Pre-Paint Instant Zero-Flicker Page View Router */
+    html[data-active-page="home"] #page-home { display: block !important; }
+    html[data-active-page="home"] #page-planner,
+    html[data-active-page="home"] #page-budget,
+    html[data-active-page="home"] #page-packing,
+    html[data-active-page="home"] #page-saved { display: none !important; }
+
+    html[data-active-page="planner"] #page-home { display: none !important; }
+    html[data-active-page="planner"] #page-planner { display: block !important; }
+
+    html[data-active-page="budget"] #page-home { display: none !important; }
+    html[data-active-page="budget"] #page-budget { display: block !important; }
+
+    html[data-active-page="packing"] #page-home { display: none !important; }
+    html[data-active-page="packing"] #page-packing { display: block !important; }
+
+    html[data-active-page="saved"] #page-home { display: none !important; }
+    html[data-active-page="saved"] #page-saved { display: block !important; }
 
     /* Instant CSS Theme Icon Indicator (Zero-Flicker Synchronous Rendering) */
     .theme-icon::before {
@@ -1318,7 +1342,17 @@ HTML_CONTENT = """<!DOCTYPE html>
                   <p class="text-[11px] text-gray-400">Step 1: Set Destination & Vibe</p>
                 </div>
               </div>
-              <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30" id="activeRegionBadge">🇮🇳 INR Active</span>
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  onclick="resetPlannerAll()"
+                  class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-white/10 hover:bg-rose-500/20 text-gray-300 hover:text-rose-400 border border-white/15 hover:border-rose-500/30 transition flex items-center gap-1 shadow-sm"
+                  title="Reset all inputs, draft and clear current trip"
+                >
+                  <span>🔄</span> Reset All
+                </button>
+                <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30" id="activeRegionBadge">🇮🇳 INR Active</span>
+              </div>
             </div>
 
             <div class="space-y-4 pt-3">
@@ -2083,6 +2117,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 
     function switchPage(page, saveState = true) {
       activePage = page;
+      document.documentElement.setAttribute('data-active-page', page);
       if (saveState) {
         try {
           localStorage.setItem('roamai_active_page', page);
@@ -2110,6 +2145,126 @@ HTML_CONTENT = """<!DOCTYPE html>
       if (saveState) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+    }
+
+    // ========================================================
+    // PLANNER FORM PERSISTENCE & RESET ALL SYSTEM
+    // ========================================================
+    function savePlannerDraft() {
+      try {
+        const draft = {
+          destination: document.getElementById('plannerDest')?.value || '',
+          days: document.getElementById('plannerDays')?.value || '3',
+          tier: document.getElementById('plannerTier')?.value || 'Student (Low)',
+          budgetCap: document.getElementById('plannerBudgetCap')?.value || '',
+          mustVisit: document.getElementById('plannerMustVisit')?.value || '',
+          pace: document.getElementById('plannerPace')?.value || 'Balanced',
+          interests: selectedInterests
+        };
+        localStorage.setItem('roamai_planner_draft', JSON.stringify(draft));
+      } catch (e) {}
+    }
+
+    function initPlannerDraft() {
+      try {
+        // 1. Restore Form Draft
+        const draftStr = localStorage.getItem('roamai_planner_draft');
+        if (draftStr) {
+          const draft = JSON.parse(draftStr);
+          if (draft.destination) document.getElementById('plannerDest').value = draft.destination;
+          if (draft.days) {
+            document.getElementById('plannerDays').value = draft.days;
+            document.getElementById('daysDisp').innerText = `${draft.days} Days`;
+          }
+          if (draft.tier) document.getElementById('plannerTier').value = draft.tier;
+          if (draft.budgetCap) document.getElementById('plannerBudgetCap').value = draft.budgetCap;
+          if (draft.mustVisit) document.getElementById('plannerMustVisit').value = draft.mustVisit;
+          if (draft.pace) document.getElementById('plannerPace').value = draft.pace;
+          if (Array.isArray(draft.interests) && draft.interests.length > 0) {
+            selectedInterests = draft.interests;
+            document.querySelectorAll('#interestPills .chip-tag').forEach(tag => {
+              const text = tag.innerText.replace(/^[^\\s]+\\s*/, '').trim();
+              const isActive = selectedInterests.some(i => text.includes(i) || i.includes(text));
+              tag.classList.toggle('active', isActive);
+            });
+          }
+        }
+
+        // 2. Attach Auto-Save listeners to all form controls
+        ['plannerDest', 'plannerDays', 'plannerTier', 'plannerBudgetCap', 'plannerMustVisit', 'plannerPace'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', savePlannerDraft);
+            el.addEventListener('change', savePlannerDraft);
+          }
+        });
+
+        // 3. Restore Last Active Trip if available (prevents itinerary loss on reload)
+        const activeTripStr = localStorage.getItem('roamai_active_trip');
+        if (activeTripStr) {
+          const tripData = JSON.parse(activeTripStr);
+          if (tripData && tripData.itinerary) {
+            currentTrip = tripData;
+            document.getElementById('plannerPlaceholder').classList.add('hidden');
+            document.getElementById('plannerResults').classList.remove('hidden');
+            document.getElementById('itineraryView').innerHTML = marked.parse(tripData.itinerary);
+            if (tripData.trip_summary && tripData.trip_summary.destination) {
+              document.getElementById('mapHeading').innerText = `📍 Exploring ${tripData.trip_summary.destination}`;
+            }
+            renderMap(tripData.destination_coords, tripData.markers);
+          }
+        }
+      } catch (e) {}
+    }
+
+    function resetPlannerAll() {
+      showConfirmModal({
+        title: 'Reset Trip Architect?',
+        message: 'This will clear all destination parameters, draft inputs, and reset the current itinerary blueprint.',
+        icon: '🔄',
+        confirmText: 'Reset Everything',
+        onConfirm: () => {
+          try {
+            localStorage.removeItem('roamai_planner_draft');
+            localStorage.removeItem('roamai_active_trip');
+          } catch (e) {}
+
+          currentTrip = null;
+
+          // Reset Form inputs
+          const dest = document.getElementById('plannerDest');
+          if (dest) dest.value = '';
+          const days = document.getElementById('plannerDays');
+          if (days) {
+            days.value = '3';
+            document.getElementById('daysDisp').innerText = '3 Days';
+          }
+          const tier = document.getElementById('plannerTier');
+          if (tier) tier.value = 'Student (Low)';
+          const cap = document.getElementById('plannerBudgetCap');
+          if (cap) cap.value = '';
+          const must = document.getElementById('plannerMustVisit');
+          if (must) must.value = '';
+          const pace = document.getElementById('plannerPace');
+          if (pace) pace.value = 'Balanced';
+
+          // Reset interest tags to default
+          selectedInterests = ['Street Food', 'History & Shrines'];
+          document.querySelectorAll('#interestPills .chip-tag').forEach(tag => {
+            const text = tag.innerText.replace(/^[^\\s]+\\s*/, '').trim();
+            const isActive = selectedInterests.some(i => text.includes(i) || i.includes(text));
+            tag.classList.toggle('active', isActive);
+          });
+
+          // Reset Map and Itinerary View back to clean template state
+          resetMapPlaceholder();
+          document.getElementById('plannerResults').classList.add('hidden');
+          document.getElementById('plannerPlaceholder').classList.remove('hidden');
+          document.getElementById('plannerErr').classList.add('hidden');
+
+          showToast('Trip Architect and itinerary reset back to defaults!', 'info');
+        }
+      });
     }
 
     // --- Planner Sidebar & View Mode Controls ---
@@ -2221,11 +2376,15 @@ HTML_CONTENT = """<!DOCTYPE html>
         selectedInterests.push(tag);
         el.classList.add('active');
       }
+      savePlannerDraft();
     }
 
     function startQuickTrip() {
       const dest = document.getElementById('heroDestInput').value.trim();
-      if (dest) document.getElementById('plannerDest').value = dest;
+      if (dest) {
+        document.getElementById('plannerDest').value = dest;
+        savePlannerDraft();
+      }
       switchPage('planner');
     }
 
@@ -2235,6 +2394,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('daysDisp').innerText = days + ' Days';
       document.getElementById('plannerTier').value = tier;
       selectedInterests = tags;
+      savePlannerDraft();
       switchPage('planner');
       planTrip();
     }
@@ -2245,6 +2405,8 @@ HTML_CONTENT = """<!DOCTYPE html>
         showToast('Please enter a destination to generate an itinerary.', 'warning');
         return;
       }
+
+      savePlannerDraft();
 
       const days = parseInt(document.getElementById('plannerDays').value) || 3;
       const budgetTier = document.getElementById('plannerTier').value;
@@ -2276,6 +2438,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         const data = await res.json();
         currentTrip = data;
+        try { localStorage.setItem('roamai_active_trip', JSON.stringify(data)); } catch (e) {}
 
         // Render Map
         renderMap(data.destination_coords, data.markers);
@@ -2499,10 +2662,15 @@ HTML_CONTENT = """<!DOCTYPE html>
         destination_coords: trip.destination_coords || null
       };
 
+      try {
+        localStorage.setItem('roamai_active_trip', JSON.stringify(currentTrip));
+      } catch (e) {}
+
       document.getElementById('plannerDest').value = trip.destination;
       document.getElementById('plannerDays').value = trip.days || 3;
       const daysDisp = document.getElementById('daysDisp');
       if (daysDisp) daysDisp.innerText = (trip.days || 3) + ' Days';
+      savePlannerDraft();
 
       switchPage('planner');
 
@@ -3383,10 +3551,13 @@ HTML_CONTENT = """<!DOCTYPE html>
       const savedPage = hashPage || localStorage.getItem('roamai_active_page') || 'home';
       switchPage(savedPage, false);
 
-      // 6. Render packing checklist
+      // 6. Restore Trip Architect Form Draft & Active Itinerary (prevents info loss on reload)
+      initPlannerDraft();
+
+      // 7. Render packing checklist
       renderPacking();
 
-      // 7. Render saved itineraries from persistent vault
+      // 8. Render saved itineraries from persistent vault
       renderSaved();
     });
   </script>
