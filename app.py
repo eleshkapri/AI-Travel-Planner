@@ -246,6 +246,19 @@ HTML_CONTENT = """<!DOCTYPE html>
   <!-- Vanilla Tilt (3D Card Physics) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
+  <!-- Instant Theme Execution (Prevents FOUC / flicker on page reload) -->
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('roamai_theme');
+        var isLight = savedTheme === 'light' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+        if (isLight) {
+          document.documentElement.classList.add('light-theme');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <style>
     body {
       background-color: #080C14;
@@ -471,101 +484,157 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     /* ========================================================
-       LIGHT THEME (DEVICE PREFERRED & USER TOGGLEABLE)
+       PREMIUM LIGHT THEME (MODERN TRAVEL PALETTE & CONTRAST)
        ======================================================== */
+    html.light-theme,
     body.light-theme {
-      background-color: #F4F6FB;
+      background-color: #F8FAFC;
       color: #0F172A;
     }
-    body.light-theme header {
-      background-color: rgba(255, 255, 255, 0.92);
-      border-bottom-color: rgba(0, 0, 0, 0.08);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    .light-theme header {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-bottom-color: rgba(226, 232, 240, 0.9);
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
     }
-    body.light-theme .glass-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 100%), #FFFFFF;
-      border-color: rgba(0, 0, 0, 0.08);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
+    .brand-logo-title {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 50%, #FF5E36 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    body.light-theme .glass-card:hover {
+    .light-theme .brand-logo-title {
+      background: linear-gradient(135deg, #0F172A 0%, #334155 45%, #FF5E36 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .light-theme .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 100%), #FFFFFF;
+      border-color: rgba(226, 232, 240, 0.95);
+      box-shadow: 0 15px 35px -10px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(226, 232, 240, 0.6);
+    }
+    .light-theme .glass-card:hover {
       border-color: rgba(255, 94, 54, 0.45);
-      box-shadow: 0 16px 36px rgba(255, 94, 54, 0.12);
+      box-shadow: 0 20px 40px -10px rgba(255, 94, 54, 0.12), 0 0 0 1px rgba(255, 94, 54, 0.2);
     }
-    body.light-theme .text-white {
+    .light-theme .text-white {
       color: #0F172A !important;
     }
-    body.light-theme .text-gray-300 {
+    .light-theme .text-gray-300 {
       color: #334155 !important;
     }
-    body.light-theme .text-gray-400 {
+    .light-theme .text-gray-400 {
       color: #64748B !important;
     }
-    body.light-theme .text-gray-200 {
+    .light-theme .text-gray-200 {
       color: #1E293B !important;
     }
-    body.light-theme .bg-spaceDark {
+    .light-theme .bg-spaceDark {
       background-color: #FFFFFF !important;
     }
-    body.light-theme .bg-cardDark {
+    .light-theme .bg-cardDark {
       background-color: #F1F5F9 !important;
     }
-    body.light-theme input,
-    body.light-theme select {
+    .light-theme input,
+    .light-theme select {
       background-color: #FFFFFF !important;
       color: #0F172A !important;
-      border-color: rgba(0, 0, 0, 0.14) !important;
+      border-color: #CBD5E1 !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
-    body.light-theme input::placeholder {
+    .light-theme input::placeholder {
       color: #94A3B8 !important;
     }
-    body.light-theme .btn-secondary {
-      background: #FFFFFF;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #1E293B;
+    .light-theme input:focus,
+    .light-theme select:focus {
+      border-color: #FF5E36 !important;
+      box-shadow: 0 0 0 3px rgba(255, 94, 54, 0.15);
     }
-    body.light-theme .btn-secondary:hover {
-      background: #F1F5F9;
-      border-color: rgba(0, 0, 0, 0.22);
+    .light-theme .btn-secondary {
+      background: #FFFFFF;
+      border-color: #CBD5E1;
+      color: #1E293B;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .light-theme .btn-secondary:hover {
+      background: #F8FAFC;
+      border-color: #94A3B8;
       color: #0F172A;
     }
-    body.light-theme .itinerary-prose {
-      background-color: #FFFFFF !important;
-      border-color: rgba(0, 0, 0, 0.08) !important;
-    }
-    body.light-theme .itinerary-prose p {
+    .light-theme .chip-tag {
+      background: #F1F5F9;
+      border-color: #E2E8F0;
       color: #334155;
     }
-    body.light-theme .itinerary-prose li {
+    .light-theme .chip-tag.active {
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.12), rgba(255, 160, 0, 0.15));
+      border-color: #FF5E36;
+      color: #C2410C;
+      font-weight: 700;
+    }
+    .light-theme .hero-badge {
+      background: #FFFFFF !important;
+      border-color: #E2E8F0 !important;
+      color: #0F172A !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .light-theme #regionInfoBanner {
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.06), rgba(6, 182, 212, 0.06)) !important;
+      border-color: rgba(255, 94, 54, 0.25) !important;
+    }
+    .light-theme #bannerRegionTitle {
+      color: #C2410C !important;
+    }
+    .light-theme #bannerRegionTip {
+      color: #475569 !important;
+    }
+    .light-theme .itinerary-prose {
+      background-color: #FFFFFF !important;
+      border-color: #E2E8F0 !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+    .light-theme .itinerary-prose p {
+      color: #334155;
+    }
+    .light-theme .itinerary-prose li {
       color: #1E293B;
     }
-    body.light-theme .itinerary-prose strong {
+    .light-theme .itinerary-prose strong {
       color: #0F172A;
     }
-    body.light-theme .itinerary-prose table {
-      border-color: rgba(0, 0, 0, 0.1);
+    .light-theme .itinerary-prose table {
+      border-color: #E2E8F0;
     }
-    body.light-theme .itinerary-prose th {
-      background: rgba(0, 0, 0, 0.04);
-      color: #D97706;
+    .light-theme .itinerary-prose th {
+      background: #F8FAFC;
+      color: #C2410C;
+      border-bottom: 2px solid #E2E8F0;
     }
-    body.light-theme .itinerary-prose td {
-      border-bottom-color: rgba(0, 0, 0, 0.06);
+    .light-theme .itinerary-prose td {
+      border-bottom-color: #F1F5F9;
       color: #1E293B;
     }
-    body.light-theme #themeToggleBtn {
+    .light-theme #themeToggleBtn {
       background-color: #FFFFFF;
-      border-color: rgba(0, 0, 0, 0.12);
-      color: #1E293B;
+      border-color: #CBD5E1;
+      color: #0F172A;
     }
-    body.light-theme #navRegionSelector {
+    .light-theme #navRegionSelector {
       background-color: #FFFFFF !important;
       color: #0F172A !important;
-      border-color: rgba(0, 0, 0, 0.12) !important;
+      border-color: #CBD5E1 !important;
     }
-    body.light-theme .travel-sky-pattern {
-      background: radial-gradient(circle at 20% 15%, rgba(255, 94, 54, 0.12) 0%, transparent 55%),
-                  radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
-                  radial-gradient(circle at 50% 80%, rgba(255, 160, 0, 0.10) 0%, transparent 60%);
+    .light-theme .travel-sky-pattern {
+      background: radial-gradient(circle at 20% 15%, rgba(255, 94, 54, 0.08) 0%, transparent 55%),
+                  radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 80%, rgba(255, 160, 0, 0.06) 0%, transparent 60%);
+    }
+    .light-theme .orb-1 {
+      background: radial-gradient(circle, rgba(255, 94, 54, 0.08) 0%, transparent 65%);
+    }
+    .light-theme .orb-2 {
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 65%);
+    }
+    .light-theme .orb-3 {
+      background: radial-gradient(circle, rgba(255, 160, 0, 0.06) 0%, transparent 65%);
     }
   </style>
 </head>
@@ -590,7 +659,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <span class="text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-coralPrimary">RoamAI</span>
+            <span class="text-xl font-extrabold tracking-tight brand-logo-title">RoamAI</span>
             <span class="text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase">Student</span>
           </div>
           <p class="text-[11px] text-gray-400 font-medium">Smart AI Travel Architect</p>
@@ -1487,6 +1556,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       }
 
       const isLight = theme === 'light';
+      document.documentElement.classList.toggle('light-theme', isLight);
       document.body.classList.toggle('light-theme', isLight);
 
       const deskIcon = document.getElementById('themeToggleIcon');
