@@ -511,12 +511,35 @@ HTML_CONTENT = """<!DOCTYPE html>
       background-color: #EEF4FB;
       color: #0B132B;
     }
+    /* ========================================================
+       TRANSLUCENT FROSTED GLASS HEADER & SCROLL DYNAMICS
+       ======================================================== */
+    header {
+      background-color: rgba(11, 15, 25, 0.75) !important;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+      transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, background-color 0.3s ease, box-shadow 0.35s ease;
+      will-change: transform;
+    }
+    header.nav-hidden {
+      transform: translateY(-110%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    header.nav-scrolled {
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
     .light-theme header {
-      background-color: rgba(255, 255, 255, 0.90);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom-color: rgba(203, 213, 225, 0.7);
+      background-color: rgba(255, 255, 255, 0.78) !important;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom-color: rgba(203, 213, 225, 0.65) !important;
       box-shadow: 0 4px 25px rgba(11, 19, 43, 0.05);
+    }
+    .light-theme header.nav-scrolled {
+      box-shadow: 0 20px 40px -10px rgba(11, 19, 43, 0.10);
     }
     .brand-logo-title {
       background: linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 50%, #FF5E36 100%);
@@ -688,7 +711,7 @@ HTML_CONTENT = """<!DOCTYPE html>
   <div class="travel-sky-pattern"></div>
 
   <!-- ==================== PROPERLY DESIGNED NAVBAR WITH REGION SELECTOR ==================== -->
-  <header class="sticky top-0 z-50 backdrop-blur-xl bg-spaceDark/90 border-b border-cardBorder shadow-2xl">
+  <header id="mainHeader" class="sticky top-0 z-50 backdrop-blur-xl border-b border-cardBorder shadow-2xl">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
       
       <!-- Brand Logo (Left) -->
@@ -1618,6 +1641,35 @@ HTML_CONTENT = """<!DOCTYPE html>
       setThemeMood(newTheme, true);
       showToast(`Switched to ${newTheme === 'light' ? 'Daylight Light ☀️' : 'Deep Space Dark 🌙'} mode`, 'info');
     }
+
+    // ========================================================
+    // SMART GLASS NAVBAR AUTO-HIDE / REVEAL ON SCROLL
+    // ========================================================
+    let lastScrollY = window.scrollY;
+    const scrollThreshold = 10;
+    const headerEl = document.getElementById('mainHeader');
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+      if (!headerEl) return;
+
+      if (currentScrollY > 70) {
+        headerEl.classList.add('nav-scrolled');
+        if (currentScrollY > lastScrollY + scrollThreshold) {
+          // Scrolling Down -> Hide Navbar with smooth upward slide
+          headerEl.classList.add('nav-hidden');
+        } else if (currentScrollY < lastScrollY - scrollThreshold) {
+          // Scrolling Up -> Reveal Navbar with smooth spring drop
+          headerEl.classList.remove('nav-hidden');
+        }
+      } else {
+        // At top of page -> Keep visible and clean
+        headerEl.classList.remove('nav-scrolled');
+        headerEl.classList.remove('nav-hidden');
+      }
+
+      lastScrollY = Math.max(0, currentScrollY);
+    }, { passive: true });
 
     // ========================================================
     // TOAST NOTIFICATION & CONFIRMATION MODAL SYSTEM
