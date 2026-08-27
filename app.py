@@ -2469,7 +2469,9 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     // ========================================================
-    // PLANNER FORM PERSISTENCE & RESET ALL SYSTEM
+    // PLANNER FORM PERSISTENCE & SESSION RESET SYSTEM
+    // (Uses sessionStorage: persists during tab refresh, but
+    // automatically resets when site is closed & reopened)
     // ========================================================
     function savePlannerDraft() {
       try {
@@ -2482,14 +2484,20 @@ HTML_CONTENT = """<!DOCTYPE html>
           pace: document.getElementById('plannerPace')?.value || 'Balanced',
           interests: selectedInterests
         };
-        localStorage.setItem('roamai_planner_draft', JSON.stringify(draft));
+        sessionStorage.setItem('roamai_planner_draft', JSON.stringify(draft));
       } catch (e) {}
     }
 
     function initPlannerDraft() {
       try {
-        // 1. Restore Form Draft
-        const draftStr = localStorage.getItem('roamai_planner_draft');
+        // Clean up any legacy persistent localStorage from prior versions
+        try {
+          localStorage.removeItem('roamai_planner_draft');
+          localStorage.removeItem('roamai_active_trip');
+        } catch (e) {}
+
+        // 1. Restore Form Draft from current session
+        const draftStr = sessionStorage.getItem('roamai_planner_draft');
         if (draftStr) {
           const draft = JSON.parse(draftStr);
           if (draft.destination) document.getElementById('plannerDest').value = draft.destination;
@@ -2520,8 +2528,8 @@ HTML_CONTENT = """<!DOCTYPE html>
           }
         });
 
-        // 3. Restore Last Active Trip if available (prevents itinerary loss on reload)
-        const activeTripStr = localStorage.getItem('roamai_active_trip');
+        // 3. Restore Active Trip in current session if available
+        const activeTripStr = sessionStorage.getItem('roamai_active_trip');
         if (activeTripStr) {
           const tripData = JSON.parse(activeTripStr);
           if (tripData && tripData.itinerary) {
@@ -2546,6 +2554,8 @@ HTML_CONTENT = """<!DOCTYPE html>
         confirmText: 'Reset Everything',
         onConfirm: () => {
           try {
+            sessionStorage.removeItem('roamai_planner_draft');
+            sessionStorage.removeItem('roamai_active_trip');
             localStorage.removeItem('roamai_planner_draft');
             localStorage.removeItem('roamai_active_trip');
           } catch (e) {}
@@ -2814,7 +2824,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         const data = await res.json();
         currentTrip = data;
-        try { localStorage.setItem('roamai_active_trip', JSON.stringify(data)); } catch (e) {}
+        try { sessionStorage.setItem('roamai_active_trip', JSON.stringify(data)); } catch (e) {}
 
         // Render Map
         renderMap(data.destination_coords, data.markers);
@@ -3039,7 +3049,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       };
 
       try {
-        localStorage.setItem('roamai_active_trip', JSON.stringify(currentTrip));
+        sessionStorage.setItem('roamai_active_trip', JSON.stringify(currentTrip));
       } catch (e) {}
 
       document.getElementById('plannerDest').value = trip.destination;
