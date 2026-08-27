@@ -302,23 +302,23 @@ HTML_CONTENT = """<!DOCTYPE html>
     .orb-1 {
       position: fixed; top: -10%; left: -8%; width: 55vw; height: 55vw;
       background: radial-gradient(circle, rgba(255, 94, 54, 0.22) 0%, transparent 65%);
-      filter: blur(70px); z-index: -2; pointer-events: none;
+      filter: blur(70px); z-index: 0; pointer-events: none;
       animation: floatOrb1 18s ease-in-out infinite;
     }
     .orb-2 {
       position: fixed; top: 20%; right: -12%; width: 50vw; height: 50vw;
       background: radial-gradient(circle, rgba(6, 182, 212, 0.18) 0%, transparent 65%);
-      filter: blur(80px); z-index: -2; pointer-events: none;
+      filter: blur(80px); z-index: 0; pointer-events: none;
       animation: floatOrb2 22s ease-in-out infinite;
     }
     .orb-3 {
       position: fixed; bottom: -15%; left: 20%; width: 60vw; height: 60vw;
       background: radial-gradient(circle, rgba(139, 92, 246, 0.20) 0%, transparent 65%);
-      filter: blur(90px); z-index: -2; pointer-events: none;
+      filter: blur(90px); z-index: 0; pointer-events: none;
       animation: floatOrb3 20s ease-in-out infinite;
     }
     .travel-sky-pattern {
-      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: radial-gradient(circle at 20% 15%, rgba(255, 94, 54, 0.08) 0%, transparent 50%),
                   radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 45%),
                   radial-gradient(circle at 50% 80%, rgba(255, 160, 0, 0.06) 0%, transparent 60%);
@@ -661,7 +661,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
   <!-- Dynamic Animated Wanderlust Sky Canvas, Floating Ambient Glow & Travel Texture -->
-  <canvas id="bgParticleCanvas" class="fixed inset-0 pointer-events-none z-[-1]"></canvas>
+  <canvas id="bgParticleCanvas" class="fixed inset-0 pointer-events-none" style="z-index: 1;"></canvas>
   <div class="orb-1"></div>
   <div class="orb-2"></div>
   <div class="orb-3"></div>
@@ -750,7 +750,7 @@ HTML_CONTENT = """<!DOCTYPE html>
   </header>
 
   <!-- ==================== MAIN CONTENT ==================== -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative" style="z-index: 10;">
 
     <!-- Region Information Alert Banner -->
     <div id="regionInfoBanner" class="mb-8 p-4 rounded-2xl bg-gradient-to-r from-coralPrimary/10 via-amberAccent/10 to-cyanAccent/10 border border-coralPrimary/30 flex items-center justify-between text-xs sm:text-sm text-gray-200">
@@ -1510,7 +1510,7 @@ HTML_CONTENT = """<!DOCTYPE html>
   </div>
 
   <!-- ==================== DISTINCT MINIMALIST MODERN FOOTER ==================== -->
-  <footer class="mt-24 pb-12 px-4 sm:px-6 lg:px-8">
+  <footer class="mt-24 pb-12 px-4 sm:px-6 lg:px-8 relative" style="z-index: 10;">
     <div class="max-w-3xl mx-auto glass-card p-6 sm:p-8 rounded-3xl border border-white/10 text-center space-y-4 shadow-2xl relative overflow-hidden">
       
       <!-- Subtle Ambient Glow Behind Footer -->
@@ -1519,7 +1519,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       <!-- Centered Brand & Status Pill -->
       <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-white shadow-inner">
         <span class="text-coralPrimary text-base">✈️</span>
-        <span class="font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-coralPrimary">RoamAI</span>
+        <span class="font-extrabold tracking-tight brand-logo-title">RoamAI</span>
         <span class="text-gray-500">•</span>
         <span class="flex items-center gap-1.5 text-emeraldAccent font-bold text-[11px]">
           <span class="w-1.5 h-1.5 rounded-full bg-emeraldAccent animate-pulse"></span> Free for Students
