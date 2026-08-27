@@ -1039,158 +1039,390 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- HOTSPOT CARDS WITH CATEGORY FILTER TABS -->
+      <!-- HOTSPOT CARDS WITH NATIONAL / INTERNATIONAL CLASSIFICATION & CATEGORY FILTER TABS -->
       <div class="space-y-8">
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-coralPrimary">Curated For Students</span>
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">🔥 Trending Student Destinations</h2>
-            <p class="text-gray-400 text-xs sm:text-sm mt-1">Estimated daily budgets auto-converted to your selected region currency.</p>
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-2 border-b border-white/10">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-coralPrimary">Curated For Students</span>
+              <span class="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">14 Destinations</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white">🔥 Trending Student Destinations</h2>
+            <p class="text-gray-400 text-xs sm:text-sm">Classified by National (India) and International hotspots with auto-converting student budgets.</p>
           </div>
 
-          <!-- Category Filter Tabs -->
-          <div class="flex flex-wrap gap-2" id="hotspotFilterPills">
-            <button onclick="filterHotspotGrid('all')" class="hotspot-filter-btn active text-xs px-3.5 py-1.5 rounded-full border border-transparent bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-bold transition">All Hotspots</button>
-            <button onclick="filterHotspotGrid('beach')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏖️ Beach & Tropics</button>
-            <button onclick="filterHotspotGrid('culture')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏛️ History & Culture</button>
-            <button onclick="filterHotspotGrid('nightlife')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🎉 Nightlife & Food</button>
+          <!-- Scope & Theme Filters -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+            <!-- National vs International Scope Toggle -->
+            <div class="p-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1 shadow-inner">
+              <button
+                type="button"
+                data-scope="all"
+                onclick="setHotspotScope('all')"
+                class="hotspot-scope-btn active text-xs px-4 py-2 rounded-full border border-transparent bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-extrabold transition shadow-md flex items-center gap-1.5"
+              >
+                <span>🌍</span> All (14)
+              </button>
+              <button
+                type="button"
+                data-scope="national"
+                onclick="setHotspotScope('national')"
+                class="hotspot-scope-btn text-xs px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300 hover:text-white hover:border-white/20 transition flex items-center gap-1.5"
+              >
+                <span>🇮🇳</span> National (6)
+              </button>
+              <button
+                type="button"
+                data-scope="international"
+                onclick="setHotspotScope('international')"
+                class="hotspot-scope-btn text-xs px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300 hover:text-white hover:border-white/20 transition flex items-center gap-1.5"
+              >
+                <span>✈️</span> International (8)
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="hotspotCardsGrid">
+        <!-- Secondary Theme Filter Pills -->
+        <div class="flex flex-wrap items-center gap-2" id="hotspotFilterPills">
+          <span class="text-xs font-bold text-gray-400 mr-1 flex items-center gap-1"><span>✨</span> Vibe:</span>
+          <button type="button" data-cat="all" onclick="setHotspotCategory('all')" class="hotspot-filter-btn active text-xs px-3.5 py-1.5 rounded-full border border-transparent bg-white/20 text-white font-bold transition shadow-sm">All Vibes</button>
+          <button type="button" data-cat="beach" onclick="setHotspotCategory('beach')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏖️ Beach & Coastal</button>
+          <button type="button" data-cat="mountain" onclick="setHotspotCategory('mountain')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏔️ Mountains & Trekking</button>
+          <button type="button" data-cat="culture" onclick="setHotspotCategory('culture')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🏛️ History & Culture</button>
+          <button type="button" data-cat="nightlife" onclick="setHotspotCategory('nightlife')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">🎉 Nightlife & Food</button>
+          <button type="button" data-cat="adventure" onclick="setHotspotCategory('adventure')" class="hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition">⚡ Adventure & Nature</button>
+        </div>
+
+        <!-- HOTSPOT CARDS GRID -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="hotspotCardsGrid">
           
-          <!-- Tokyo -->
-          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-cat="culture nightlife" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Tokyo, Japan', 4, 'Student (Low)', ['Street Food', 'Anime & Pop Culture', 'History'])">
-            <div class="space-y-3">
-              <div class="relative rounded-2xl overflow-hidden h-48">
-                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/80 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">🇯🇵 Japan</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purpleAccent/20 text-purpleAccent border border-purpleAccent/30">Pop Culture & Food</span>
-                </div>
-                <h3 class="text-lg font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Tokyo, Japan</h3>
-                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Neon street alleys, high-speed rail, futuristic arcades, and incredible budget ramen stalls.</p>
-              </div>
-            </div>
-            <div class="flex justify-between items-center pt-3 border-t border-white/10">
-              <span class="text-xs font-bold text-amberAccent" id="hotspotTokyoCost">💰 ~₹4,000 / day</span>
-              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
-            </div>
-          </div>
+          <!-- ============================================ -->
+          <!-- 🇮🇳 NATIONAL DESTINATIONS (DOMESTIC INDIA) -->
+          <!-- ============================================ -->
 
-          <!-- Bali -->
-          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-cat="beach" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Bali, Indonesia', 5, 'Student (Low)', ['Nature', 'Beaches', 'Adventure'])">
+          <!-- 1. Goa -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="beach nightlife" data-cost-inr="2000" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Goa, India', 4, 'Student (Low)', ['Nightlife', 'Beaches', 'Street Food'])">
             <div class="space-y-3">
-              <div class="relative rounded-2xl overflow-hidden h-48">
-                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/80 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">🇮🇩 Indonesia</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyanAccent/20 text-cyanAccent border border-cyanAccent/30">Beach & Nature</span>
-                </div>
-                <h3 class="text-lg font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Bali, Indonesia</h3>
-                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Lush jungle waterfalls, world-class surf breaks, beach clubs, and vibrant backpacker hostels.</p>
-              </div>
-            </div>
-            <div class="flex justify-between items-center pt-3 border-t border-white/10">
-              <span class="text-xs font-bold text-cyanAccent" id="hotspotBaliCost">💰 ~₹2,500 / day</span>
-              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
-            </div>
-          </div>
-
-          <!-- Rome -->
-          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-cat="culture" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Rome, Italy', 3, 'Moderate', ['History', 'Museums', 'Street Food'])">
-            <div class="space-y-3">
-              <div class="relative rounded-2xl overflow-hidden h-48">
-                <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/80 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">🇮🇹 Italy</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30">History & Architecture</span>
-                </div>
-                <h3 class="text-lg font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Rome, Italy</h3>
-                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Colosseum tours, Trevi fountain wishes, free museum days for EU students, and authentic pasta.</p>
-              </div>
-            </div>
-            <div class="flex justify-between items-center pt-3 border-t border-white/10">
-              <span class="text-xs font-bold text-coralPrimary" id="hotspotRomeCost">💰 ~₹5,000 / day</span>
-              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
-            </div>
-          </div>
-
-          <!-- Amsterdam -->
-          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-cat="nightlife culture" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Amsterdam, Netherlands', 3, 'Student (Low)', ['Nightlife', 'Museums', 'Street Food'])">
-            <div class="space-y-3">
-              <div class="relative rounded-2xl overflow-hidden h-48">
-                <img src="https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/80 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">🇳🇱 Netherlands</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purpleAccent/20 text-purpleAccent border border-purpleAccent/30">Canals & Nightlife</span>
-                </div>
-                <h3 class="text-lg font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Amsterdam, Netherlands</h3>
-                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Historic canals, cycling tours, world-class art museums, and unmatched student hostel vibes.</p>
-              </div>
-            </div>
-            <div class="flex justify-between items-center pt-3 border-t border-white/10">
-              <span class="text-xs font-bold text-purpleAccent" id="hotspotAmsterdamCost">💰 ~₹5,500 / day</span>
-              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
-            </div>
-          </div>
-
-          <!-- Goa -->
-          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-cat="beach nightlife" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Goa, India', 4, 'Student (Low)', ['Nightlife', 'Beaches', 'Street Food'])">
-            <div class="space-y-3">
-              <div class="relative rounded-2xl overflow-hidden h-48">
-                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/80 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">🇮🇳 India</span>
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" alt="Goa Beaches" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">Coastal Shacks & Parties</span>
                 </div>
-                <h3 class="text-lg font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Goa, India</h3>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Goa, India</h3>
                 <p class="text-xs text-gray-400 mt-1 leading-relaxed">Sun-kissed beaches, night flea markets, sunset cruise parties, and affordable student shacks.</p>
               </div>
             </div>
             <div class="flex justify-between items-center pt-3 border-t border-white/10">
-              <span class="text-xs font-bold text-emeraldAccent" id="hotspotGoaCost">💰 ~₹2,000 / day</span>
+              <span class="text-xs font-bold text-emeraldAccent hotspot-cost-val">💰 ~₹2,000 / day</span>
               <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
             </div>
           </div>
 
-          <!-- Kyoto -->
-          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-cat="culture" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Kyoto, Japan', 3, 'Student (Low)', ['History', 'Nature', 'Street Food'])">
+          <!-- 2. Manali & Kasol -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="mountain adventure nature" data-cost-inr="1800" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Manali, Himachal Pradesh, India', 4, 'Student (Low)', ['Nature', 'Adventure', 'Hiking'])">
             <div class="space-y-3">
-              <div class="relative rounded-2xl overflow-hidden h-48">
-                <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
-                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/80 backdrop-blur-md text-[10px] font-bold text-white border border-white/10">🇯🇵 Japan</span>
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=600&q=80" alt="Manali Mountains" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyanAccent/20 text-cyanAccent border border-cyanAccent/30">Mountains & Trekking</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Manali & Kasol, HP</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Snowcapped Himalayan passes, riverside cafes, vibrant backpacker hostels, and Kheerganga treks.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-cyanAccent hotspot-cost-val">💰 ~₹1,800 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 3. Jaipur & Udaipur -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="culture" data-cost-inr="2200" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Jaipur, Rajasthan, India', 3, 'Student (Low)', ['History', 'Culture', 'Street Food'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=600&q=80" alt="Jaipur Palace" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amberAccent/20 text-amberAccent border border-amberAccent/30">Royal Forts & Bazaars</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Jaipur & Udaipur, India</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Hawa Mahal, Amer Fort views, lakeside sunsets, student heritage discounts, and spicy street food.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-amberAccent hotspot-cost-val">💰 ~₹2,200 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 4. Rishikesh -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="adventure mountain" data-cost-inr="1600" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Rishikesh, Uttarakhand, India', 3, 'Student (Low)', ['Adventure', 'Nature', 'Culture'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1600100397608-f010e4708704?auto=format&fit=crop&w=600&q=80" alt="Rishikesh River" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purpleAccent/20 text-purpleAccent border border-purpleAccent/30">Rafting & Yoga Vibe</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Rishikesh, India</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">White-water Ganga rafting, cliff jumping, riverside camping tents, Beatles Ashram, and evening aarti.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-purpleAccent hotspot-cost-val">💰 ~₹1,600 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 5. Varanasi -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="culture" data-cost-inr="1400" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Varanasi, Uttar Pradesh, India', 3, 'Student (Low)', ['History', 'Culture', 'Street Food'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=600&q=80" alt="Varanasi Ghats" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amberAccent/20 text-amberAccent border border-amberAccent/30">Ancient Ghats & Chaat</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Varanasi, India</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Sunrise boat rides along the sacred Ganga, labyrinth heritage lanes, and world-famous street food.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-amberAccent hotspot-cost-val">💰 ~₹1,400 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 6. Munnar & Kochi -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="nature beach" data-cost-inr="2100" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Munnar, Kerala, India', 4, 'Student (Low)', ['Nature', 'Culture', 'Photography'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=600&q=80" alt="Munnar Tea Hills" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">Tea Hills & Coastal Art</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Munnar & Kochi, Kerala</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Misty tea estate walks, budget backwater ferries, Fort Kochi art cafes, and spice plantations.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-emeraldAccent hotspot-cost-val">💰 ~₹2,100 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- ============================================ -->
+          <!-- ✈️ INTERNATIONAL DESTINATIONS (GLOBAL) -->
+          <!-- ============================================ -->
+
+          <!-- 7. Tokyo -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture nightlife" data-cost-inr="4200" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Tokyo, Japan', 4, 'Student (Low)', ['Street Food', 'Anime & Pop Culture', 'History'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80" alt="Tokyo City" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇯🇵)</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purpleAccent/20 text-purpleAccent border border-purpleAccent/30">Pop Culture & Tech</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Tokyo, Japan</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Neon Shibuya alleys, high-speed rail, anime arcades, 100-yen stores, and incredible budget ramen stalls.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-amberAccent hotspot-cost-val">💰 ~₹4,200 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 8. Bali -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="beach nature" data-cost-inr="2500" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Bali, Indonesia', 5, 'Student (Low)', ['Nature', 'Beaches', 'Adventure'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80" alt="Bali Beach" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇮🇩)</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyanAccent/20 text-cyanAccent border border-cyanAccent/30">Beaches & Jungles</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Bali, Indonesia</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Lush jungle waterfalls, world-class surf breaks, sunset beach clubs, and vibrant backpacker hostels.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-cyanAccent hotspot-cost-val">💰 ~₹2,500 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 9. Bangkok & Phuket -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="beach nightlife" data-cost-inr="2300" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Bangkok, Thailand', 4, 'Student (Low)', ['Street Food', 'Nightlife', 'Beaches'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=600&q=80" alt="Bangkok Temples" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇹🇭)</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30">Night Markets & Islands</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Bangkok & Phuket, Thailand</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Street food paradise, Chao Phraya express river boats, Phi Phi island trips, and lively night markets.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-coralPrimary hotspot-cost-val">💰 ~₹2,300 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 10. Rome -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture" data-cost-inr="5000" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Rome, Italy', 3, 'Moderate', ['History', 'Museums', 'Street Food'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80" alt="Rome Colosseum" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇮🇹)</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amberAccent/20 text-amberAccent border border-amberAccent/30">History & Architecture</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Rome, Italy</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Colosseum tours, Trevi fountain wishes, free museum days for students, and authentic woodfire pizza.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-amberAccent hotspot-cost-val">💰 ~₹5,000 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 11. Amsterdam -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="nightlife culture" data-cost-inr="5500" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Amsterdam, Netherlands', 3, 'Student (Low)', ['Nightlife', 'Museums', 'Street Food'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=600&q=80" alt="Amsterdam Canals" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇳🇱)</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purpleAccent/20 text-purpleAccent border border-purpleAccent/30">Canals & Nightlife</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Amsterdam, Netherlands</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Historic canals, cycling paths, world-class art museums, and unmatched student hostel vibes.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-purpleAccent hotspot-cost-val">💰 ~₹5,500 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 12. Kyoto -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture nature" data-cost-inr="3800" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Kyoto, Japan', 3, 'Student (Low)', ['History', 'Nature', 'Street Food'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80" alt="Kyoto Shrine" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇯🇵)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amberAccent/20 text-amberAccent border border-amberAccent/30">Shrines & Bamboo Groves</span>
                 </div>
-                <h3 class="text-lg font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Kyoto, Japan</h3>
-                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Golden pavilions, bamboo forests, Fushimi Inari torii gates, and traditional matcha desserts.</p>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Kyoto, Japan</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Fushimi Inari thousand torii gates, Arashiyama bamboo forests, and traditional matcha desserts.</p>
               </div>
             </div>
             <div class="flex justify-between items-center pt-3 border-t border-white/10">
-              <span class="text-xs font-bold text-amberAccent" id="hotspotKyotoCost">💰 ~₹3,800 / day</span>
+              <span class="text-xs font-bold text-amberAccent hotspot-cost-val">💰 ~₹3,800 / day</span>
               <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
             </div>
           </div>
 
+          <!-- 13. Paris -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture" data-cost-inr="5200" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Paris, France', 3, 'Moderate', ['Museums', 'Culture', 'Photography'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80" alt="Paris Eiffel Tower" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇫🇷)</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30">Art, Cafes & Architecture</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Paris, France</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Seine river sunset picnics, Montmartre artists, youth museum access, and fresh neighborhood bakeries.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-coralPrimary hotspot-cost-val">💰 ~₹5,200 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+          <!-- 14. Dubai -->
+          <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="nightlife adventure" data-cost-inr="4500" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Dubai, UAE', 3, 'Student (Low)', ['Adventure', 'Sightseeing', 'Shopping'])">
+            <div class="space-y-3">
+              <div class="relative rounded-2xl overflow-hidden h-44">
+                <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80" alt="Dubai Skyline" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇦🇪)</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-cyanAccent/20 text-cyanAccent border border-cyanAccent/30">Desert Safaris & Skylines</span>
+                </div>
+                <h3 class="text-base font-bold text-white group-hover:text-coralPrimary transition mt-1.5">Dubai, UAE</h3>
+                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Red dune sandboarding safaris, 1-dirham creek abra rides, Spice Souks, and futuristic architecture.</p>
+              </div>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-white/10">
+              <span class="text-xs font-bold text-cyanAccent hotspot-cost-val">💰 ~₹4,500 / day</span>
+              <span class="text-xs font-bold text-coralPrimary flex items-center gap-1 group-hover:translate-x-1 transition">Plan Trip →</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Empty State Message when filters yield no matches -->
+        <div id="hotspotEmptyMsg" class="hidden glass-card p-10 rounded-3xl border border-dashed border-white/15 text-center space-y-3 shadow-lg">
+          <span class="text-3xl">🧭</span>
+          <h4 class="text-base font-bold text-white">No destinations match the selected filters</h4>
+          <p class="text-xs text-gray-400">Try selecting "All" in the scope or vibe tabs above to explore all 14 student hotspots.</p>
+          <button onclick="setHotspotScope('all'); setHotspotCategory('all')" class="btn-secondary px-4 py-2 rounded-xl text-xs font-semibold text-coralPrimary mx-auto">
+            <span>Reset Hotspot Filters</span>
+          </button>
         </div>
       </div>
 
@@ -2069,13 +2301,8 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('activeRegionBadge').innerText = `${reg.flag} ${reg.curr} Active`;
       document.getElementById('plannerCurr').value = `${reg.curr} (${reg.sym})`;
 
-      // Update Hotspot Cards Costs
-      document.getElementById('hotspotTokyoCost').innerText = `💰 ~${reg.hotspots.tokyo} / day`;
-      document.getElementById('hotspotBaliCost').innerText = `💰 ~${reg.hotspots.bali} / day`;
-      document.getElementById('hotspotRomeCost').innerText = `💰 ~${reg.hotspots.rome} / day`;
-      document.getElementById('hotspotAmsterdamCost').innerText = `💰 ~${reg.hotspots.amsterdam} / day`;
-      document.getElementById('hotspotGoaCost').innerText = `💰 ~${reg.hotspots.goa} / day`;
-      document.getElementById('hotspotKyotoCost').innerText = `💰 ~${reg.hotspots.kyoto} / day`;
+      // Update Hotspot Cards Costs dynamically for all 14 destinations
+      updateHotspotCosts();
 
       // Update Budget Calculator Inputs & Sliders
       document.getElementById('bCurrDisplay').value = `${reg.curr} (${reg.sym})`;
@@ -2345,25 +2572,80 @@ HTML_CONTENT = """<!DOCTYPE html>
       }
     }
 
-    function filterHotspotGrid(category) {
-      const cards = document.querySelectorAll('.hotspot-card');
-      const btns = document.querySelectorAll('.hotspot-filter-btn');
+    // ========================================================
+    // TRENDING STUDENT DESTINATIONS: NATIONAL & INTERNATIONAL FILTERS
+    // ========================================================
+    let activeHotspotScope = 'all';
+    let activeHotspotCat = 'all';
 
-      btns.forEach(btn => {
-        const isTarget = btn.getAttribute('onclick').includes(`'${category}'`);
+    function setHotspotScope(scope) {
+      activeHotspotScope = scope;
+      document.querySelectorAll('.hotspot-scope-btn').forEach(btn => {
+        const isTarget = btn.getAttribute('data-scope') === scope;
         if (isTarget) {
-          btn.className = 'hotspot-filter-btn active text-xs px-3.5 py-1.5 rounded-full border border-transparent bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-bold transition shadow-md';
+          btn.className = 'hotspot-scope-btn active text-xs px-4 py-2 rounded-full border border-transparent bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-extrabold transition shadow-md flex items-center gap-1.5';
+        } else {
+          btn.className = 'hotspot-scope-btn text-xs px-4 py-2 rounded-full border border-white/10 bg-white/5 text-gray-300 hover:text-white hover:border-white/20 transition flex items-center gap-1.5';
+        }
+      });
+      applyHotspotFilters();
+    }
+
+    function setHotspotCategory(cat) {
+      activeHotspotCat = cat;
+      document.querySelectorAll('.hotspot-filter-btn').forEach(btn => {
+        const isTarget = btn.getAttribute('data-cat') === cat;
+        if (isTarget) {
+          btn.className = 'hotspot-filter-btn active text-xs px-3.5 py-1.5 rounded-full border border-transparent bg-white/20 text-white font-bold transition shadow-sm';
         } else {
           btn.className = 'hotspot-filter-btn text-xs px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-400 hover:text-white transition';
         }
       });
+      applyHotspotFilters();
+    }
+
+    function filterHotspotGrid(category) {
+      setHotspotCategory(category);
+    }
+
+    function applyHotspotFilters() {
+      const cards = document.querySelectorAll('.hotspot-card');
+      let visibleCount = 0;
 
       cards.forEach(card => {
-        const cardCats = card.getAttribute('data-cat') || '';
-        if (category === 'all' || cardCats.includes(category)) {
+        const scope = card.getAttribute('data-scope') || '';
+        const cats = card.getAttribute('data-cat') || '';
+
+        const scopeMatch = (activeHotspotScope === 'all' || scope === activeHotspotScope);
+        const catMatch = (activeHotspotCat === 'all' || cats.includes(activeHotspotCat));
+
+        if (scopeMatch && catMatch) {
           card.classList.remove('hidden');
+          visibleCount++;
         } else {
           card.classList.add('hidden');
+        }
+      });
+
+      const emptyMsg = document.getElementById('hotspotEmptyMsg');
+      if (emptyMsg) {
+        emptyMsg.classList.toggle('hidden', visibleCount > 0);
+      }
+    }
+
+    function updateHotspotCosts() {
+      const reg = REGIONS[activeRegionKey] || REGIONS.INR;
+      document.querySelectorAll('.hotspot-card').forEach(card => {
+        const costInr = parseFloat(card.getAttribute('data-cost-inr')) || 3000;
+        const costEl = card.querySelector('.hotspot-cost-val');
+        if (costEl) {
+          if (activeRegionKey === 'INR') {
+            costEl.innerText = `💰 ~₹${costInr.toLocaleString()} / day`;
+          } else {
+            const inUsd = costInr / 80;
+            const converted = Math.round(inUsd * reg.multiplier);
+            costEl.innerText = `💰 ~${reg.sym}${converted.toLocaleString()} / day`;
+          }
         }
       });
     }
