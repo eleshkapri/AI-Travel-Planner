@@ -246,6 +246,19 @@ HTML_CONTENT = """<!DOCTYPE html>
   <!-- Vanilla Tilt (3D Card Physics) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
+  <!-- Instant Theme Engine (Reads device preference first, prevents any reload flicker) -->
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('roamai_theme');
+        var isLight = savedTheme ? savedTheme === 'light' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+        if (isLight) {
+          document.documentElement.classList.add('light-theme');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <style>
     body {
       background-color: #080C14;
@@ -469,6 +482,165 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #9CA3AF;
       font-style: italic;
     }
+
+    /* ========================================================
+       PREMIUM LIGHT THEME (VIBRANT MORNING SKY & CELESTIAL MIST)
+       ======================================================== */
+    html.light-theme,
+    body.light-theme {
+      background-color: #EEF4FB;
+      color: #0B132B;
+    }
+    .light-theme header {
+      background-color: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom-color: rgba(203, 213, 225, 0.7);
+      box-shadow: 0 4px 25px rgba(11, 19, 43, 0.05);
+    }
+    .brand-logo-title {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 50%, #FF5E36 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .light-theme .brand-logo-title {
+      background: linear-gradient(135deg, #0B132B 0%, #1E293B 40%, #FF5E36 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .light-theme .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.78) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 15px 35px -10px rgba(11, 19, 43, 0.07), 0 0 0 1px rgba(226, 232, 240, 0.8);
+    }
+    .light-theme .glass-card:hover {
+      border-color: rgba(255, 94, 54, 0.5);
+      box-shadow: 0 20px 40px -10px rgba(255, 94, 54, 0.15), 0 0 0 1px rgba(255, 94, 54, 0.3);
+      transform: translateY(-4px);
+    }
+    .light-theme .text-white {
+      color: #0B132B !important;
+    }
+    .light-theme .text-gray-300 {
+      color: #334155 !important;
+    }
+    .light-theme .text-gray-400 {
+      color: #64748B !important;
+    }
+    .light-theme .text-gray-200 {
+      color: #1E293B !important;
+    }
+    .light-theme .bg-spaceDark {
+      background-color: rgba(255, 255, 255, 0.92) !important;
+    }
+    .light-theme .bg-cardDark {
+      background-color: rgba(241, 245, 249, 0.92) !important;
+    }
+    .light-theme input,
+    .light-theme select {
+      background-color: #FFFFFF !important;
+      color: #0B132B !important;
+      border-color: #CBD5E1 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .light-theme input::placeholder {
+      color: #94A3B8 !important;
+    }
+    .light-theme input:focus,
+    .light-theme select:focus {
+      border-color: #FF5E36 !important;
+      box-shadow: 0 0 0 3px rgba(255, 94, 54, 0.15);
+    }
+    .light-theme .btn-secondary {
+      background: #FFFFFF;
+      border-color: #CBD5E1;
+      color: #1E293B;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+    .light-theme .btn-secondary:hover {
+      background: #F8FAFC;
+      border-color: #94A3B8;
+      color: #0B132B;
+    }
+    .light-theme .chip-tag {
+      background: #F1F5F9;
+      border-color: #E2E8F0;
+      color: #334155;
+    }
+    .light-theme .chip-tag.active {
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.15), rgba(255, 160, 0, 0.15));
+      border-color: #FF5E36;
+      color: #C2410C;
+      font-weight: 700;
+    }
+    .light-theme .hero-badge {
+      background: #FFFFFF !important;
+      border-color: #E2E8F0 !important;
+      color: #0B132B !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+    .light-theme #regionInfoBanner {
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.08), rgba(2, 132, 199, 0.08)) !important;
+      border-color: rgba(255, 94, 54, 0.3) !important;
+    }
+    .light-theme #bannerRegionTitle {
+      color: #C2410C !important;
+    }
+    .light-theme #bannerRegionTip {
+      color: #475569 !important;
+    }
+    .light-theme .itinerary-prose {
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      border-color: #E2E8F0 !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+    .light-theme .itinerary-prose p {
+      color: #334155;
+    }
+    .light-theme .itinerary-prose li {
+      color: #1E293B;
+    }
+    .light-theme .itinerary-prose strong {
+      color: #0B132B;
+    }
+    .light-theme .itinerary-prose table {
+      border-color: #E2E8F0;
+    }
+    .light-theme .itinerary-prose th {
+      background: #F8FAFC;
+      color: #C2410C;
+      border-bottom: 2px solid #E2E8F0;
+    }
+    .light-theme .itinerary-prose td {
+      border-bottom-color: #F1F5F9;
+      color: #1E293B;
+    }
+    .light-theme #themeToggleBtn {
+      background-color: #FFFFFF;
+      border-color: #CBD5E1;
+      color: #0B132B;
+    }
+    .light-theme #navRegionSelector {
+      background-color: #FFFFFF !important;
+      color: #0B132B !important;
+      border-color: #CBD5E1 !important;
+    }
+    .light-theme .travel-sky-pattern {
+      background: radial-gradient(circle at 15% 15%, rgba(255, 94, 54, 0.12) 0%, transparent 55%),
+                  radial-gradient(circle at 85% 25%, rgba(2, 132, 199, 0.14) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.10) 0%, transparent 60%);
+    }
+    .light-theme .orb-1 {
+      background: radial-gradient(circle, rgba(255, 94, 54, 0.18) 0%, transparent 65%);
+    }
+    .light-theme .orb-2 {
+      background: radial-gradient(circle, rgba(2, 132, 199, 0.18) 0%, transparent 65%);
+    }
+    .light-theme .orb-3 {
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 65%);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
@@ -492,7 +664,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <span class="text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-coralPrimary">RoamAI</span>
+            <span class="text-xl font-extrabold tracking-tight brand-logo-title">RoamAI</span>
             <span class="text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase">Student</span>
           </div>
           <p class="text-[11px] text-gray-400 font-medium">Smart AI Travel Architect</p>
@@ -508,9 +680,20 @@ HTML_CONTENT = """<!DOCTYPE html>
         <button onclick="switchPage('saved')" id="tab-saved" class="nav-tab hover:text-white flex items-center gap-1.5 transition"><span>📂</span> Saved (<span id="savedCount">0</span>)</button>
       </nav>
 
-      <!-- Region Selector & CTA (Right) -->
-      <div class="flex items-center gap-3 shrink-0">
+      <!-- Theme Switcher, Region Selector & CTA (Right) -->
+      <div class="flex items-center gap-2.5 shrink-0">
         
+        <!-- Theme Mood Switcher (Dark / Light) -->
+        <button
+          id="themeToggleBtn"
+          onclick="toggleThemeMood()"
+          class="w-9 h-9 rounded-xl bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 flex items-center justify-center text-sm text-gray-300 hover:text-white transition shadow-sm"
+          title="Toggle Light / Dark Mode"
+          aria-label="Toggle Theme Mood"
+        >
+          <span id="themeToggleIcon">🌙</span>
+        </button>
+
         <!-- Region & Currency Selector -->
         <div class="relative flex items-center">
           <span class="absolute left-3 text-sm pointer-events-none" id="navRegionFlag">🇮🇳</span>
@@ -546,6 +729,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center"><span>💰</span>Budget</button>
       <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center"><span>🎒</span>Packing</button>
       <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center"><span>📂</span>Saved</button>
+      <button onclick="toggleThemeMood()" class="flex flex-col items-center"><span id="mobThemeToggleIcon">🌙</span>Mood</button>
     </div>
   </header>
 
@@ -1345,6 +1529,59 @@ HTML_CONTENT = """<!DOCTYPE html>
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
+    // ========================================================
+    // THEME MOOD SYSTEM (DEVICE PREFERRED & USER TOGGLEABLE)
+    // ========================================================
+    let currentTheme = 'dark';
+
+    function initThemeMood() {
+      const savedTheme = localStorage.getItem('roamai_theme');
+      if (savedTheme) {
+        setThemeMood(savedTheme, false);
+      } else {
+        // First prefer the mood of the site by device preference
+        const systemPrefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        setThemeMood(systemPrefersLight ? 'light' : 'dark', false);
+      }
+
+      // Automatically sync if system theme changes and user hasn't set manual override
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+          if (!localStorage.getItem('roamai_theme')) {
+            setThemeMood(e.matches ? 'light' : 'dark', false);
+          }
+        });
+      }
+    }
+
+    function setThemeMood(theme, saveManual = true) {
+      currentTheme = theme;
+      if (saveManual) {
+        try { localStorage.setItem('roamai_theme', theme); } catch(e) {}
+      }
+
+      const isLight = theme === 'light';
+      document.documentElement.classList.toggle('light-theme', isLight);
+      document.body.classList.toggle('light-theme', isLight);
+
+      const deskIcon = document.getElementById('themeToggleIcon');
+      if (deskIcon) deskIcon.innerText = isLight ? '☀️' : '🌙';
+
+      const mobIcon = document.getElementById('mobThemeToggleIcon');
+      if (mobIcon) mobIcon.innerText = isLight ? '☀️' : '🌙';
+
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) {
+        btn.title = isLight ? 'Switch to Dark Mode (🌙)' : 'Switch to Light Mode (☀️)';
+      }
+    }
+
+    function toggleThemeMood() {
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      setThemeMood(newTheme, true);
+      showToast(`Switched to ${newTheme === 'light' ? 'Daylight Light ☀️' : 'Deep Space Dark 🌙'} mode`, 'info');
+    }
+
     // ========================================================
     // TOAST NOTIFICATION & CONFIRMATION MODAL SYSTEM
     // ========================================================
@@ -2593,14 +2830,15 @@ HTML_CONTENT = """<!DOCTYPE html>
         mouse.y = null;
       });
 
-      function drawPlane(p) {
+      function drawPlane(p, isLight) {
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.angle);
 
-        ctx.fillStyle = p.color;
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 8;
+        const planeColor = isLight ? (p.color === '#06B6D4' ? '#0284C7' : '#E11D48') : p.color;
+        ctx.fillStyle = planeColor;
+        ctx.shadowColor = isLight ? 'rgba(15, 23, 42, 0.3)' : planeColor;
+        ctx.shadowBlur = isLight ? 4 : 8;
         ctx.beginPath();
         // Nose
         ctx.moveTo(p.size, 0);
@@ -2624,14 +2862,14 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.restore();
       }
 
-      function drawBalloon(b) {
+      function drawBalloon(b, isLight) {
         ctx.save();
         ctx.translate(b.x, b.y);
 
         // Balloon envelope
         ctx.fillStyle = b.hue;
-        ctx.shadowColor = b.hue;
-        ctx.shadowBlur = 10;
+        ctx.shadowColor = isLight ? 'rgba(0,0,0,0.15)' : b.hue;
+        ctx.shadowBlur = 8;
         ctx.beginPath();
         ctx.arc(0, 0, b.radius, 0, Math.PI, true);
         ctx.quadraticCurveTo(-b.radius * 0.9, b.radius * 1.1, 0, b.radius * 1.4);
@@ -2639,12 +2877,12 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.fill();
 
         // Basket
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fillStyle = isLight ? '#475569' : 'rgba(255, 255, 255, 0.7)';
         ctx.fillRect(-b.radius * 0.25, b.radius * 1.65, b.radius * 0.5, b.radius * 0.35);
 
         // Strings
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 0.6;
+        ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.45)' : 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 0.8;
         ctx.beginPath();
         ctx.moveTo(-b.radius * 0.3, b.radius * 1.4);
         ctx.lineTo(-b.radius * 0.2, b.radius * 1.65);
@@ -2655,11 +2893,14 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.restore();
       }
 
-      function drawCompassStar(s, alpha) {
+      function drawCompassStar(s, alpha, isLight) {
         ctx.save();
         ctx.translate(s.x, s.y);
-        ctx.fillStyle = s.color + alpha + ')';
-        ctx.shadowColor = s.color + '0.8)';
+        const starColor = isLight 
+          ? (s.color.includes('255, 160') ? 'rgba(217, 119, 6, ' : 'rgba(2, 132, 199, ')
+          : s.color;
+        ctx.fillStyle = starColor + alpha + ')';
+        ctx.shadowColor = isLight ? 'rgba(217, 119, 6, 0.6)' : starColor + '0.8)';
         ctx.shadowBlur = 6;
 
         ctx.beginPath();
@@ -2678,18 +2919,19 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       function animate() {
         ctx.clearRect(0, 0, width, height);
+        const isLight = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
 
         // 1. Draw Global Great-Circle Flight Arcs
         ctx.save();
         ctx.setLineDash([6, 12]);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(255, 160, 0, 0.12)';
+        ctx.lineWidth = isLight ? 1.5 : 1;
+        ctx.strokeStyle = isLight ? 'rgba(234, 88, 12, 0.40)' : 'rgba(255, 160, 0, 0.12)';
         ctx.beginPath();
         ctx.moveTo(0, height * 0.3);
         ctx.quadraticCurveTo(width * 0.5, height * 0.1, width, height * 0.45);
         ctx.stroke();
 
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.10)';
+        ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.40)' : 'rgba(6, 182, 212, 0.10)';
         ctx.beginPath();
         ctx.moveTo(0, height * 0.7);
         ctx.quadraticCurveTo(width * 0.4, height * 0.85, width, height * 0.6);
@@ -2699,16 +2941,16 @@ HTML_CONTENT = """<!DOCTYPE html>
         // 2. Draw Destination Waypoint Pulses
         waypoints.forEach(wp => {
           wp.pulseRadius = (wp.pulseRadius + 0.3) % 45;
-          const pAlpha = (1 - wp.pulseRadius / 45) * 0.35;
+          const pAlpha = (1 - wp.pulseRadius / 45) * (isLight ? 0.6 : 0.35);
           ctx.beginPath();
           ctx.arc(wp.x, wp.y, wp.pulseRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(6, 182, 212, ${pAlpha})`;
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = isLight ? `rgba(2, 132, 199, ${pAlpha})` : `rgba(6, 182, 212, ${pAlpha})`;
+          ctx.lineWidth = isLight ? 1.5 : 1;
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.arc(wp.x, wp.y, 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#06B6D4';
+          ctx.arc(wp.x, wp.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = isLight ? '#0284C7' : '#06B6D4';
           ctx.fill();
         });
 
@@ -2722,14 +2964,17 @@ HTML_CONTENT = """<!DOCTYPE html>
           if (s.y > height) s.y = 0;
 
           s.alpha += Math.sin(Date.now() * s.pulse) * 0.006;
-          const curAlpha = Math.max(0.2, Math.min(0.85, s.alpha));
+          const curAlpha = Math.max(0.25, Math.min(0.9, s.alpha));
 
           if (s.isCompass) {
-            drawCompassStar(s, curAlpha);
+            drawCompassStar(s, curAlpha, isLight);
           } else {
+            const dotColor = isLight 
+              ? (s.color.includes('255, 160') ? 'rgba(217, 119, 6, ' : 'rgba(2, 132, 199, ')
+              : s.color;
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-            ctx.fillStyle = s.color + curAlpha + ')';
+            ctx.fillStyle = dotColor + curAlpha + ')';
             ctx.fill();
           }
         });
@@ -2743,7 +2988,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             b.y = height + 30;
             b.x = Math.random() * width;
           }
-          drawBalloon(b);
+          drawBalloon(b, isLight);
         });
 
         // 5. Update & Draw Cruising Planes with Contrails
@@ -2758,10 +3003,12 @@ HTML_CONTENT = """<!DOCTYPE html>
           if (p.history.length > 2) {
             ctx.save();
             ctx.setLineDash([3, 5]);
-            ctx.lineWidth = 1.2;
+            ctx.lineWidth = isLight ? 1.6 : 1.2;
             for (let i = 0; i < p.history.length - 1; i++) {
-              const trailAlpha = (i / p.history.length) * 0.35;
-              ctx.strokeStyle = `rgba(255, 255, 255, ${trailAlpha})`;
+              const trailAlpha = (i / p.history.length) * (isLight ? 0.6 : 0.35);
+              ctx.strokeStyle = isLight 
+                ? `rgba(2, 132, 199, ${trailAlpha})`
+                : `rgba(255, 255, 255, ${trailAlpha})`;
               ctx.beginPath();
               ctx.moveTo(p.history[i].x, p.history[i].y);
               ctx.lineTo(p.history[i + 1].x, p.history[i + 1].y);
@@ -2785,7 +3032,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             p.history = [];
           }
 
-          drawPlane(p);
+          drawPlane(p, isLight);
         });
 
         // 6. Interactive Mouse Compass Radar Ring
@@ -2793,8 +3040,8 @@ HTML_CONTENT = """<!DOCTYPE html>
           ctx.save();
           ctx.beginPath();
           ctx.arc(mouse.x, mouse.y, 45, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(255, 94, 54, 0.25)';
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = isLight ? 'rgba(225, 29, 72, 0.45)' : 'rgba(255, 94, 54, 0.25)';
+          ctx.lineWidth = 1.2;
           ctx.setLineDash([4, 4]);
           ctx.stroke();
 
@@ -2813,10 +3060,13 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Initialize animated moving particle canvas background
+      // 1. Initialize Theme Mood (Detects user device preference first)
+      initThemeMood();
+
+      // 2. Initialize animated moving travel sky canvas background
       initBackgroundCanvas();
 
-      // 2. Restore saved region (prevent resetting to INR on reload)
+      // 3. Restore saved region (prevent resetting to INR on reload)
       const savedRegion = localStorage.getItem('roamai_selected_region') || 'INR';
       onRegionChange(savedRegion, false);
 
