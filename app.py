@@ -2172,8 +2172,19 @@ HTML_CONTENT = """<!DOCTYPE html>
         const jsonStr = JSON.stringify(trips);
         localStorage.setItem('roamai_saved_trips', jsonStr);
         localStorage.setItem('saved_trips', jsonStr);
+        updateSavedCount();
       } catch (e) {
         console.error('Failed to persist saved trips', e);
+      }
+    }
+
+    function updateSavedCount() {
+      try {
+        const trips = getSavedTrips();
+        const countEl = document.getElementById('savedCount');
+        if (countEl) countEl.innerText = trips.length;
+      } catch (e) {
+        console.error('Error updating saved count', e);
       }
     }
 
@@ -3085,25 +3096,28 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Initialize Theme Mood (Detects user device preference first)
+      // 1. Immediately update saved trips count badge in navbar
+      updateSavedCount();
+
+      // 2. Initialize Theme Mood (Detects user device preference first)
       initThemeMood();
 
-      // 2. Initialize animated moving travel sky canvas background
+      // 3. Initialize animated moving travel sky canvas background
       initBackgroundCanvas();
 
-      // 3. Restore saved region (prevent resetting to INR on reload)
+      // 4. Restore saved region (prevent resetting to INR on reload)
       const savedRegion = localStorage.getItem('roamai_selected_region') || 'INR';
       onRegionChange(savedRegion, false);
 
-      // 3. Restore saved active page (prevent automatically resetting to home on reload)
+      // 5. Restore saved active page (prevent automatically resetting to home on reload)
       const hashPage = window.location.hash.replace('#', '');
       const savedPage = hashPage || localStorage.getItem('roamai_active_page') || 'home';
       switchPage(savedPage, false);
 
-      // 4. Render packing checklist
+      // 6. Render packing checklist
       renderPacking();
 
-      // 5. Render saved itineraries from persistent vault
+      // 7. Render saved itineraries from persistent vault
       renderSaved();
     });
   </script>
