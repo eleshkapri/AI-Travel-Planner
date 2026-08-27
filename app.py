@@ -1,9 +1,11 @@
 import os
+import re
 from typing import List, Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from starlette.middleware.base import BaseHTTPMiddleware
+from pydantic import BaseModel, Field
 from groq import Groq
 from geopy.geocoders import Nominatim
 
@@ -11,36 +13,66 @@ from geopy.geocoders import Nominatim
 app = FastAPI(
     title="RoamAI • AI Student Travel Planner",
     description="Next-Gen 3D Modern Student Travel Planner powered by Groq AI",
-    version="2.1.0"
+    version="2.2.0"
 )
 
-# Enable CORS
+# Security Response Headers Middleware
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response: Response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+# Enable CORS with explicit safe settings
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
+# In-memory coordinate cache to optimize performance & reduce external OSM lookups
+COORD_CACHE = {}
+
+def sanitize_str(val: Optional[str], max_len: int = 120) -> str:
+    if not val:
+        return ""
+    # Strip non-printable / control characters except basic punctuation
+    cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', str(val)).strip()
+    return cleaned[:max_len]
+
 class TripRequest(BaseModel):
-    destination: str
-    days: int = 3
-    budget_level: str = "Student (Low)"
-    budget_amount: Optional[str] = ""
-    currency: Optional[str] = "USD"
-    region: Optional[str] = "Global / USD"
-    interests: List[str] = []
-    must_visit: Optional[str] = ""
-    travel_pace: Optional[str] = "Balanced"
-    accommodation_style: Optional[str] = "Hostel / Backpacker"
+    destination: str = Field(..., min_length=1, max_length=120)
+    days: int = Field(default=3, ge=1, le=90)
+    budget_level: str = Field(default="Student (Low)", max_length=50)
+    budget_amount: Optional[str] = Field(default="", max_length=40)
+    currency: Optional[str] = Field(default="USD", max_length=10)
+    region: Optional[str] = Field(default="Global / USD", max_length=80)
+    interests: List[str] = Field(default=[], max_items=25)
+    must_visit: Optional[str] = Field(default="", max_length=120)
+    travel_pace: Optional[str] = Field(default="Balanced", max_length=40)
+    accommodation_style: Optional[str] = Field(default="Hostel / Backpacker", max_length=60)
 
 def get_coordinates(location_name: str):
+    if not location_name:
+        return None
+    loc_key = location_name.strip().lower()
+    if loc_key in COORD_CACHE:
+        return COORD_CACHE[loc_key]
     try:
-        geolocator = Nominatim(user_agent="roamai_travel_architect_v2")
-        location = geolocator.geocode(location_name, timeout=10)
+        geolocator = Nominatim(user_agent="roamai_travel_architect_v3_secure")
+        location = geolocator.geocode(location_name, timeout=5)
         if location:
-            return [location.latitude, location.longitude]
+            coords = [location.latitude, location.longitude]
+            COORD_CACHE[loc_key] = coords
+            return coords
     except Exception:
         pass
     return None
@@ -50,8 +82,8 @@ def health_check():
     return {
         "status": "ok",
         "service": "RoamAI FastAPI Backend",
-        "version": "2.1.0",
-        "models": ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "llama-3.1-8b-instant", "qwen/qwen3.6-27b"]
+        "version": "2.2.0",
+        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "gemma2-9b-it", "mixtral-8x7b-32768"]
     }
 
 @app.post("/api/generate")
@@ -63,27 +95,40 @@ def generate_itinerary(req: TripRequest):
             detail="GROQ_API_KEY environment variable is not configured in Vercel settings."
         )
 
+    # Sanitize inputs
+    destination_clean = sanitize_str(req.destination, 100)
+    if not destination_clean:
+        raise HTTPException(status_code=400, detail="Invalid destination provided.")
+
+    must_visit_clean = sanitize_str(req.must_visit, 100)
+    budget_amount_clean = sanitize_str(req.budget_amount, 30)
+    curr = sanitize_str(req.currency, 10) or "USD"
+    region_info = sanitize_str(req.region, 50) or "Global"
+    budget_level_clean = sanitize_str(req.budget_level, 40) or "Student (Low)"
+    pace_clean = sanitize_str(req.travel_pace, 30) or "Balanced"
+    accom_clean = sanitize_str(req.accommodation_style, 40) or "Hostel"
+
+    sanitized_interests = [sanitize_str(i, 40) for i in req.interests if i][:15]
+    interests_string = ", ".join(sanitized_interests) if sanitized_interests else "Local street food, culture, secret budget spots"
+
     client = Groq(api_key=api_key)
 
-    curr = req.currency or "USD"
-    region_info = req.region or "Global"
-    budget_text = f"{req.budget_level} Tier ({curr}) for {region_info} traveler"
-    if req.budget_amount:
-        budget_text += f" with strict limit of {req.budget_amount} {curr}"
+    budget_text = f"{budget_level_clean} Tier ({curr}) for {region_info} traveler"
+    if budget_amount_clean:
+        budget_text += f" with strict limit of {budget_amount_clean} {curr}"
 
     must_visit_instruction = ""
-    if req.must_visit:
-        must_visit_instruction = f"CRITICAL: You MUST feature a dedicated visit to '{req.must_visit}' in the itinerary."
+    if must_visit_clean:
+        must_visit_instruction = f"CRITICAL: You MUST feature a dedicated visit to '{must_visit_clean}' in the itinerary."
 
-    interests_string = ", ".join(req.interests) if req.interests else "Local street food, culture, secret budget spots"
-    pace_text = f"Pace: {req.travel_pace or 'Balanced'}. Accommodation: {req.accommodation_style or 'Hostel'}."
+    pace_text = f"Pace: {pace_clean}. Accommodation: {accom_clean}."
 
     prompt = f"""
     You are an award-winning local travel architect specializing in epic, student-friendly, budget adventures.
-    Create a detailed, high-energy {req.days}-day trip itinerary to {req.destination}.
+    Create a detailed, high-energy {req.days}-day trip itinerary to {destination_clean}.
 
     Travel Parameters:
-    - Destination: {req.destination}
+    - Destination: {destination_clean}
     - Duration: {req.days} Days
     - Traveler Region/Currency: {region_info} ({curr})
     - Budget Level: {budget_text}
@@ -95,7 +140,7 @@ def generate_itinerary(req: TripRequest):
     # 🌍 [Catchy Trip Title & Emoji]
 
     ## 💰 Estimated Student Budget Breakdown ({curr})
-    - 🏨 **Accommodation ({req.accommodation_style or 'Hostel'}):** [Estimated cost per night & total in {curr}]
+    - 🏨 **Accommodation ({accom_clean}):** [Estimated cost per night & total in {curr}]
     - 🍜 **Food & Street Eats:** [Daily & total food estimate in {curr}]
     - 🚇 **Local Transport:** [Passes/Subway/Bus estimates in {curr}]
     - 🎟️ **Activities & Entry Fees:** [Cost estimates for attractions in {curr}]
@@ -110,17 +155,17 @@ def generate_itinerary(req: TripRequest):
 
     (Repeat detailed ### Day X format for all {req.days} days)
 
-    ## 🎒 Essential Student Tips for {req.destination}
+    ## 🎒 Essential Student Tips for {destination_clean}
     - 3 practical tips for safety, local transit apps, SIM cards, or student discounts.
 
     LANDMARKS: Place 1, Place 2, Place 3
     """
 
     models_to_try = [
-        "openai/gpt-oss-120b",
-        "openai/gpt-oss-20b",
+        "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
-        "qwen/qwen3.6-27b",
+        "gemma2-9b-it",
+        "mixtral-8x7b-32768"
     ]
 
     response_text = None
@@ -136,42 +181,45 @@ def generate_itinerary(req: TripRequest):
             if response_text:
                 break
         except Exception as e:
-            last_error = str(e)
+            last_error = "Model busy or unavailable. Falling back..."
             continue
 
     if not response_text:
-        raise HTTPException(status_code=500, detail=f"AI Generation failed: {last_error}")
+        raise HTTPException(
+            status_code=503,
+            detail="AI Generation service is currently experiencing high load. Please try again in a few moments."
+        )
 
     raw_landmarks = []
     if "LANDMARKS:" in response_text:
         parts = response_text.split("LANDMARKS:")
         itinerary = parts[0].strip()
-        raw_landmarks = [l.strip().rstrip('.') for l in parts[1].strip().split(",") if l.strip()]
+        raw_landmarks = [l.strip().rstrip('.') for l in parts[1].strip().split(",") if l.strip()][:4]
     else:
         itinerary = response_text.strip()
-        raw_landmarks = [req.destination]
+        raw_landmarks = [destination_clean]
 
-    dest_coords = get_coordinates(req.destination)
+    dest_coords = get_coordinates(destination_clean)
     markers = []
 
     if dest_coords:
         markers.append({
-            "name": f"Destination: {req.destination}",
+            "name": f"Destination: {destination_clean}",
             "type": "destination",
             "coords": dest_coords
         })
 
-    if req.must_visit:
-        mv_coords = get_coordinates(f"{req.must_visit}, {req.destination}")
+    if must_visit_clean:
+        mv_coords = get_coordinates(f"{must_visit_clean}, {destination_clean}")
         if mv_coords:
             markers.append({
-                "name": f"Must Visit: {req.must_visit}",
+                "name": f"Must Visit: {must_visit_clean}",
                 "type": "must_visit",
                 "coords": mv_coords
             })
 
     for landmark in raw_landmarks:
-        l_coords = get_coordinates(f"{landmark}, {req.destination}")
+        l_coords = get_coordinates(f"{landmark}, {destination_clean}")
         if l_coords:
             markers.append({
                 "name": landmark,
@@ -185,12 +233,12 @@ def generate_itinerary(req: TripRequest):
         "destination_coords": dest_coords,
         "markers": markers,
         "trip_summary": {
-            "destination": req.destination,
+            "destination": destination_clean,
             "days": req.days,
-            "budget_level": req.budget_level,
+            "budget_level": budget_level_clean,
             "currency": curr,
             "region": region_info,
-            "interests": req.interests
+            "interests": sanitized_interests
         }
     }
 
@@ -259,6 +307,9 @@ HTML_CONTENT = """<!DOCTYPE html>
   <!-- Marked.js (Markdown parser) -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+  <!-- DOMPurify (XSS Sanitizer) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
+
   <!-- html2pdf for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -282,6 +333,42 @@ HTML_CONTENT = """<!DOCTYPE html>
     body.light-theme {
       background-color: #EEF4FB !important;
       color: #0B132B !important;
+    }
+
+    /* Responsive Mobile Layout & Touch Rules */
+    @media (max-width: 768px) {
+      .glass-card {
+        padding: 1.25rem !important;
+      }
+      #map {
+        min-height: 320px !important;
+      }
+      #plannerTopGrids {
+        gap: 1.25rem !important;
+      }
+      #plannerMapCard {
+        min-height: 400px !important;
+      }
+      .itinerary-prose h1 {
+        font-size: 1.4rem !important;
+      }
+      .itinerary-prose h2 {
+        font-size: 1.2rem !important;
+      }
+    }
+    @media (max-width: 480px) {
+      .brand-logo-title {
+        font-size: 1.1rem !important;
+      }
+      #heroDestInput {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+    }
+    @media (pointer: coarse) {
+      button, a, select, input[type="range"], .chip-tag, .hotspot-card {
+        touch-action: manipulation;
+      }
     }
 
     /* ========================================================
@@ -922,7 +1009,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <select
             id="navRegionSelector"
             onchange="onRegionChange(this.value)"
-            class="pl-8 pr-8 py-2 bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-coralPrimary cursor-pointer shadow-sm transition"
+            class="pl-8 pr-7 py-2 max-w-[115px] sm:max-w-none truncate bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-coralPrimary cursor-pointer shadow-sm transition"
           >
             <option value="INR" data-flag="🇮🇳" data-curr="INR" data-sym="₹" data-name="India" selected>🇮🇳 India (INR ₹)</option>
             <option value="USD" data-flag="🇺🇸" data-curr="USD" data-sym="$" data-name="United States">🇺🇸 USA (USD $)</option>
@@ -2379,6 +2466,28 @@ HTML_CONTENT = """<!DOCTYPE html>
     let mapInstance = null;
     let markersLayer = null;
 
+    // Secure & Sanitized Markdown Parser (Prevents XSS Attacks)
+    function safeMarkdown(content) {
+      if (!content) return '';
+      try {
+        const rawHtml = marked.parse(content);
+        return typeof DOMPurify !== 'undefined' ? DOMPurify.sanitize(rawHtml) : rawHtml;
+      } catch (e) {
+        return content;
+      }
+    }
+
+    // Debounced Responsive Map Invalidate Listener on Resize / Orientation Change
+    let mapResizeTimer = null;
+    window.addEventListener('resize', function() {
+      clearTimeout(mapResizeTimer);
+      mapResizeTimer = setTimeout(function() {
+        if (mapInstance && typeof mapInstance.invalidateSize === 'function') {
+          mapInstance.invalidateSize();
+        }
+      }, 200);
+    });
+
     // --- On Region Change Handler with Persistence ---
     function onRegionChange(regionKey, savePreference = true) {
       activeRegionKey = regionKey;
@@ -2544,7 +2653,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             currentTrip = tripData;
             document.getElementById('plannerPlaceholder').classList.add('hidden');
             document.getElementById('plannerResults').classList.remove('hidden');
-            document.getElementById('itineraryView').innerHTML = marked.parse(tripData.itinerary);
+            document.getElementById('itineraryView').innerHTML = safeMarkdown(tripData.itinerary);
             if (tripData.trip_summary && tripData.trip_summary.destination) {
               document.getElementById('mapHeading').innerText = `📍 Exploring ${tripData.trip_summary.destination}`;
             }
@@ -2837,8 +2946,8 @@ HTML_CONTENT = """<!DOCTYPE html>
         // Render Map
         renderMap(data.destination_coords, data.markers);
 
-        // Render Markdown
-        document.getElementById('itineraryView').innerHTML = marked.parse(data.itinerary);
+        // Render Markdown safely
+        document.getElementById('itineraryView').innerHTML = safeMarkdown(data.itinerary);
         document.getElementById('mapHeading').innerText = `📍 Exploring ${destination}`;
 
         document.getElementById('plannerLoading').classList.add('hidden');
@@ -3072,7 +3181,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('plannerLoading').classList.add('hidden');
       document.getElementById('plannerResults').classList.remove('hidden');
 
-      document.getElementById('itineraryView').innerHTML = marked.parse(trip.itinerary);
+      document.getElementById('itineraryView').innerHTML = safeMarkdown(trip.itinerary);
       document.getElementById('mapHeading').innerText = `📍 Exploring ${trip.destination}`;
 
       if (trip.destination_coords || (trip.markers && trip.markers.length > 0)) {
@@ -3090,7 +3199,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       showToast('Preparing PDF export...', 'info');
       const tempDiv = document.createElement('div');
       tempDiv.className = 'itinerary-prose p-6 bg-slate-900 text-white rounded-xl';
-      tempDiv.innerHTML = marked.parse(trip.itinerary);
+      tempDiv.innerHTML = safeMarkdown(trip.itinerary);
 
       const opt = {
         margin: [10, 10, 10, 10],
