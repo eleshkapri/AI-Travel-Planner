@@ -810,7 +810,34 @@ HTML_CONTENT = """<!DOCTYPE html>
       </div>
     </section>
 
-  </main>
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Modern 3D Glass Confirmation Modal -->
+  <div id="confirmModalBackdrop" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md hidden flex items-center justify-center p-4 transition-opacity duration-300">
+    <div id="confirmModalCard" class="glass-card max-w-md w-full p-6 sm:p-7 rounded-3xl border border-white/15 shadow-2xl space-y-5 transform scale-95 transition-all duration-300">
+      <div class="flex items-center gap-3">
+        <div id="confirmModalIconBg" class="w-12 h-12 rounded-2xl bg-coralPrimary/20 border border-coralPrimary/30 flex items-center justify-center text-2xl shrink-0">
+          <span id="confirmModalIcon">⚠️</span>
+        </div>
+        <div>
+          <h3 id="confirmModalTitle" class="text-lg font-bold text-white">Confirmation</h3>
+          <p id="confirmModalSubtitle" class="text-xs text-gray-400">Please review before proceeding</p>
+        </div>
+      </div>
+      <p id="confirmModalMessage" class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+        Are you sure you want to proceed?
+      </p>
+      <div class="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+        <button id="confirmModalCancelBtn" class="btn-secondary px-4 py-2 rounded-xl text-xs font-bold">
+          Cancel
+        </button>
+        <button id="confirmModalConfirmBtn" class="btn-gradient px-5 py-2 rounded-xl text-xs font-bold shadow-lg">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
 
   <footer class="mt-20 border-t border-cardBorder bg-spaceDark/90 py-8 text-center text-xs text-gray-500">
     RoamAI • AI Student Travel Planner • Multi-Region Support • Powered by Groq AI & FastAPI
@@ -818,6 +845,112 @@ HTML_CONTENT = """<!DOCTYPE html>
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
+    // ========================================================
+    // TOAST NOTIFICATION & CONFIRMATION MODAL SYSTEM
+    // ========================================================
+    function showToast(message, type = 'success', duration = 3500) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+
+      const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+      };
+
+      const borderColors = {
+        success: 'border-emeraldAccent/40 shadow-emeraldAccent/20',
+        error: 'border-red-500/40 shadow-red-500/20',
+        warning: 'border-amberAccent/40 shadow-amberAccent/20',
+        info: 'border-cyanAccent/40 shadow-cyanAccent/20'
+      };
+
+      const titleColors = {
+        success: 'text-emeraldAccent',
+        error: 'text-red-400',
+        warning: 'text-amberAccent',
+        info: 'text-cyanAccent'
+      };
+
+      const titles = {
+        success: 'Completed',
+        error: 'Action Failed',
+        warning: 'Attention',
+        info: 'Notice'
+      };
+
+      const toastId = 'toast_' + Date.now();
+      const toastEl = document.createElement('div');
+      toastEl.id = toastId;
+      toastEl.className = `glass-card p-4 rounded-2xl border ${borderColors[type] || borderColors.info} shadow-2xl flex items-start gap-3 pointer-events-auto transition-all duration-300 transform translate-y-4 opacity-0`;
+      
+      toastEl.innerHTML = `
+        <span class="text-xl shrink-0">${icons[type] || 'ℹ️'}</span>
+        <div class="flex-grow">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider ${titleColors[type] || titleColors.info}">${titles[type]}</h4>
+            <button onclick="document.getElementById('${toastId}').remove()" class="text-xs text-gray-400 hover:text-white p-0.5 ml-2">✕</button>
+          </div>
+          <p class="text-xs text-gray-200 mt-0.5 leading-relaxed">${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toastEl);
+
+      // Animate in
+      setTimeout(() => {
+        toastEl.classList.remove('translate-y-4', 'opacity-0');
+        toastEl.classList.add('translate-y-0', 'opacity-100');
+      }, 20);
+
+      // Auto dismiss
+      setTimeout(() => {
+        toastEl.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => { toastEl.remove(); }, 300);
+      }, duration);
+    }
+
+    let currentModalConfirmHandler = null;
+
+    function showConfirmModal({ title, message, icon = '⚠️', confirmText = 'Confirm', onConfirm }) {
+      const backdrop = document.getElementById('confirmModalBackdrop');
+      const card = document.getElementById('confirmModalCard');
+      const titleEl = document.getElementById('confirmModalTitle');
+      const msgEl = document.getElementById('confirmModalMessage');
+      const iconEl = document.getElementById('confirmModalIcon');
+      const confirmBtn = document.getElementById('confirmModalConfirmBtn');
+      const cancelBtn = document.getElementById('confirmModalCancelBtn');
+
+      titleEl.innerText = title;
+      msgEl.innerText = message;
+      iconEl.innerText = icon;
+      confirmBtn.innerText = confirmText;
+
+      currentModalConfirmHandler = () => {
+        hideConfirmModal();
+        if (typeof onConfirm === 'function') onConfirm();
+      };
+
+      confirmBtn.onclick = currentModalConfirmHandler;
+      cancelBtn.onclick = hideConfirmModal;
+      backdrop.onclick = (e) => { if (e.target === backdrop) hideConfirmModal(); };
+
+      backdrop.classList.remove('hidden');
+      setTimeout(() => {
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+      }, 20);
+    }
+
+    function hideConfirmModal() {
+      const backdrop = document.getElementById('confirmModalBackdrop');
+      const card = document.getElementById('confirmModalCard');
+      card.classList.remove('scale-100');
+      card.classList.add('scale-95');
+      setTimeout(() => { backdrop.classList.add('hidden'); }, 150);
+    }
+
     // Region Configuration Database
     const REGIONS = {
       INR: {
@@ -1051,7 +1184,10 @@ HTML_CONTENT = """<!DOCTYPE html>
 
     async function planTrip() {
       const destination = document.getElementById('plannerDest').value.trim();
-      if (!destination) return alert('Please enter a destination.');
+      if (!destination) {
+        showToast('Please enter a destination to generate an itinerary.', 'warning');
+        return;
+      }
 
       const days = parseInt(document.getElementById('plannerDays').value) || 3;
       const budgetTier = document.getElementById('plannerTier').value;
@@ -1093,11 +1229,13 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         document.getElementById('plannerLoading').classList.add('hidden');
         document.getElementById('plannerResults').classList.remove('hidden');
+        showToast(`Itinerary for ${destination} generated successfully!`, 'success');
       } catch (err) {
         document.getElementById('plannerLoading').classList.add('hidden');
         const errBox = document.getElementById('plannerErr');
         errBox.innerText = `Error: ${err.message}`;
         errBox.classList.remove('hidden');
+        showToast(err.message || 'AI Generation failed. Please try again.', 'error');
       }
     }
 
@@ -1128,12 +1266,13 @@ HTML_CONTENT = """<!DOCTYPE html>
     function copyTrip() {
       if (currentTrip) {
         navigator.clipboard.writeText(currentTrip.itinerary);
-        alert('Itinerary copied to clipboard!');
+        showToast('Itinerary copied to clipboard!', 'success');
       }
     }
 
     function downloadTripPDF() {
       if (!currentTrip) return;
+      showToast('Generating and downloading your PDF itinerary...', 'info');
       const el = document.getElementById('itineraryView');
       const opt = {
         margin: [10, 10, 10, 10],
@@ -1157,7 +1296,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       });
       localStorage.setItem('saved_trips', JSON.stringify(trips));
       document.getElementById('savedCount').innerText = trips.length;
-      alert('Trip saved successfully!');
+      showToast(`Trip to ${currentTrip.trip_summary.destination} saved to offline vault!`, 'success');
     }
 
     function renderSaved() {
@@ -1191,11 +1330,27 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('plannerResults').classList.remove('hidden');
       document.getElementById('itineraryView').innerHTML = marked.parse(itinerary);
       document.getElementById('mapHeading').innerText = `📍 Exploring ${dest}`;
+      showToast(`Loaded saved itinerary for ${dest}`, 'info');
     }
 
     function clearTrips() {
-      localStorage.removeItem('saved_trips');
-      renderSaved();
+      const trips = JSON.parse(localStorage.getItem('saved_trips') || '[]');
+      if (trips.length === 0) {
+        showToast('No saved trips to clear.', 'info');
+        return;
+      }
+
+      showConfirmModal({
+        title: 'Clear All Saved Trips?',
+        message: 'Are you sure you want to remove all saved itineraries from your device? This action cannot be undone.',
+        icon: '🗑️',
+        confirmText: 'Yes, Clear All',
+        onConfirm: () => {
+          localStorage.removeItem('saved_trips');
+          renderSaved();
+          showToast('All saved trips have been cleared.', 'info');
+        }
+      });
     }
 
     function calcBudget() {
@@ -1525,10 +1680,13 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       input.value = '';
       renderPacking();
+      showToast(`Added "${val}" to packing checklist!`, 'success');
     }
 
     function deleteCustomPackingItem(id) {
       let customItems = getStoredCustomItems();
+      const target = customItems.find(i => i.id === id);
+      const itemName = target ? target.name : 'Item';
       customItems = customItems.filter(i => i.id !== id);
       saveCustomItems(customItems);
 
@@ -1537,6 +1695,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       saveCheckedState(checks);
 
       renderPacking();
+      showToast(`Removed "${itemName}" from checklist.`, 'info');
     }
 
     function checkAllPacking(checkBool) {
@@ -1545,14 +1704,22 @@ HTML_CONTENT = """<!DOCTYPE html>
       allItems.forEach(i => { checks[i.id] = checkBool; });
       saveCheckedState(checks);
       renderPacking();
+      showToast(checkBool ? 'All items marked as packed!' : 'All items unchecked.', 'info');
     }
 
     function resetPackingDefaults() {
-      if (confirm('Reset all packing items and checklist progress to defaults?')) {
-        localStorage.removeItem('roamai_pack_checked_state');
-        localStorage.removeItem('roamai_custom_pack_items');
-        renderPacking();
-      }
+      showConfirmModal({
+        title: 'Reset Packing Checklist?',
+        message: 'Are you sure you want to reset all checked items and custom entries back to defaults?',
+        icon: '🔄',
+        confirmText: 'Reset to Defaults',
+        onConfirm: () => {
+          localStorage.removeItem('roamai_pack_checked_state');
+          localStorage.removeItem('roamai_custom_pack_items');
+          renderPacking();
+          showToast('Packing checklist reset to defaults.', 'info');
+        }
+      });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
