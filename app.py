@@ -380,14 +380,95 @@ HTML_CONTENT = """<!DOCTYPE html>
       border-radius: 1.25rem;
       z-index: 1;
     }
-    .itinerary-prose h1 { font-size: 1.75rem; font-weight: 800; color: #FF5E36; margin-bottom: 1.25rem; }
-    .itinerary-prose h2 { font-size: 1.35rem; font-weight: 700; color: #FFA000; margin-top: 1.5rem; margin-bottom: 0.75rem; }
-    .itinerary-prose h3 { font-size: 1.15rem; font-weight: 600; color: #06B6D4; margin-top: 1.25rem; margin-bottom: 0.5rem; }
-    .itinerary-prose p { margin-bottom: 0.75rem; line-height: 1.7; color: #D1D5DB; }
-    .itinerary-prose ul { list-style: none; padding-left: 0; margin-bottom: 1rem; }
-    .itinerary-prose li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; line-height: 1.6; color: #E5E7EB; }
-    .itinerary-prose li::before { content: '✦'; position: absolute; left: 0; color: #FF5E36; }
-    .itinerary-prose strong { color: #FFFFFF; }
+    .itinerary-prose h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #FF5E36;
+      line-height: 1.35;
+      margin-top: 0.5rem;
+      margin-bottom: 1.25rem;
+      word-break: break-word;
+    }
+    .itinerary-prose h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #FFA000;
+      line-height: 1.4;
+      margin-top: 1.75rem;
+      margin-bottom: 0.85rem;
+      word-break: break-word;
+    }
+    .itinerary-prose h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #06B6D4;
+      line-height: 1.45;
+      margin-top: 1.35rem;
+      margin-bottom: 0.6rem;
+      word-break: break-word;
+    }
+    .itinerary-prose p {
+      margin-bottom: 0.85rem;
+      line-height: 1.75;
+      color: #D1D5DB;
+      font-size: 0.925rem;
+    }
+    .itinerary-prose ul {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 1.15rem;
+    }
+    .itinerary-prose li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 0.6rem;
+      line-height: 1.65;
+      color: #E5E7EB;
+      font-size: 0.925rem;
+    }
+    .itinerary-prose li::before {
+      content: '✦';
+      position: absolute;
+      left: 0;
+      color: #FF5E36;
+    }
+    .itinerary-prose strong {
+      color: #FFFFFF;
+      font-weight: 700;
+    }
+    .itinerary-prose table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.25rem 0;
+      font-size: 0.85rem;
+      border-radius: 0.85rem;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .itinerary-prose th {
+      background: rgba(255, 255, 255, 0.08);
+      color: #FFA000;
+      font-weight: 700;
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .itinerary-prose td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #E5E7EB;
+    }
+    .itinerary-prose tr:last-child td {
+      border-bottom: none;
+    }
+    .itinerary-prose blockquote {
+      border-left: 3px solid #FF5E36;
+      padding-left: 1rem;
+      margin: 1rem 0;
+      color: #9CA3AF;
+      font-style: italic;
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
