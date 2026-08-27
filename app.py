@@ -469,6 +469,104 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #9CA3AF;
       font-style: italic;
     }
+
+    /* ========================================================
+       LIGHT THEME (DEVICE PREFERRED & USER TOGGLEABLE)
+       ======================================================== */
+    body.light-theme {
+      background-color: #F4F6FB;
+      color: #0F172A;
+    }
+    body.light-theme header {
+      background-color: rgba(255, 255, 255, 0.92);
+      border-bottom-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+    body.light-theme .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 100%), #FFFFFF;
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1);
+    }
+    body.light-theme .glass-card:hover {
+      border-color: rgba(255, 94, 54, 0.45);
+      box-shadow: 0 16px 36px rgba(255, 94, 54, 0.12);
+    }
+    body.light-theme .text-white {
+      color: #0F172A !important;
+    }
+    body.light-theme .text-gray-300 {
+      color: #334155 !important;
+    }
+    body.light-theme .text-gray-400 {
+      color: #64748B !important;
+    }
+    body.light-theme .text-gray-200 {
+      color: #1E293B !important;
+    }
+    body.light-theme .bg-spaceDark {
+      background-color: #FFFFFF !important;
+    }
+    body.light-theme .bg-cardDark {
+      background-color: #F1F5F9 !important;
+    }
+    body.light-theme input,
+    body.light-theme select {
+      background-color: #FFFFFF !important;
+      color: #0F172A !important;
+      border-color: rgba(0, 0, 0, 0.14) !important;
+    }
+    body.light-theme input::placeholder {
+      color: #94A3B8 !important;
+    }
+    body.light-theme .btn-secondary {
+      background: #FFFFFF;
+      border-color: rgba(0, 0, 0, 0.12);
+      color: #1E293B;
+    }
+    body.light-theme .btn-secondary:hover {
+      background: #F1F5F9;
+      border-color: rgba(0, 0, 0, 0.22);
+      color: #0F172A;
+    }
+    body.light-theme .itinerary-prose {
+      background-color: #FFFFFF !important;
+      border-color: rgba(0, 0, 0, 0.08) !important;
+    }
+    body.light-theme .itinerary-prose p {
+      color: #334155;
+    }
+    body.light-theme .itinerary-prose li {
+      color: #1E293B;
+    }
+    body.light-theme .itinerary-prose strong {
+      color: #0F172A;
+    }
+    body.light-theme .itinerary-prose table {
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+    body.light-theme .itinerary-prose th {
+      background: rgba(0, 0, 0, 0.04);
+      color: #D97706;
+    }
+    body.light-theme .itinerary-prose td {
+      border-bottom-color: rgba(0, 0, 0, 0.06);
+      color: #1E293B;
+    }
+    body.light-theme #themeToggleBtn {
+      background-color: #FFFFFF;
+      border-color: rgba(0, 0, 0, 0.12);
+      color: #1E293B;
+    }
+    body.light-theme #navRegionSelector {
+      background-color: #FFFFFF !important;
+      color: #0F172A !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+    }
+    body.light-theme .travel-sky-pattern {
+      background: radial-gradient(circle at 20% 15%, rgba(255, 94, 54, 0.12) 0%, transparent 55%),
+                  radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 80%, rgba(255, 160, 0, 0.10) 0%, transparent 60%);
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
@@ -508,9 +606,20 @@ HTML_CONTENT = """<!DOCTYPE html>
         <button onclick="switchPage('saved')" id="tab-saved" class="nav-tab hover:text-white flex items-center gap-1.5 transition"><span>📂</span> Saved (<span id="savedCount">0</span>)</button>
       </nav>
 
-      <!-- Region Selector & CTA (Right) -->
-      <div class="flex items-center gap-3 shrink-0">
+      <!-- Theme Switcher, Region Selector & CTA (Right) -->
+      <div class="flex items-center gap-2.5 shrink-0">
         
+        <!-- Theme Mood Switcher (Dark / Light) -->
+        <button
+          id="themeToggleBtn"
+          onclick="toggleThemeMood()"
+          class="w-9 h-9 rounded-xl bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 flex items-center justify-center text-sm text-gray-300 hover:text-white transition shadow-sm"
+          title="Toggle Light / Dark Mode"
+          aria-label="Toggle Theme Mood"
+        >
+          <span id="themeToggleIcon">🌙</span>
+        </button>
+
         <!-- Region & Currency Selector -->
         <div class="relative flex items-center">
           <span class="absolute left-3 text-sm pointer-events-none" id="navRegionFlag">🇮🇳</span>
@@ -546,6 +655,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center"><span>💰</span>Budget</button>
       <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center"><span>🎒</span>Packing</button>
       <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center"><span>📂</span>Saved</button>
+      <button onclick="toggleThemeMood()" class="flex flex-col items-center"><span id="mobThemeToggleIcon">🌙</span>Mood</button>
     </div>
   </header>
 
@@ -1345,6 +1455,58 @@ HTML_CONTENT = """<!DOCTYPE html>
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
   <script>
+    // ========================================================
+    // THEME MOOD SYSTEM (DEVICE PREFERRED & USER TOGGLEABLE)
+    // ========================================================
+    let currentTheme = 'dark';
+
+    function initThemeMood() {
+      const savedTheme = localStorage.getItem('roamai_theme');
+      if (savedTheme) {
+        setThemeMood(savedTheme, false);
+      } else {
+        // First prefer the mood of the site by device preference
+        const systemPrefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        setThemeMood(systemPrefersLight ? 'light' : 'dark', false);
+      }
+
+      // Automatically sync if system theme changes and user hasn't set manual override
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+          if (!localStorage.getItem('roamai_theme')) {
+            setThemeMood(e.matches ? 'light' : 'dark', false);
+          }
+        });
+      }
+    }
+
+    function setThemeMood(theme, saveManual = true) {
+      currentTheme = theme;
+      if (saveManual) {
+        try { localStorage.setItem('roamai_theme', theme); } catch(e) {}
+      }
+
+      const isLight = theme === 'light';
+      document.body.classList.toggle('light-theme', isLight);
+
+      const deskIcon = document.getElementById('themeToggleIcon');
+      if (deskIcon) deskIcon.innerText = isLight ? '☀️' : '🌙';
+
+      const mobIcon = document.getElementById('mobThemeToggleIcon');
+      if (mobIcon) mobIcon.innerText = isLight ? '☀️' : '🌙';
+
+      const btn = document.getElementById('themeToggleBtn');
+      if (btn) {
+        btn.title = isLight ? 'Switch to Dark Mode (🌙)' : 'Switch to Light Mode (☀️)';
+      }
+    }
+
+    function toggleThemeMood() {
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      setThemeMood(newTheme, true);
+      showToast(`Switched to ${newTheme === 'light' ? 'Daylight Light ☀️' : 'Deep Space Dark 🌙'} mode`, 'info');
+    }
+
     // ========================================================
     // TOAST NOTIFICATION & CONFIRMATION MODAL SYSTEM
     // ========================================================
@@ -2813,10 +2975,13 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Initialize animated moving particle canvas background
+      // 1. Initialize Theme Mood (Detects user device preference first)
+      initThemeMood();
+
+      // 2. Initialize animated moving travel sky canvas background
       initBackgroundCanvas();
 
-      // 2. Restore saved region (prevent resetting to INR on reload)
+      // 3. Restore saved region (prevent resetting to INR on reload)
       const savedRegion = localStorage.getItem('roamai_selected_region') || 'INR';
       onRegionChange(savedRegion, false);
 
