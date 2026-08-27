@@ -2193,35 +2193,79 @@ HTML_CONTENT = """<!DOCTYPE html>
       } catch (e) {}
     }
 
-    function detectItineraryVibe() {
-      const destStr = ((currentTrip && currentTrip.trip_summary && currentTrip.trip_summary.destination) || document.getElementById('plannerDest')?.value || '').toLowerCase();
-      if (destStr.includes('goa') || destStr.includes('bali') || destStr.includes('beach') || destStr.includes('phuket') || destStr.includes('maldives') || destStr.includes('cancun')) {
+    function detectItineraryVibe(customText = null) {
+      let destStr = '';
+      if (customText) {
+        destStr = customText.toLowerCase();
+      } else if (currentTrip && currentTrip.trip_summary && currentTrip.trip_summary.destination) {
+        destStr = (currentTrip.trip_summary.destination + ' ' + (currentTrip.itinerary || '')).toLowerCase();
+      } else {
+        destStr = (document.getElementById('plannerDest')?.value || '').toLowerCase();
+      }
+
+      if (destStr.includes('goa') || destStr.includes('bali') || destStr.includes('beach') || destStr.includes('phuket') || destStr.includes('maldives') || destStr.includes('cancun') || destStr.includes('island') || destStr.includes('coastal')) {
         return 'beach';
       }
-      if (destStr.includes('manali') || destStr.includes('leh') || destStr.includes('ladakh') || destStr.includes('himalaya') || destStr.includes('alps') || destStr.includes('banff') || destStr.includes('trek')) {
+      if (destStr.includes('manali') || destStr.includes('leh') || destStr.includes('ladakh') || destStr.includes('himalaya') || destStr.includes('alps') || destStr.includes('banff') || destStr.includes('trek') || destStr.includes('hiking') || destStr.includes('mountain')) {
         return 'mountain';
       }
-      if (destStr.includes('sapporo') || destStr.includes('snow') || destStr.includes('kashmir') || destStr.includes('winter') || destStr.includes('iceland')) {
+      if (destStr.includes('sapporo') || destStr.includes('snow') || destStr.includes('kashmir') || destStr.includes('winter') || destStr.includes('iceland') || destStr.includes('ski')) {
         return 'winter';
       }
-      if (destStr.includes('hostel') || destStr.includes('backpack')) {
+      if (destStr.includes('hostel') || destStr.includes('backpack') || destStr.includes('dorm')) {
         return 'hostel';
       }
       return 'city';
+    }
+
+    function renderPackingVibeDropdown() {
+      const select = document.getElementById('packVibeSelector');
+      if (!select) return;
+
+      const savedTrips = getSavedTrips();
+      const currentVal = selectedPackVibe || 'auto';
+
+      let html = `
+        <option value="auto" ${currentVal === 'auto' ? 'selected' : ''}>📍 Auto-detect from Current Planner</option>
+      `;
+
+      if (savedTrips && savedTrips.length > 0) {
+        html += `<optgroup label="📂 My Saved Itineraries">`;
+        savedTrips.forEach(t => {
+          const optVal = `saved:${t.id}`;
+          const isSelected = currentVal === optVal ? 'selected' : '';
+          html += `<option value="${optVal}" ${isSelected}>📂 Saved: ${t.destination} (${t.days} Days)</option>`;
+        });
+        html += `</optgroup>`;
+      }
+
+      html += `
+        <optgroup label="✨ Preset Travel Styles & Vibes">
+          <option value="beach" ${currentVal === 'beach' ? 'selected' : ''}>🏖️ Beach, Island & Coastal (Goa, Bali, Phuket)</option>
+          <option value="mountain" ${currentVal === 'mountain' ? 'selected' : ''}>🏔️ Mountains, Hiking & Trekking (Manali, Alps)</option>
+          <option value="city" ${currentVal === 'city' ? 'selected' : ''}>🏙️ City Sightseeing & Culture (Tokyo, Rome, London)</option>
+          <option value="winter" ${currentVal === 'winter' ? 'selected' : ''}>❄️ Cold Weather & Snow (Alps, Sapporo, Kashmir)</option>
+          <option value="hostel" ${currentVal === 'hostel' ? 'selected' : ''}>🎒 Classic Backpacker & Hostel Dorm</option>
+        </optgroup>
+      `;
+
+      select.innerHTML = html;
     }
 
     function getActiveVibeKey() {
       if (selectedPackVibe === 'auto') {
         return detectItineraryVibe();
       }
+      if (selectedPackVibe.startsWith('saved:')) {
+        const tripId = selectedPackVibe.replace('saved:', '');
+        const savedTrips = getSavedTrips();
+        const trip = savedTrips.find(t => String(t.id) === String(tripId));
+        if (trip) {
+          return detectItineraryVibe(trip.destination + ' ' + (trip.itinerary || ''));
+        }
+        return 'city';
+      }
       return selectedPackVibe;
-    }
-
-    function getAllCurrentPackItems() {
-      const vibeKey = getActiveVibeKey();
-      const vibeItems = DESTINATION_VIBE_ITEMS[vibeKey] || DESTINATION_VIBE_ITEMS.city;
-      const customItems = getStoredCustomItems();
-      return [...DEFAULT_BASE_ITEMS, ...vibeItems, ...customItems];
     }
 
     function onPackVibeChange(vibeVal) {
@@ -2232,13 +2276,24 @@ HTML_CONTENT = """<!DOCTYPE html>
       if (vibeVal === 'auto') {
         const detected = detectItineraryVibe();
         badge.innerText = `Auto: ${detected.toUpperCase()}`;
+        showToast(`Checklist adapted to current planner (${detected.toUpperCase()})`, 'info');
+      } else if (vibeVal.startsWith('saved:')) {
+        const tripId = vibeVal.replace('saved:', '');
+        const savedTrips = getSavedTrips();
+        const trip = savedTrips.find(t => String(t.id) === String(tripId));
+        const tripName = trip ? trip.destination : 'Saved Trip';
+        const detected = trip ? detectItineraryVibe(trip.destination + ' ' + (trip.itinerary || '')) : 'city';
+        badge.innerText = `Saved: ${tripName}`;
+        showToast(`Checklist adapted for saved itinerary "${tripName}" (${detected.toUpperCase()})!`, 'success');
       } else {
         badge.innerText = `Manual: ${vibeVal.toUpperCase()}`;
+        showToast(`Checklist vibe set to ${vibeVal.toUpperCase()}`, 'info');
       }
       renderPacking();
     }
 
     function renderPacking() {
+      renderPackingVibeDropdown();
       const allItems = getAllCurrentPackItems();
       const checks = getStoredCheckedState();
       
