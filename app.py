@@ -376,7 +376,9 @@ HTML_CONTENT = """<!DOCTYPE html>
       font-weight: 600;
     }
     #map {
-      height: 480px;
+      height: 100%;
+      min-height: 420px;
+      width: 100%;
       border-radius: 1.25rem;
       z-index: 1;
     }
@@ -970,172 +972,163 @@ HTML_CONTENT = """<!DOCTYPE html>
     </section>
 
     <!-- PAGE 2: AI TRIP PLANNER -->
-    <section id="page-planner" class="hidden space-y-6">
+    <section id="page-planner" class="hidden space-y-8">
       
-      <!-- Top Planner Toolbar with Sidebar Toggle & View Modes -->
-      <div class="glass-card px-5 py-3.5 rounded-2xl border border-white/10 flex flex-wrap items-center justify-between gap-4 shadow-xl">
-        <div class="flex flex-wrap items-center gap-3">
-          <button
-            id="togglePlannerSidebarBtn"
-            onclick="togglePlannerSidebar()"
-            class="btn-secondary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition shadow-sm"
-          >
-            <span id="toggleSidebarIcon">◀</span>
-            <span id="toggleSidebarText">Hide Form & Maximize View</span>
-          </button>
-
-          <!-- View Mode Switcher (Visible once itinerary is generated/loading) -->
-          <div class="hidden sm:inline-flex items-center gap-1 bg-spaceDark/80 p-1 rounded-xl border border-white/10 text-xs">
-            <button id="viewBtnAll" onclick="setPlannerViewMode('all')" class="px-3 py-1.5 rounded-lg font-bold bg-coralPrimary text-white shadow transition">
-              🗺️ Map + Itinerary
-            </button>
-            <button id="viewBtnItinerary" onclick="setPlannerViewMode('itinerary')" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white transition">
-              📝 Itinerary Only
-            </button>
-            <button id="viewBtnMap" onclick="setPlannerViewMode('map')" class="px-3 py-1.5 rounded-lg font-medium text-gray-400 hover:text-white transition">
-              📍 Map Only
-            </button>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <span class="px-3 py-1 text-[11px] font-bold rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30" id="activeRegionBadge">
-            🇮🇳 INR Active
-          </span>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- Top Row: 2 Equal Width & Matching Length Grids (1. Trip Architect Form, 2. Interactive Map) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch" id="plannerTopGrids">
         
-        <!-- Left Side: Trip Architect Parameter Form -->
-        <aside id="plannerSidebarCol" class="lg:col-span-5 space-y-6 transition-all duration-300">
-          <div class="glass-card p-6 sm:p-7 rounded-3xl border border-white/10 space-y-5 shadow-2xl">
+        <!-- Grid 1: Trip Architect Parameter Form -->
+        <div class="glass-card p-6 sm:p-7 rounded-3xl border border-white/10 flex flex-col justify-between space-y-5 shadow-2xl h-full">
+          <div>
             <div class="flex items-center justify-between pb-3 border-b border-white/10">
-              <h2 class="text-lg font-bold text-white flex items-center gap-2"><span>🧭</span> Trip Architect</h2>
-              <span class="text-[11px] text-gray-400 font-medium">Customize Plan</span>
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="block text-xs font-bold uppercase text-gray-300">📍 Destination</label>
-              <input type="text" id="plannerDest" placeholder="e.g. Kyoto, Japan or Manali, India" class="w-full px-4 py-3 bg-spaceDark border border-white/15 rounded-xl text-sm text-white focus:outline-none focus:border-coralPrimary shadow-inner" />
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-1.5">
-                <div class="flex justify-between text-xs font-bold text-gray-300">
-                  <span>📅 Duration</span>
-                  <span id="daysDisp" class="text-coralPrimary">3 Days</span>
-                </div>
-                <input type="range" id="plannerDays" min="1" max="14" value="3" class="w-full accent-coralPrimary cursor-pointer" oninput="document.getElementById('daysDisp').innerText = this.value + ' Days'" />
-              </div>
-              <div class="space-y-1.5">
-                <label class="block text-xs font-bold uppercase text-gray-300">💰 Tier</label>
-                <select id="plannerTier" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-coralPrimary">
-                  <option value="Student (Low)">Student (Low)</option>
-                  <option value="Moderate">Moderate</option>
-                  <option value="Luxury">Luxury</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3">
-              <div class="space-y-1">
-                <label class="text-[11px] font-bold text-gray-400">Currency</label>
-                <input type="text" id="plannerCurr" readonly value="INR (₹)" class="w-full px-2.5 py-2.5 bg-spaceDark/60 border border-white/10 rounded-xl text-xs text-amberAccent font-bold" />
-              </div>
-              <div class="col-span-2 space-y-1">
-                <label class="text-[11px] font-bold text-gray-400">Cap Budget (Optional)</label>
-                <input type="text" id="plannerBudgetCap" placeholder="e.g. 20000 or 500" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              <label class="block text-xs font-bold uppercase text-gray-300">❤️ Interests</label>
-              <div class="flex flex-wrap gap-1.5" id="interestPills">
-                <span class="chip-tag active text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Street Food')">🍜 Street Food</span>
-                <span class="chip-tag active text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'History & Shrines')">🏯 History</span>
-                <span class="chip-tag text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Nature & Trekking')">🌲 Nature</span>
-                <span class="chip-tag text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Nightlife')">🌙 Nightlife</span>
-                <span class="chip-tag text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Museums')">🎨 Museums</span>
-                <span class="chip-tag text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Adventure')">🏄 Adventure</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-1">
-                <label class="text-[11px] font-bold text-gray-400">Must-Visit</label>
-                <input type="text" id="plannerMustVisit" placeholder="e.g. Fushimi Inari" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
-              </div>
-              <div class="space-y-1">
-                <label class="text-[11px] font-bold text-gray-400">Pace</label>
-                <select id="plannerPace" class="w-full px-2.5 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white">
-                  <option value="Balanced">Balanced</option>
-                  <option value="Relaxed">Relaxed</option>
-                  <option value="Packed Action">Packed</option>
-                </select>
-              </div>
-            </div>
-
-            <button id="genBtn" onclick="planTrip()" class="w-full btn-gradient py-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl">
-              <span>🚀 Generate AI Itinerary</span>
-            </button>
-          </div>
-        </aside>
-
-        <!-- Right Side: Results & Map Area -->
-        <div id="plannerResultsCol" class="lg:col-span-7 space-y-6 transition-all duration-300">
-          <div id="plannerErr" class="hidden p-4 rounded-2xl bg-red-950/80 border border-red-800 text-red-200 text-sm"></div>
-
-          <!-- Initial Empty Placeholder -->
-          <div id="plannerPlaceholder" class="glass-card rounded-3xl p-12 text-center space-y-4 shadow-xl">
-            <div class="w-16 h-16 rounded-3xl bg-coralPrimary/10 border border-coralPrimary/20 flex items-center justify-center text-3xl mx-auto shadow-inner">
-              🗺️
-            </div>
-            <h3 class="text-2xl font-extrabold text-white">Your Custom Plan Awaits</h3>
-            <p class="text-gray-400 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">
-              Fill in your destination and preferences on the left, then hit Generate to craft your comprehensive day-by-day itinerary & interactive map.
-            </p>
-          </div>
-
-          <!-- Loading State -->
-          <div id="plannerLoading" class="hidden glass-card rounded-3xl p-12 text-center space-y-4 border border-coralPrimary/30 shadow-2xl">
-            <div class="w-14 h-14 border-4 border-coralPrimary/20 border-t-coralPrimary rounded-full animate-spin mx-auto"></div>
-            <h3 class="text-xl font-bold text-white">Architecting Your Trip...</h3>
-            <p class="text-xs text-coralPrimary animate-pulse">Calculating regional budget breakdowns and geocoding landmark pins...</p>
-          </div>
-
-          <!-- Results Section -->
-          <div id="plannerResults" class="hidden space-y-6">
-            
-            <!-- Map Card Container -->
-            <div id="plannerMapCard" class="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
-              <div class="flex items-center justify-between">
-                <h3 id="mapHeading" class="text-base sm:text-lg font-bold text-white">📍 Interactive Destination Map</h3>
-                <span class="text-xs text-cyanAccent font-semibold">Live GPS Markers</span>
-              </div>
-              <div id="map"></div>
-            </div>
-
-            <!-- Itinerary Text Card Container -->
-            <div id="plannerItineraryCard" class="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 space-y-6 shadow-xl">
-              <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-white/10">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🧭</span>
                 <div>
-                  <h3 class="text-lg font-bold text-white">📝 Your Itinerary Blueprint</h3>
-                  <p class="text-xs text-gray-400">Tailored student stops & budget schedule</p>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  <button onclick="saveTrip()" class="btn-secondary px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">💾 Save</button>
-                  <button onclick="copyTrip()" class="btn-secondary px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1">📋 Copy</button>
-                  <button onclick="downloadTripPDF()" class="btn-gradient px-4 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 shadow-md">⬇️ PDF</button>
+                  <h2 class="text-lg font-bold text-white leading-tight">Trip Architect</h2>
+                  <p class="text-[11px] text-gray-400">Step 1: Set Destination & Vibe</p>
                 </div>
               </div>
-              <div id="itineraryView" class="itinerary-prose text-sm p-4 sm:p-5 rounded-2xl bg-spaceDark/60 border border-white/5 shadow-inner"></div>
+              <span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30" id="activeRegionBadge">🇮🇳 INR Active</span>
             </div>
 
+            <div class="space-y-4 pt-3">
+              <div class="space-y-1.5">
+                <label class="block text-xs font-bold uppercase text-gray-300">📍 Destination</label>
+                <input type="text" id="plannerDest" placeholder="e.g. Kyoto, Japan or Rome, Italy" class="w-full px-4 py-3 bg-spaceDark border border-white/15 rounded-xl text-sm text-white focus:outline-none focus:border-coralPrimary shadow-inner" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                  <div class="flex justify-between text-xs font-bold text-gray-300">
+                    <span>📅 Duration</span>
+                    <span id="daysDisp" class="text-coralPrimary">3 Days</span>
+                  </div>
+                  <input type="range" id="plannerDays" min="1" max="14" value="3" class="w-full accent-coralPrimary cursor-pointer" oninput="document.getElementById('daysDisp').innerText = this.value + ' Days'" />
+                </div>
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-bold uppercase text-gray-300">💰 Tier</label>
+                  <select id="plannerTier" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-coralPrimary">
+                    <option value="Student (Low)">Student (Low)</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="Luxury">Luxury</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-3">
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-400">Currency</label>
+                  <input type="text" id="plannerCurr" readonly value="INR (₹)" class="w-full px-2.5 py-2.5 bg-spaceDark/60 border border-white/10 rounded-xl text-xs text-amberAccent font-bold" />
+                </div>
+                <div class="col-span-2 space-y-1">
+                  <label class="text-[11px] font-bold text-gray-400">Cap Budget (Optional)</label>
+                  <input type="text" id="plannerBudgetCap" placeholder="e.g. 20000 or 500" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <label class="block text-xs font-bold uppercase text-gray-300">❤️ Interests</label>
+                <div class="flex flex-wrap gap-1.5" id="interestPills">
+                  <span class="chip-tag active text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Street Food')">🍜 Street Food</span>
+                  <span class="chip-tag active text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'History & Shrines')">🏯 History</span>
+                  <span class="chip-tag text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Nature & Trekking')">🌲 Nature</span>
+                  <span class="chip-tag text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Nightlife')">🌙 Nightlife</span>
+                  <span class="chip-tag text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Museums')">🎨 Museums</span>
+                  <span class="chip-tag text-xs px-3 py-1.5 rounded-full" onclick="toggleTag(this, 'Adventure')">🏄 Adventure</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-400">Must-Visit</label>
+                  <input type="text" id="plannerMustVisit" placeholder="e.g. Colosseum" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-bold text-gray-400">Pace</label>
+                  <select id="plannerPace" class="w-full px-2.5 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white">
+                    <option value="Balanced">Balanced</option>
+                    <option value="Relaxed">Relaxed</option>
+                    <option value="Packed Action">Packed</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button id="genBtn" onclick="planTrip()" class="w-full mt-4 btn-gradient py-3.5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-xl">
+            <span>🚀 Generate AI Itinerary</span>
+          </button>
+        </div>
+
+        <!-- Grid 2: Interactive Destination Map (Equal Height & Width with Grid 1) -->
+        <div class="glass-card p-6 rounded-3xl border border-white/10 flex flex-col justify-between shadow-2xl h-full min-h-[540px]" id="plannerMapCard">
+          <div class="flex items-center justify-between pb-3 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">📍</span>
+              <div>
+                <h3 id="mapHeading" class="text-base sm:text-lg font-bold text-white leading-tight">Interactive Destination Map</h3>
+                <p class="text-[11px] text-gray-400">Step 2: Explore Geo-Coordinates</p>
+              </div>
+            </div>
+            <span class="text-xs text-cyanAccent font-semibold px-2.5 py-0.5 rounded-full bg-cyanAccent/10 border border-cyanAccent/20">Live GPS Pins</span>
+          </div>
+          
+          <div class="flex-grow w-full rounded-2xl overflow-hidden mt-4 relative bg-spaceDark/60 border border-white/10 min-h-[440px]">
+            <div id="map" class="w-full h-full min-h-[440px]"></div>
           </div>
         </div>
 
       </div>
+
+      <!-- Grid 3: Your Itinerary Blueprint (Full Width: Combination of 1 & 2 Below Top Grids) -->
+      <div id="plannerResultsContainer" class="w-full space-y-6">
+        <div id="plannerErr" class="hidden p-4 rounded-2xl bg-red-950/80 border border-red-800 text-red-200 text-sm"></div>
+
+        <!-- Initial Placeholder when no trip is planned yet -->
+        <div id="plannerPlaceholder" class="glass-card rounded-3xl p-10 sm:p-12 text-center space-y-4 shadow-xl border border-white/10">
+          <div class="w-16 h-16 rounded-3xl bg-coralPrimary/10 border border-coralPrimary/20 flex items-center justify-center text-3xl mx-auto shadow-inner">
+            📝
+          </div>
+          <h3 class="text-2xl font-extrabold text-white">Your Itinerary Blueprint</h3>
+          <p class="text-gray-400 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+            Customize your parameters above and click "Generate AI Itinerary". Your comprehensive day-by-day itinerary, budget breakdown matrix, and local student tips will appear here in full widescreen format spanning the entire width.
+          </p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="plannerLoading" class="hidden glass-card rounded-3xl p-12 text-center space-y-4 border border-coralPrimary/30 shadow-2xl">
+          <div class="w-14 h-14 border-4 border-coralPrimary/20 border-t-coralPrimary rounded-full animate-spin mx-auto"></div>
+          <h3 class="text-xl font-bold text-white">Architecting Your Trip...</h3>
+          <p class="text-xs text-coralPrimary animate-pulse">Calculating regional budget breakdowns and geocoding landmark pins...</p>
+        </div>
+
+        <!-- Itinerary Blueprint Card (Full Width: Combination of 1 and 2 below top grids) -->
+        <div id="plannerResults" class="hidden glass-card p-6 sm:p-10 rounded-3xl border border-white/10 space-y-6 shadow-2xl">
+          <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-white/10">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
+                <span>📝</span> Your Itinerary Blueprint
+              </h3>
+              <p class="text-xs sm:text-sm text-gray-400 mt-0.5">Comprehensive day-by-day plan, budget breakdown & student hacks</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="saveTrip()" class="btn-secondary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                <span>💾 Save Trip</span>
+              </button>
+              <button onclick="copyTrip()" class="btn-secondary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                <span>📋 Copy</span>
+              </button>
+              <button onclick="downloadTripPDF()" class="btn-gradient px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+                <span>⬇️ Export PDF</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="itineraryView" class="itinerary-prose text-sm p-5 sm:p-8 rounded-2xl bg-spaceDark/70 border border-white/5 shadow-inner"></div>
+        </div>
+
+      </div>
+
     </section>
 
     <!-- PAGE 3: BUDGET CALCULATOR -->
@@ -1631,7 +1624,13 @@ HTML_CONTENT = """<!DOCTYPE html>
       });
       if (page === 'saved') renderSaved();
       if (page === 'packing') renderPacking();
-      if (page === 'planner' && mapInstance) setTimeout(() => mapInstance.invalidateSize(), 200);
+      if (page === 'planner') {
+        if (!mapInstance) {
+          renderMap([35.6762, 139.6503], [{ coords: [35.6762, 139.6503], name: "World Explorer" }]);
+        } else {
+          setTimeout(() => mapInstance.invalidateSize(), 200);
+        }
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1810,6 +1809,10 @@ HTML_CONTENT = """<!DOCTYPE html>
         document.getElementById('plannerLoading').classList.add('hidden');
         document.getElementById('plannerResults').classList.remove('hidden');
         showToast(`Itinerary for ${destination} generated successfully!`, 'success');
+        setTimeout(() => {
+          const resultsEl = document.getElementById('plannerResults');
+          if (resultsEl) resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
       } catch (err) {
         document.getElementById('plannerLoading').classList.add('hidden');
         const errBox = document.getElementById('plannerErr');
