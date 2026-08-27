@@ -202,6 +202,20 @@ HTML_CONTENT = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Instant Theme Engine (Executes BEFORE any styles/scripts to guarantee ZERO reload flicker) -->
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('roamai_theme');
+        var isLight = savedTheme ? (savedTheme === 'light') : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+        if (isLight) {
+          document.documentElement.classList.add('light-theme');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <title>RoamAI • Next-Gen AI Student Travel Planner</title>
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/921/921490.png" />
 
@@ -246,25 +260,23 @@ HTML_CONTENT = """<!DOCTYPE html>
   <!-- Vanilla Tilt (3D Card Physics) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
-  <!-- Instant Theme Engine (Reads device preference first, prevents any reload flicker) -->
-  <script>
-    (function() {
-      try {
-        var savedTheme = localStorage.getItem('roamai_theme');
-        var isLight = savedTheme ? savedTheme === 'light' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
-        if (isLight) {
-          document.documentElement.classList.add('light-theme');
-        }
-      } catch(e) {}
-    })();
-  </script>
-
   <style>
+    html {
+      background-color: #080C14;
+    }
+    html.light-theme {
+      background-color: #EEF4FB !important;
+    }
     body {
       background-color: #080C14;
       color: #F3F4F6;
       font-family: 'Plus Jakarta Sans', sans-serif;
       overflow-x: hidden;
+    }
+    html.light-theme body,
+    body.light-theme {
+      background-color: #EEF4FB !important;
+      color: #0B132B !important;
     }
 
     /* Ambient Floating Orbs */
