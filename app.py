@@ -391,7 +391,8 @@ HTML_CONTENT = """<!DOCTYPE html>
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
-  <!-- Dynamic Floating Ambient Orbs & Cosmic Grid Pattern -->
+  <!-- Dynamic Animated Background Canvas, Floating Ambient Orbs & Cosmic Grid Pattern -->
+  <canvas id="bgParticleCanvas" class="fixed inset-0 pointer-events-none z-[-1]"></canvas>
   <div class="orb-1"></div>
   <div class="orb-2"></div>
   <div class="orb-3"></div>
@@ -497,7 +498,10 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="lg:col-span-7 space-y-6">
             <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-amberAccent shadow-inner">
               <span class="w-2 h-2 rounded-full bg-emeraldAccent animate-ping"></span>
-              <span class="text-white">2026 Student Travel Architect</span>
+              <span class="text-white">Next-Gen Student Travel Architect</span>
+              <span class="text-gray-400">•</span>
+              <span>Sub-Second AI Engine</span>
+            </div>
               <span class="text-gray-400">•</span>
               <span>Sub-Second AI Engine</span>
             </div>
@@ -1652,57 +1656,188 @@ HTML_CONTENT = """<!DOCTYPE html>
       html2pdf().set(opt).from(el).save();
     }
 
+    // --- Robust Saved Trips Storage & Management ---
+    function getSavedTrips() {
+      try {
+        const raw = localStorage.getItem('roamai_saved_trips') || localStorage.getItem('saved_trips');
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error('Failed to parse saved trips', e);
+        return [];
+      }
+    }
+
+    function persistSavedTrips(trips) {
+      try {
+        const jsonStr = JSON.stringify(trips);
+        localStorage.setItem('roamai_saved_trips', jsonStr);
+        localStorage.setItem('saved_trips', jsonStr);
+      } catch (e) {
+        console.error('Failed to persist saved trips', e);
+      }
+    }
+
     function saveTrip() {
-      if (!currentTrip) return;
-      const trips = JSON.parse(localStorage.getItem('saved_trips') || '[]');
-      trips.unshift({
-        id: Date.now(),
-        destination: currentTrip.trip_summary.destination,
-        days: currentTrip.trip_summary.days,
+      if (!currentTrip) {
+        showToast('No active trip to save. Plan a trip first!', 'warning');
+        return;
+      }
+
+      const trips = getSavedTrips();
+      const dest = currentTrip.trip_summary?.destination || document.getElementById('plannerDest')?.value || 'Trip';
+      const days = currentTrip.trip_summary?.days || document.getElementById('plannerDays')?.value || 3;
+
+      // Prevent exact duplicate saves within same session
+      const existingIdx = trips.findIndex(t => t.destination.toLowerCase() === dest.toLowerCase() && t.itinerary === currentTrip.itinerary);
+      if (existingIdx !== -1) {
+        showToast(`Trip to ${dest} is already saved in your vault!`, 'info');
+        return;
+      }
+
+      const newTrip = {
+        id: 'trip_' + Date.now(),
+        destination: dest,
+        days: days,
         itinerary: currentTrip.itinerary,
-        date: new Date().toLocaleDateString()
-      });
-      localStorage.setItem('saved_trips', JSON.stringify(trips));
-      document.getElementById('savedCount').innerText = trips.length;
-      showToast(`Trip to ${currentTrip.trip_summary.destination} saved to offline vault!`, 'success');
+        markers: currentTrip.markers || [],
+        destination_coords: currentTrip.destination_coords || null,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      };
+
+      trips.unshift(newTrip);
+      persistSavedTrips(trips);
+
+      const countEl = document.getElementById('savedCount');
+      if (countEl) countEl.innerText = trips.length;
+
+      showToast(`Trip to ${dest} saved to offline vault!`, 'success');
+      renderSaved();
     }
 
     function renderSaved() {
-      const trips = JSON.parse(localStorage.getItem('saved_trips') || '[]');
-      document.getElementById('savedCount').innerText = trips.length;
+      const trips = getSavedTrips();
+      const countEl = document.getElementById('savedCount');
+      if (countEl) countEl.innerText = trips.length;
+
       const grid = document.getElementById('savedGrid');
       const empty = document.getElementById('savedEmpty');
+      if (!grid || !empty) return;
 
       if (trips.length === 0) {
         grid.innerHTML = '';
         empty.classList.remove('hidden');
         return;
       }
+
       empty.classList.add('hidden');
       grid.innerHTML = trips.map(t => `
-        <div class="glass-card p-5 rounded-2xl border border-white/10 space-y-3">
-          <div class="flex justify-between">
-            <h4 class="text-base font-bold text-white">${t.destination}</h4>
-            <span class="text-xs text-coralPrimary font-bold">${t.days} Days</span>
+        <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl flex flex-col justify-between group hover:border-coralPrimary/40 transition">
+          <div class="space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="text-base font-extrabold text-white group-hover:text-coralPrimary transition">${t.destination}</h4>
+              <span class="text-xs text-coralPrimary font-bold px-2.5 py-0.5 rounded-full bg-coralPrimary/10 border border-coralPrimary/20 whitespace-nowrap">${t.days} Days</span>
+            </div>
+            <p class="text-xs text-gray-400 flex items-center gap-1.5">
+              <span>📅</span> Saved: ${t.date}
+            </p>
           </div>
-          <p class="text-xs text-gray-400">Saved: ${t.date}</p>
-          <button onclick='loadSaved(${JSON.stringify(t.itinerary)}, "${t.destination}")' class="w-full btn-gradient py-2 rounded-xl text-xs font-bold">View Plan</button>
+
+          <div class="space-y-2 pt-2 border-t border-white/10">
+            <button onclick="loadSavedTrip('${t.id}')" class="w-full btn-gradient py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-md">
+              <span>🚀 View Itinerary & Map</span>
+            </button>
+            <div class="flex items-center gap-2">
+              <button onclick="downloadSavedTripPDF('${t.id}')" class="flex-grow btn-secondary py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 text-gray-300 hover:text-white">
+                <span>⬇️ PDF</span>
+              </button>
+              <button onclick="deleteSavedTrip('${t.id}')" class="p-2 rounded-xl text-xs text-gray-400 hover:text-red-400 hover:bg-white/5 border border-white/5 transition" title="Delete Saved Trip">
+                🗑️
+              </button>
+            </div>
+          </div>
         </div>
       `).join('');
     }
 
-    function loadSaved(itinerary, dest) {
-      document.getElementById('plannerDest').value = dest;
+    function loadSavedTrip(id) {
+      const trips = getSavedTrips();
+      const trip = trips.find(t => String(t.id) === String(id));
+      if (!trip) {
+        showToast('Could not find saved trip details.', 'error');
+        return;
+      }
+
+      currentTrip = {
+        trip_summary: { destination: trip.destination, days: trip.days },
+        itinerary: trip.itinerary,
+        markers: trip.markers || [],
+        destination_coords: trip.destination_coords || null
+      };
+
+      document.getElementById('plannerDest').value = trip.destination;
+      document.getElementById('plannerDays').value = trip.days || 3;
+      const daysDisp = document.getElementById('daysDisp');
+      if (daysDisp) daysDisp.innerText = (trip.days || 3) + ' Days';
+
       switchPage('planner');
+
       document.getElementById('plannerPlaceholder').classList.add('hidden');
+      document.getElementById('plannerLoading').classList.add('hidden');
       document.getElementById('plannerResults').classList.remove('hidden');
-      document.getElementById('itineraryView').innerHTML = marked.parse(itinerary);
-      document.getElementById('mapHeading').innerText = `📍 Exploring ${dest}`;
-      showToast(`Loaded saved itinerary for ${dest}`, 'info');
+
+      document.getElementById('itineraryView').innerHTML = marked.parse(trip.itinerary);
+      document.getElementById('mapHeading').innerText = `📍 Exploring ${trip.destination}`;
+
+      if (trip.destination_coords || (trip.markers && trip.markers.length > 0)) {
+        renderMap(trip.destination_coords, trip.markers);
+      }
+
+      showToast(`Loaded saved itinerary for ${trip.destination}`, 'info');
+    }
+
+    function downloadSavedTripPDF(id) {
+      const trips = getSavedTrips();
+      const trip = trips.find(t => String(t.id) === String(id));
+      if (!trip) return;
+
+      showToast('Preparing PDF export...', 'info');
+      const tempDiv = document.createElement('div');
+      tempDiv.className = 'itinerary-prose p-6 bg-slate-900 text-white rounded-xl';
+      tempDiv.innerHTML = marked.parse(trip.itinerary);
+
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `Trip_to_${trip.destination.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(tempDiv).save();
+    }
+
+    function deleteSavedTrip(id) {
+      let trips = getSavedTrips();
+      const target = trips.find(t => String(t.id) === String(id));
+      const destName = target ? target.destination : 'trip';
+
+      showConfirmModal({
+        title: 'Delete Saved Itinerary?',
+        message: `Are you sure you want to remove your saved itinerary for "${destName}"?`,
+        icon: '🗑️',
+        confirmText: 'Yes, Delete',
+        onConfirm: () => {
+          trips = trips.filter(t => String(t.id) !== String(id));
+          persistSavedTrips(trips);
+          renderSaved();
+          showToast(`Deleted trip for ${destName}.`, 'info');
+        }
+      });
     }
 
     function clearTrips() {
-      const trips = JSON.parse(localStorage.getItem('saved_trips') || '[]');
+      const trips = getSavedTrips();
       if (trips.length === 0) {
         showToast('No saved trips to clear.', 'info');
         return;
@@ -1714,6 +1849,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         icon: '🗑️',
         confirmText: 'Yes, Clear All',
         onConfirm: () => {
+          localStorage.removeItem('roamai_saved_trips');
           localStorage.removeItem('saved_trips');
           renderSaved();
           showToast('All saved trips have been cleared.', 'info');
@@ -2090,19 +2226,133 @@ HTML_CONTENT = """<!DOCTYPE html>
       });
     }
 
+    // --- Dynamic Moving Interactive Canvas Background ---
+    function initBackgroundCanvas() {
+      const canvas = document.getElementById('bgParticleCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const particles = [];
+      const particleCount = Math.min(Math.floor((width * height) / 18000), 75);
+
+      const colors = [
+        'rgba(255, 94, 54, ',   // Coral
+        'rgba(6, 182, 212, ',   // Cyan
+        'rgba(255, 160, 0, ',   // Amber
+        'rgba(139, 92, 246, '   // Purple
+      ];
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.65,
+          vy: (Math.random() - 0.5) * 0.65,
+          radius: Math.random() * 2.2 + 1,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: Math.random() * 0.6 + 0.2,
+          pulseSpeed: Math.random() * 0.02 + 0.01
+        });
+      }
+
+      let mouse = { x: null, y: null, radius: 140 };
+
+      window.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+
+      window.addEventListener('mouseleave', () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Update & draw particles
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          // Mouse repulsion
+          if (mouse.x !== null && mouse.y !== null) {
+            const dx = mouse.x - p.x;
+            const dy = mouse.y - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.radius) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              p.x -= (dx / dist) * force * 3;
+              p.y -= (dy / dist) * force * 3;
+            }
+          }
+
+          // Pulsing opacity
+          p.alpha += Math.sin(Date.now() * p.pulseSpeed) * 0.005;
+          const currentAlpha = Math.max(0.15, Math.min(0.85, p.alpha));
+
+          // Draw particle
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + currentAlpha + ')';
+          ctx.fill();
+
+          // Connect nearby particles
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            if (dist < 110) {
+              const lineAlpha = (1 - dist / 110) * 0.18;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
+              ctx.lineWidth = 0.75;
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Restore saved region (prevent resetting to INR on reload)
+      // 1. Initialize animated moving particle canvas background
+      initBackgroundCanvas();
+
+      // 2. Restore saved region (prevent resetting to INR on reload)
       const savedRegion = localStorage.getItem('roamai_selected_region') || 'INR';
       onRegionChange(savedRegion, false);
 
-      // 2. Restore saved active page (prevent automatically resetting to home on reload)
+      // 3. Restore saved active page (prevent automatically resetting to home on reload)
       const hashPage = window.location.hash.replace('#', '');
       const savedPage = hashPage || localStorage.getItem('roamai_active_page') || 'home';
       switchPage(savedPage, false);
 
+      // 4. Render packing checklist
       renderPacking();
-      const trips = JSON.parse(localStorage.getItem('saved_trips') || '[]');
-      document.getElementById('savedCount').innerText = trips.length;
+
+      // 5. Render saved itineraries from persistent vault
+      renderSaved();
     });
   </script>
 </body>
