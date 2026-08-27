@@ -279,6 +279,14 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #0B132B !important;
     }
 
+    /* Instant CSS Theme Icon Indicator (Zero-Flicker Synchronous Rendering) */
+    .theme-icon::before {
+      content: '🌙';
+    }
+    html.light-theme .theme-icon::before {
+      content: '☀️';
+    }
+
     /* Ambient Floating Orbs */
     @keyframes floatOrb1 {
       0%, 100% { transform: translate(0px, 0px) scale(1); }
@@ -719,7 +727,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           title="Toggle Light / Dark Mode"
           aria-label="Toggle Theme Mood"
         >
-          <span id="themeToggleIcon">🌙</span>
+          <span id="themeToggleIcon" class="theme-icon inline-block"></span>
         </button>
 
         <!-- Region & Currency Selector -->
@@ -757,7 +765,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center"><span>💰</span>Budget</button>
       <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center"><span>🎒</span>Packing</button>
       <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center"><span>📂</span>Saved</button>
-      <button onclick="toggleThemeMood()" class="flex flex-col items-center"><span id="mobThemeToggleIcon">🌙</span>Mood</button>
+      <button onclick="toggleThemeMood()" class="flex flex-col items-center"><span id="mobThemeToggleIcon" class="theme-icon inline-block"></span>Mood</button>
     </div>
   </header>
 
@@ -1931,7 +1939,9 @@ HTML_CONTENT = """<!DOCTYPE html>
           setTimeout(() => mapInstance.invalidateSize(), 200);
         }
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (saveState) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
     // --- Planner Sidebar & View Mode Controls ---
