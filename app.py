@@ -1309,8 +1309,42 @@ HTML_CONTENT = """<!DOCTYPE html>
     </div>
   </div>
 
-  <footer class="mt-20 border-t border-cardBorder bg-spaceDark/90 py-8 text-center text-xs text-gray-500">
-    RoamAI • AI Student Travel Planner • Multi-Region Support • Powered by Groq AI & FastAPI
+  <!-- ==================== SIMPLE & CLEAN MODERN FOOTER ==================== -->
+  <footer class="mt-20 border-t border-white/10 bg-spaceDark/80 backdrop-blur-xl py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      
+      <!-- Brand & Tagline -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchPage('home')">
+        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-coralPrimary to-amberAccent p-0.5 shadow-md">
+          <div class="w-full h-full bg-spaceDark rounded-[10px] flex items-center justify-center">
+            <span class="text-xl">✈️</span>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-base font-extrabold text-white">RoamAI</span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30">STUDENT</span>
+          </div>
+          <p class="text-xs text-gray-400">Smart AI Student Travel Architect</p>
+        </div>
+      </div>
+
+      <!-- Quick Nav Links -->
+      <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 font-medium">
+        <button onclick="switchPage('home')" class="hover:text-white transition">Discover</button>
+        <button onclick="switchPage('planner')" class="hover:text-white transition">AI Planner</button>
+        <button onclick="switchPage('budget')" class="hover:text-white transition">Budget Calc</button>
+        <button onclick="switchPage('packing')" class="hover:text-white transition">Packing List</button>
+        <button onclick="switchPage('saved')" class="hover:text-white transition">Saved Trips</button>
+      </div>
+
+      <!-- Sub-info -->
+      <div class="text-center md:text-right text-xs text-gray-500">
+        <p>Crafted for student explorers worldwide</p>
+        <p class="text-[11px] text-gray-600 mt-0.5">Powered by Groq AI & FastAPI</p>
+      </div>
+
+    </div>
   </footer>
 
   <!-- ==================== JAVASCRIPT LOGIC ==================== -->
