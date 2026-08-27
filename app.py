@@ -265,7 +265,52 @@ HTML_CONTENT = """<!DOCTYPE html>
   <!-- Vanilla Tilt (3D Card Physics) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
-  <style>
+    /* ========================================================
+       ULTRA-SLEEK THIN CUSTOM SCROLLBAR SYSTEM
+       ======================================================== */
+    /* Firefox */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 94, 54, 0.45) transparent;
+    }
+    html.light-theme * {
+      scrollbar-color: rgba(255, 94, 54, 0.55) rgba(0, 0, 0, 0.04);
+    }
+
+    /* WebKit Browsers (Chrome, Edge, Safari, Opera, Brave) */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+      margin: 3px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 94, 54, 0.45) 0%, rgba(255, 160, 0, 0.45) 100%);
+      border-radius: 9999px;
+      transition: background 0.3s ease;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #FF5E36 0%, #FFA000 100%);
+      box-shadow: 0 0 8px rgba(255, 94, 54, 0.5);
+    }
+    ::-webkit-scrollbar-thumb:active {
+      background: linear-gradient(180deg, #E04820 0%, #E68A00 100%);
+    }
+
+    /* Light Theme Custom Scrollbar */
+    html.light-theme ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    html.light-theme ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 94, 54, 0.6) 0%, rgba(255, 140, 0, 0.6) 100%);
+    }
+    html.light-theme ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #E64A19 0%, #F57C00 100%);
+      box-shadow: 0 0 8px rgba(230, 74, 25, 0.4);
+    }
+
     html {
       background-color: #080C14;
     }
