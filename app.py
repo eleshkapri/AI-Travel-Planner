@@ -1309,39 +1309,35 @@ HTML_CONTENT = """<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- ==================== SIMPLE & CLEAN MODERN FOOTER ==================== -->
-  <footer class="mt-20 border-t border-white/10 bg-spaceDark/80 backdrop-blur-xl py-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+  <!-- ==================== DISTINCT MINIMALIST MODERN FOOTER ==================== -->
+  <footer class="mt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto glass-card p-6 sm:p-8 rounded-3xl border border-white/10 text-center space-y-4 shadow-2xl relative overflow-hidden">
       
-      <!-- Brand & Tagline -->
-      <div class="flex items-center gap-3 cursor-pointer" onclick="switchPage('home')">
-        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-coralPrimary to-amberAccent p-0.5 shadow-md">
-          <div class="w-full h-full bg-spaceDark rounded-[10px] flex items-center justify-center">
-            <span class="text-xl">✈️</span>
-          </div>
-        </div>
-        <div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-base font-extrabold text-white">RoamAI</span>
-            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30">STUDENT</span>
-          </div>
-          <p class="text-xs text-gray-400">Smart AI Student Travel Architect</p>
-        </div>
+      <!-- Subtle Ambient Glow Behind Footer -->
+      <div class="absolute inset-0 bg-gradient-to-r from-coralPrimary/5 via-amberAccent/5 to-cyanAccent/5 pointer-events-none"></div>
+
+      <!-- Centered Brand & Status Pill -->
+      <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-white shadow-inner">
+        <span class="text-coralPrimary text-base">✈️</span>
+        <span class="font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-coralPrimary">RoamAI</span>
+        <span class="text-gray-500">•</span>
+        <span class="flex items-center gap-1.5 text-emeraldAccent font-bold text-[11px]">
+          <span class="w-1.5 h-1.5 rounded-full bg-emeraldAccent animate-pulse"></span> Free for Students
+        </span>
       </div>
 
-      <!-- Quick Nav Links -->
-      <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 font-medium">
-        <button onclick="switchPage('home')" class="hover:text-white transition">Discover</button>
-        <button onclick="switchPage('planner')" class="hover:text-white transition">AI Planner</button>
-        <button onclick="switchPage('budget')" class="hover:text-white transition">Budget Calc</button>
-        <button onclick="switchPage('packing')" class="hover:text-white transition">Packing List</button>
-        <button onclick="switchPage('saved')" class="hover:text-white transition">Saved Trips</button>
-      </div>
+      <!-- Inspirational Travel Micro-Copy -->
+      <p class="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed max-w-lg mx-auto">
+        "Go further, spend smarter, explore everywhere."
+      </p>
 
-      <!-- Sub-info -->
-      <div class="text-center md:text-right text-xs text-gray-500">
-        <p>Crafted for student explorers worldwide</p>
-        <p class="text-[11px] text-gray-600 mt-0.5">Powered by Groq AI & FastAPI</p>
+      <!-- Bottom Metadata Badges -->
+      <div class="pt-3 border-t border-white/10 flex flex-wrap items-center justify-center gap-4 text-[11px] text-gray-400 font-medium">
+        <span class="flex items-center gap-1"><span>🌍</span> 9-Region Currency Engine</span>
+        <span class="text-gray-600">•</span>
+        <span class="flex items-center gap-1"><span>⚡</span> Sub-Second AI Planning</span>
+        <span class="text-gray-600">•</span>
+        <span class="flex items-center gap-1"><span>🎒</span> Smart Packing Architect</span>
       </div>
 
     </div>
