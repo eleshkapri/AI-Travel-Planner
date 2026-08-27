@@ -484,17 +484,19 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     /* ========================================================
-       PREMIUM LIGHT THEME (MODERN TRAVEL PALETTE & CONTRAST)
+       PREMIUM LIGHT THEME (VIBRANT MORNING SKY & CELESTIAL MIST)
        ======================================================== */
     html.light-theme,
     body.light-theme {
-      background-color: #F8FAFC;
-      color: #0F172A;
+      background-color: #EEF4FB;
+      color: #0B132B;
     }
     .light-theme header {
-      background-color: rgba(255, 255, 255, 0.95);
-      border-bottom-color: rgba(226, 232, 240, 0.9);
-      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+      background-color: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom-color: rgba(203, 213, 225, 0.7);
+      box-shadow: 0 4px 25px rgba(11, 19, 43, 0.05);
     }
     .brand-logo-title {
       background: linear-gradient(135deg, #FFFFFF 0%, #F3F4F6 50%, #FF5E36 100%);
@@ -502,21 +504,24 @@ HTML_CONTENT = """<!DOCTYPE html>
       -webkit-text-fill-color: transparent;
     }
     .light-theme .brand-logo-title {
-      background: linear-gradient(135deg, #0F172A 0%, #334155 45%, #FF5E36 100%);
+      background: linear-gradient(135deg, #0B132B 0%, #1E293B 40%, #FF5E36 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .light-theme .glass-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 100%), #FFFFFF;
-      border-color: rgba(226, 232, 240, 0.95);
-      box-shadow: 0 15px 35px -10px rgba(15, 23, 42, 0.06), 0 0 0 1px rgba(226, 232, 240, 0.6);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.78) 100%);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 15px 35px -10px rgba(11, 19, 43, 0.07), 0 0 0 1px rgba(226, 232, 240, 0.8);
     }
     .light-theme .glass-card:hover {
-      border-color: rgba(255, 94, 54, 0.45);
-      box-shadow: 0 20px 40px -10px rgba(255, 94, 54, 0.12), 0 0 0 1px rgba(255, 94, 54, 0.2);
+      border-color: rgba(255, 94, 54, 0.5);
+      box-shadow: 0 20px 40px -10px rgba(255, 94, 54, 0.15), 0 0 0 1px rgba(255, 94, 54, 0.3);
+      transform: translateY(-4px);
     }
     .light-theme .text-white {
-      color: #0F172A !important;
+      color: #0B132B !important;
     }
     .light-theme .text-gray-300 {
       color: #334155 !important;
@@ -528,17 +533,17 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #1E293B !important;
     }
     .light-theme .bg-spaceDark {
-      background-color: #FFFFFF !important;
+      background-color: rgba(255, 255, 255, 0.92) !important;
     }
     .light-theme .bg-cardDark {
-      background-color: #F1F5F9 !important;
+      background-color: rgba(241, 245, 249, 0.92) !important;
     }
     .light-theme input,
     .light-theme select {
       background-color: #FFFFFF !important;
-      color: #0F172A !important;
+      color: #0B132B !important;
       border-color: #CBD5E1 !important;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
     .light-theme input::placeholder {
       color: #94A3B8 !important;
@@ -557,7 +562,7 @@ HTML_CONTENT = """<!DOCTYPE html>
     .light-theme .btn-secondary:hover {
       background: #F8FAFC;
       border-color: #94A3B8;
-      color: #0F172A;
+      color: #0B132B;
     }
     .light-theme .chip-tag {
       background: #F1F5F9;
@@ -565,7 +570,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #334155;
     }
     .light-theme .chip-tag.active {
-      background: linear-gradient(135deg, rgba(255, 94, 54, 0.12), rgba(255, 160, 0, 0.15));
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.15), rgba(255, 160, 0, 0.15));
       border-color: #FF5E36;
       color: #C2410C;
       font-weight: 700;
@@ -573,12 +578,12 @@ HTML_CONTENT = """<!DOCTYPE html>
     .light-theme .hero-badge {
       background: #FFFFFF !important;
       border-color: #E2E8F0 !important;
-      color: #0F172A !important;
+      color: #0B132B !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     }
     .light-theme #regionInfoBanner {
-      background: linear-gradient(135deg, rgba(255, 94, 54, 0.06), rgba(6, 182, 212, 0.06)) !important;
-      border-color: rgba(255, 94, 54, 0.25) !important;
+      background: linear-gradient(135deg, rgba(255, 94, 54, 0.08), rgba(2, 132, 199, 0.08)) !important;
+      border-color: rgba(255, 94, 54, 0.3) !important;
     }
     .light-theme #bannerRegionTitle {
       color: #C2410C !important;
@@ -587,7 +592,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #475569 !important;
     }
     .light-theme .itinerary-prose {
-      background-color: #FFFFFF !important;
+      background-color: rgba(255, 255, 255, 0.95) !important;
       border-color: #E2E8F0 !important;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
     }
@@ -598,7 +603,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #1E293B;
     }
     .light-theme .itinerary-prose strong {
-      color: #0F172A;
+      color: #0B132B;
     }
     .light-theme .itinerary-prose table {
       border-color: #E2E8F0;
@@ -615,26 +620,26 @@ HTML_CONTENT = """<!DOCTYPE html>
     .light-theme #themeToggleBtn {
       background-color: #FFFFFF;
       border-color: #CBD5E1;
-      color: #0F172A;
+      color: #0B132B;
     }
     .light-theme #navRegionSelector {
       background-color: #FFFFFF !important;
-      color: #0F172A !important;
+      color: #0B132B !important;
       border-color: #CBD5E1 !important;
     }
     .light-theme .travel-sky-pattern {
-      background: radial-gradient(circle at 20% 15%, rgba(255, 94, 54, 0.08) 0%, transparent 55%),
-                  radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
-                  radial-gradient(circle at 50% 80%, rgba(255, 160, 0, 0.06) 0%, transparent 60%);
+      background: radial-gradient(circle at 15% 15%, rgba(255, 94, 54, 0.12) 0%, transparent 55%),
+                  radial-gradient(circle at 85% 25%, rgba(2, 132, 199, 0.14) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.10) 0%, transparent 60%);
     }
     .light-theme .orb-1 {
-      background: radial-gradient(circle, rgba(255, 94, 54, 0.08) 0%, transparent 65%);
+      background: radial-gradient(circle, rgba(255, 94, 54, 0.18) 0%, transparent 65%);
     }
     .light-theme .orb-2 {
-      background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 65%);
+      background: radial-gradient(circle, rgba(2, 132, 199, 0.18) 0%, transparent 65%);
     }
     .light-theme .orb-3 {
-      background: radial-gradient(circle, rgba(255, 160, 0, 0.06) 0%, transparent 65%);
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 65%);
     }
   </style>
 </head>
@@ -2825,14 +2830,15 @@ HTML_CONTENT = """<!DOCTYPE html>
         mouse.y = null;
       });
 
-      function drawPlane(p) {
+      function drawPlane(p, isLight) {
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.angle);
 
-        ctx.fillStyle = p.color;
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 8;
+        const planeColor = isLight ? (p.color === '#06B6D4' ? '#0284C7' : '#E11D48') : p.color;
+        ctx.fillStyle = planeColor;
+        ctx.shadowColor = isLight ? 'rgba(15, 23, 42, 0.3)' : planeColor;
+        ctx.shadowBlur = isLight ? 4 : 8;
         ctx.beginPath();
         // Nose
         ctx.moveTo(p.size, 0);
@@ -2856,14 +2862,14 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.restore();
       }
 
-      function drawBalloon(b) {
+      function drawBalloon(b, isLight) {
         ctx.save();
         ctx.translate(b.x, b.y);
 
         // Balloon envelope
         ctx.fillStyle = b.hue;
-        ctx.shadowColor = b.hue;
-        ctx.shadowBlur = 10;
+        ctx.shadowColor = isLight ? 'rgba(0,0,0,0.15)' : b.hue;
+        ctx.shadowBlur = 8;
         ctx.beginPath();
         ctx.arc(0, 0, b.radius, 0, Math.PI, true);
         ctx.quadraticCurveTo(-b.radius * 0.9, b.radius * 1.1, 0, b.radius * 1.4);
@@ -2871,12 +2877,12 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.fill();
 
         // Basket
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.fillStyle = isLight ? '#475569' : 'rgba(255, 255, 255, 0.7)';
         ctx.fillRect(-b.radius * 0.25, b.radius * 1.65, b.radius * 0.5, b.radius * 0.35);
 
         // Strings
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.lineWidth = 0.6;
+        ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.45)' : 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 0.8;
         ctx.beginPath();
         ctx.moveTo(-b.radius * 0.3, b.radius * 1.4);
         ctx.lineTo(-b.radius * 0.2, b.radius * 1.65);
@@ -2887,11 +2893,14 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.restore();
       }
 
-      function drawCompassStar(s, alpha) {
+      function drawCompassStar(s, alpha, isLight) {
         ctx.save();
         ctx.translate(s.x, s.y);
-        ctx.fillStyle = s.color + alpha + ')';
-        ctx.shadowColor = s.color + '0.8)';
+        const starColor = isLight 
+          ? (s.color.includes('255, 160') ? 'rgba(217, 119, 6, ' : 'rgba(2, 132, 199, ')
+          : s.color;
+        ctx.fillStyle = starColor + alpha + ')';
+        ctx.shadowColor = isLight ? 'rgba(217, 119, 6, 0.6)' : starColor + '0.8)';
         ctx.shadowBlur = 6;
 
         ctx.beginPath();
@@ -2910,18 +2919,19 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       function animate() {
         ctx.clearRect(0, 0, width, height);
+        const isLight = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
 
         // 1. Draw Global Great-Circle Flight Arcs
         ctx.save();
         ctx.setLineDash([6, 12]);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'rgba(255, 160, 0, 0.12)';
+        ctx.lineWidth = isLight ? 1.5 : 1;
+        ctx.strokeStyle = isLight ? 'rgba(234, 88, 12, 0.40)' : 'rgba(255, 160, 0, 0.12)';
         ctx.beginPath();
         ctx.moveTo(0, height * 0.3);
         ctx.quadraticCurveTo(width * 0.5, height * 0.1, width, height * 0.45);
         ctx.stroke();
 
-        ctx.strokeStyle = 'rgba(6, 182, 212, 0.10)';
+        ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.40)' : 'rgba(6, 182, 212, 0.10)';
         ctx.beginPath();
         ctx.moveTo(0, height * 0.7);
         ctx.quadraticCurveTo(width * 0.4, height * 0.85, width, height * 0.6);
@@ -2931,16 +2941,16 @@ HTML_CONTENT = """<!DOCTYPE html>
         // 2. Draw Destination Waypoint Pulses
         waypoints.forEach(wp => {
           wp.pulseRadius = (wp.pulseRadius + 0.3) % 45;
-          const pAlpha = (1 - wp.pulseRadius / 45) * 0.35;
+          const pAlpha = (1 - wp.pulseRadius / 45) * (isLight ? 0.6 : 0.35);
           ctx.beginPath();
           ctx.arc(wp.x, wp.y, wp.pulseRadius, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(6, 182, 212, ${pAlpha})`;
-          ctx.lineWidth = 1;
+          ctx.strokeStyle = isLight ? `rgba(2, 132, 199, ${pAlpha})` : `rgba(6, 182, 212, ${pAlpha})`;
+          ctx.lineWidth = isLight ? 1.5 : 1;
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.arc(wp.x, wp.y, 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = '#06B6D4';
+          ctx.arc(wp.x, wp.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = isLight ? '#0284C7' : '#06B6D4';
           ctx.fill();
         });
 
@@ -2954,14 +2964,17 @@ HTML_CONTENT = """<!DOCTYPE html>
           if (s.y > height) s.y = 0;
 
           s.alpha += Math.sin(Date.now() * s.pulse) * 0.006;
-          const curAlpha = Math.max(0.2, Math.min(0.85, s.alpha));
+          const curAlpha = Math.max(0.25, Math.min(0.9, s.alpha));
 
           if (s.isCompass) {
-            drawCompassStar(s, curAlpha);
+            drawCompassStar(s, curAlpha, isLight);
           } else {
+            const dotColor = isLight 
+              ? (s.color.includes('255, 160') ? 'rgba(217, 119, 6, ' : 'rgba(2, 132, 199, ')
+              : s.color;
             ctx.beginPath();
             ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-            ctx.fillStyle = s.color + curAlpha + ')';
+            ctx.fillStyle = dotColor + curAlpha + ')';
             ctx.fill();
           }
         });
@@ -2975,7 +2988,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             b.y = height + 30;
             b.x = Math.random() * width;
           }
-          drawBalloon(b);
+          drawBalloon(b, isLight);
         });
 
         // 5. Update & Draw Cruising Planes with Contrails
@@ -2990,10 +3003,12 @@ HTML_CONTENT = """<!DOCTYPE html>
           if (p.history.length > 2) {
             ctx.save();
             ctx.setLineDash([3, 5]);
-            ctx.lineWidth = 1.2;
+            ctx.lineWidth = isLight ? 1.6 : 1.2;
             for (let i = 0; i < p.history.length - 1; i++) {
-              const trailAlpha = (i / p.history.length) * 0.35;
-              ctx.strokeStyle = `rgba(255, 255, 255, ${trailAlpha})`;
+              const trailAlpha = (i / p.history.length) * (isLight ? 0.6 : 0.35);
+              ctx.strokeStyle = isLight 
+                ? `rgba(2, 132, 199, ${trailAlpha})`
+                : `rgba(255, 255, 255, ${trailAlpha})`;
               ctx.beginPath();
               ctx.moveTo(p.history[i].x, p.history[i].y);
               ctx.lineTo(p.history[i + 1].x, p.history[i + 1].y);
@@ -3017,7 +3032,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             p.history = [];
           }
 
-          drawPlane(p);
+          drawPlane(p, isLight);
         });
 
         // 6. Interactive Mouse Compass Radar Ring
