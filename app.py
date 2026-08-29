@@ -77,18 +77,7 @@ def get_coordinates(location_name: str):
         pass
     return None
 
-def build_rich_fallback_itinerary(
-    destination: str,
-    days: int,
-    curr: str,
-    region: str,
-    budget_level: str,
-    pace: str,
-    accom: str,
-    interests: List[str],
-    must_visit: str
-) -> str:
-    # Sensible multipliers relative to INR
+def generate_fallback_itinerary(destination: str, days: int, curr: str, region_info: str, budget_level: str, accom_style: str, interests: list, must_visit: str, pace: str) -> str:
     multipliers = {
         "INR": 1.0,
         "USD": 0.012,
@@ -100,75 +89,79 @@ def build_rich_fallback_itinerary(
         "AED": 0.044,
         "THB": 0.44
     }
-    m = multipliers.get(curr.upper(), 1.0 if curr == "INR" else 0.012)
+    m = multipliers.get(curr, 0.012)
     
-    stay_night = int(800 * m) if m != 1.0 else 800
-    food_day = int(600 * m) if m != 1.0 else 600
-    transit_day = int(350 * m) if m != 1.0 else 350
-    act_day = int(450 * m) if m != 1.0 else 450
-    
+    tier_mult = 1.0
     if "Moderate" in budget_level:
-        stay_night = int(stay_night * 1.8)
-        food_day = int(food_day * 1.5)
+        tier_mult = 1.8
     elif "Luxury" in budget_level:
-        stay_night = int(stay_night * 3.5)
-        food_day = int(food_day * 2.5)
+        tier_mult = 3.5
 
-    tot_stay = stay_night * days
-    tot_food = food_day * days
-    tot_transit = transit_day * days
-    tot_act = act_day * days
+    base_stay = int(800 * m * tier_mult)
+    base_food = int(500 * m * tier_mult)
+    base_trans = int(300 * m * tier_mult)
+    base_act = int(400 * m * tier_mult)
+
+    total_stay = base_stay * days
+    total_food = base_food * days
+    total_trans = base_trans * days
+    total_act = base_act * days
+    est_total = total_stay + total_food + total_trans + total_act
+
+    mv_text = f" (including priority stop at {must_visit})" if must_visit else ""
+    interest_desc = ", ".join(interests) if interests else "Sightseeing, Local Street Food & Hidden Gems"
+
+    lines = [
+        f"# 🌍 {days}-Day Student Adventure: {destination}",
+        "",
+        f"## 💰 Estimated Student Budget Breakdown ({curr})",
+        f"- 🏨 **Accommodation ({accom_style}):** ~{base_stay:,} {curr} / night (~{total_stay:,} {curr} total for {days} days)",
+        f"- 🍜 **Food & Street Eats:** ~{base_food:,} {curr} / day (~{total_food:,} {curr} total)",
+        f"- 🚇 **Local Transport:** ~{base_trans:,} {curr} / day (~{total_trans:,} {curr} total with student transit passes)",
+        f"- 🎟️ **Activities & Entry Fees:** ~{base_act:,} {curr} / day (~{total_act:,} {curr} total with student ID discounts)",
+        f"- 💡 **Estimated Total:** **~{est_total:,} {curr}** ({budget_level} Tier for {region_info})",
+        f"- 💡 **Region-Specific Student Savings Tip:** Always carry your valid International Student Identity Card (ISIC) or university ID to get up to 50% discount on museums, heritage monuments, and youth transport passes.",
+        "",
+        f"## 🗓️ Day-by-Day Itinerary ({pace} Pace{mv_text})",
+        ""
+    ]
 
     day_themes = [
-        ("Arrival & Iconic City Core Exploration", "City Center & Heritage Quarter", "Street Food Walk", "Panoramic Sunset Viewpoint"),
-        ("Historic Landmarks & Heritage Walk", "Famous Temples & Historic Shrines", "Local Artisan Market", "Lively Evening Night Bazaar"),
-        ("Nature, Scenic Landscapes & Hidden Gems", "Scenic Viewpoint & Public Park", "Student-Favorite Café Hub", "Stargazing or Waterfront Stroll"),
-        ("Art, Culture & Local Museums", "National Gallery or Culture Center", "Traditional Lunch Spot", "Acoustic Live Music Venue"),
-        ("Action, Adventure & Coastline Discovery", "Outdoor Excursion & Trek", "Specialty Food Market", "Bonfire or Rooftop Gathering"),
-        ("Neighborhood Gems & Secret Alleyways", "Art District Exploration", "Street Food Tasting Tour", "Nightlife & Social Lounge"),
-        ("Wrap-Up, Souvenir Hunt & Golden Hour", "Flea Market for Souvenirs", "Farewell Lunch Spot", "Iconic Landmark Farewell Photo")
+        ("Arrival, Old Quarter Vibes & Street Food Walk", "Explore the historic old town, pick up a local SIM card, and join a free walking tour.", "Sample authentic street delicacies, visit iconic plazas, and grab budget lunch at a local market stall.", "Sunset viewpoint meetup, youth hostel social gathering, and exploring lively night markets."),
+        ("Iconic Heritage, Shrines & Cultural Immersion", "Early morning visit to top heritage landmarks before the crowds arrive.", "Cultural museum tour with student discount pass and authentic regional lunch.", "Evening stroll through artisan quarters, acoustic live cafes, or vibrant riverfront walk."),
+        ("Adventure Trek, Hidden Corners & Secret Viewpoints", "Scenic panoramic viewpoint hike or nature walk with breathtaking city vistas.", "Explore hipster vintage district, indie bookstores, and street art alleys.", "Budget-friendly night food crawl, local dessert spots, and sunset social meetup."),
+        ("Local Life, Waterfront Vibes & Hidden Markets", "Visit vibrant local morning produce market and try local specialty breakfast.", "Afternoon park picnic, bicycle route along scenic promenade or waterways.", "Student hangout district with affordable eateries, music bars, and local vibes."),
+        ("Art, Architecture & Photography Walk", "Sunrise photography at iconic monuments and quiet architectural gems.", "Modern art gallery and creative design district with student admission.", "Relax at rooftop garden / scenic bridge and enjoy street performances."),
+        ("Day Trip & Scenic Nature Escapes", "Short scenic train or bus ride to picturesque surrounding nature/valleys.", "Outdoor exploration, lake/mountain views, and picnic with fresh local snacks.", "Return to city center for celebratory group dinner with hostel travel buddies."),
+        ("Must-See Highlights & Farewell Sunset", "Revisit favorite hidden spots and pick up budget-friendly local souvenirs.", "Relaxed cafe hopping, journaling, and sampling unique regional specialties.", "Grand finale sunset meetup at the best viewpoint in the city followed by street food feast.")
     ]
-    
-    day_blocks = []
+
     for d in range(1, days + 1):
-        theme_idx = (d - 1) % len(day_themes)
-        theme, morning_act, noon_act, eve_act = day_themes[theme_idx]
+        idx = (d - 1) % len(day_themes)
+        theme, morning, afternoon, evening = day_themes[idx]
         
         if must_visit and d == 1:
-            morning_act = f"Priority exploration of **{must_visit}** (arrive early to avoid queues)"
-        elif must_visit and d == 2:
-            noon_act = f"Featured visit to **{must_visit}** and surrounding historic plazas"
-            
-        day_blocks.append(f"""### Day {d}: {theme}
-- ☀️ **Morning:** {morning_act} — start with an authentic local breakfast and grab a student transit pass.
-- 🌤️ **Afternoon:** {noon_act} — sample regional street eats and visit nearby scenic spots.
-- 🌙 **Evening:** {eve_act} — unwind with local student vibes and authentic evening dining.""")
+            afternoon = f"Dedicated visit to **{must_visit}** — explore highlights, snap iconic photos, and take advantage of student discounts."
 
-    days_rendered = "\n\n".join(day_blocks)
+        lines.append(f"### Day {d}: {theme}")
+        lines.append(f"- ☀️ **Morning:** {morning}")
+        lines.append(f"- 🌤️ **Afternoon:** {afternoon}")
+        lines.append(f"- 🌙 **Evening:** {evening}")
+        lines.append("")
+
+    lines.append(f"## 🎒 Essential Student Tips for {destination}")
+    lines.append(f"- 📱 **Connectivity & Transit:** Download offline Google Maps and local transport apps before landing for seamless zero-data navigation.")
+    lines.append(f"- 💳 **Student Discounts:** Flash your student ID at transit ticketing booths and heritage sites for instant 20%–50% concessions.")
+    lines.append(f"- 🛡️ **Safety & Social:** Stay in highly-rated youth hostels with social common areas to meet fellow backpackers and share rides/costs.")
+    lines.append("")
     
-    landmarks_list = [f"{destination} City Center", f"{destination} Old Town", f"{destination} Market"]
+    lm_list = [destination]
     if must_visit:
-        landmarks_list.insert(0, must_visit)
+        lm_list.append(must_visit)
+    lm_list.extend(["City Center", "Old Town Plaza", "Central Station"])
+    lines.append(f"LANDMARKS: {', '.join(lm_list[:4])}")
 
-    return f"""# 🌍 Epic Student Adventure to {destination}
-
-## 💰 Estimated Student Budget Breakdown ({curr})
-- 🏨 **Accommodation ({accom}):** ~{curr} {stay_night:,} / night (~{curr} {tot_stay:,} total)
-- 🍜 **Food & Street Eats:** ~{curr} {food_day:,} / day (~{curr} {tot_food:,} total)
-- 🚇 **Local Transport:** ~{curr} {transit_day:,} / day (~{curr} {tot_transit:,} total)
-- 🎟️ **Activities & Entry Fees:** ~{curr} {act_day:,} / day (~{curr} {tot_act:,} total)
-- 💡 **Region-Specific Student Savings Tip:** Always carry your valid Student ID card (or ISIC) to unlock up to 50% discounts on museum entries, intercity transit, and national parks.
-
-## 🗓️ Day-by-Day Itinerary
-
-{days_rendered}
-
-## 🎒 Essential Student Tips for {destination}
-- **Smart Transit:** Download the official city transit app and purchase multi-day unlimited passes for maximum savings.
-- **Budget Eats:** Follow local university students to find the highest-rated, affordable food alleys and night stalls.
-- **Stay Connected:** Grab an eSIM or local prepaid tourist SIM at the station/airport for instant navigation and offline translation.
-
-LANDMARKS: {', '.join(landmarks_list)}"""
+    return "\n".join(lines)
 
 @app.get("/api/health")
 def health_check():
@@ -176,7 +169,7 @@ def health_check():
         "status": "ok",
         "service": "RoamAI FastAPI Backend",
         "version": "2.3.0",
-        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-70b-8192", "llama3-8b-8192", "qwen-2.5-32b"]
+        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama-3.2-3b-preview", "llama3-70b-8192"]
     }
 
 @app.post("/api/generate")
@@ -200,7 +193,6 @@ def generate_itinerary(req: TripRequest):
     api_key = os.environ.get("GROQ_API_KEY")
     response_text = None
 
-    # Step 1: Attempt Groq AI Generation if API key is provided
     if api_key:
         try:
             client = Groq(api_key=api_key)
@@ -256,10 +248,12 @@ def generate_itinerary(req: TripRequest):
             models_to_try = [
                 "llama-3.3-70b-versatile",
                 "llama-3.1-8b-instant",
+                "llama-3.2-3b-preview",
+                "llama-3.2-1b-preview",
+                "llama-3.2-11b-vision-preview",
                 "llama3-70b-8192",
                 "llama3-8b-8192",
-                "qwen-2.5-32b",
-                "deepseek-r1-distill-llama-70b"
+                "gemma2-9b-it"
             ]
 
             for model_name in models_to_try:
@@ -267,29 +261,27 @@ def generate_itinerary(req: TripRequest):
                     completion = client.chat.completions.create(
                         messages=[{"role": "user", "content": prompt}],
                         model=model_name,
-                        temperature=0.7,
-                        max_tokens=2048,
                     )
                     response_text = completion.choices[0].message.content
-                    if response_text:
+                    if response_text and len(response_text.strip()) > 50:
                         break
                 except Exception:
                     continue
         except Exception:
             pass
 
-    # Step 2: If Groq AI is unavailable, rate-limited, or unconfigured, seamlessly use the Smart Itinerary Generator
+    # Seamless Intelligent Fallback if API key is missing, rate-limited, or Groq is unavailable
     if not response_text:
-        response_text = build_rich_fallback_itinerary(
+        response_text = generate_fallback_itinerary(
             destination=destination_clean,
             days=req.days,
             curr=curr,
-            region=region_info,
+            region_info=region_info,
             budget_level=budget_level_clean,
-            pace=pace_clean,
-            accom=accom_clean,
+            accom_style=accom_clean,
             interests=sanitized_interests,
-            must_visit=must_visit_clean
+            must_visit=must_visit_clean,
+            pace=pace_clean
         )
 
     raw_landmarks = []
@@ -3021,81 +3013,6 @@ HTML_CONTENT = """<!DOCTYPE html>
       planTrip();
     }
 
-    function buildClientFallbackItinerary(dest, days, tier, curr, regionName, interests, mustVisit, pace) {
-      const reg = REGIONS[activeRegionKey] || REGIONS.INR;
-      const m = reg.multiplier || 1.0;
-      let stay = Math.round(800 * (m / 80));
-      let food = Math.round(600 * (m / 80));
-      let transit = Math.round(350 * (m / 80));
-      let act = Math.round(450 * (m / 80));
-      if (activeRegionKey === 'INR') {
-        stay = 800; food = 600; transit = 350; act = 450;
-      }
-      if (tier.includes('Moderate')) { stay = Math.round(stay * 1.8); food = Math.round(food * 1.5); }
-      if (tier.includes('Luxury')) { stay = Math.round(stay * 3.5); food = Math.round(food * 2.5); }
-
-      const totStay = stay * days;
-      const totFood = food * days;
-      const totTransit = transit * days;
-      const totAct = act * days;
-
-      const dayThemes = [
-        ["Arrival & Iconic City Exploration", "City Center & Old Town", "Street Food Market", "Panoramic Sunset Viewpoint"],
-        ["Historic Landmarks & Heritage Walk", "Famous Temples & Heritage Shrines", "Artisan Craft Bazaar", "Lively Evening Walk"],
-        ["Nature, Landscapes & Scenic Gems", "Scenic Viewpoint & Public Park", "Student-Favorite Café Hub", "Waterfront Stroll"],
-        ["Art, Culture & Local Museums", "National Gallery or Culture Center", "Traditional Lunch Spot", "Acoustic Live Music Venue"],
-        ["Action, Adventure & Coastline Discovery", "Outdoor Excursion & Trek", "Specialty Street Food Alley", "Rooftop Gathering"],
-        ["Neighborhood Secrets & Local Vibes", "Art District Exploration", "Street Food Tasting Tour", "Nightlife & Social Hub"],
-        ["Souvenir Hunt & Golden Hour Farewell", "Flea Market for Souvenirs", "Farewell Lunch Spot", "Iconic Landmark Photo Stop"]
-      ];
-
-      const dayBlocks = [];
-      for (let d = 1; d <= days; d++) {
-        const theme = dayThemes[(d - 1) % dayThemes.length];
-        let mAct = theme[1];
-        let nAct = theme[2];
-        if (mustVisit && d === 1) mAct = `Featured exploration of **${mustVisit}** (arrive early for best photo angles)`;
-        else if (mustVisit && d === 2) nAct = `Special visit to **${mustVisit}** and surrounding historic plazas`;
-
-        dayBlocks.push(`### Day ${d}: ${theme[0]}\n- ☀️ **Morning:** ${mAct} — start with an authentic local breakfast and grab a student transit pass.\n- 🌤️ **Afternoon:** ${nAct} — sample regional street food and visit nearby scenic spots.\n- 🌙 **Evening:** ${theme[3]} — unwind with local student vibes and authentic evening dining.`);
-      }
-
-      const itin = `# 🌍 Epic Student Adventure to ${dest}
-
-## 💰 Estimated Student Budget Breakdown (${curr})
-- 🏨 **Accommodation (Hostel):** ~${curr} ${stay.toLocaleString()} / night (~${curr} ${totStay.toLocaleString()} total)
-- 🍜 **Food & Street Eats:** ~${curr} ${food.toLocaleString()} / day (~${curr} ${totFood.toLocaleString()} total)
-- 🚇 **Local Transport:** ~${curr} ${transit.toLocaleString()} / day (~${curr} ${totTransit.toLocaleString()} total)
-- 🎟️ **Activities & Entry Fees:** ~${curr} ${act.toLocaleString()} / day (~${curr} ${totAct.toLocaleString()} total)
-- 💡 **Region-Specific Student Savings Tip:** Always carry your valid Student ID card to unlock up to 50% discounts on museum entries, intercity transit, and public attractions.
-
-## 🗓️ Day-by-Day Itinerary
-
-${dayBlocks.join('\n\n')}
-
-## 🎒 Essential Student Tips for ${dest}
-- **Smart Transit:** Download the local city transit app and purchase multi-day passes for unlimited savings.
-- **Budget Eats:** Follow local university students to find the highest-rated, affordable food alleys and night stalls.
-- **Stay Connected:** Grab an eSIM or local prepaid tourist SIM for fast navigation and maps.
-
-LANDMARKS: ${dest} City Center, ${dest} Old Town${mustVisit ? ', ' + mustVisit : ''}`;
-
-      return {
-        itinerary: itin,
-        landmarks: [`${dest} City Center`, `${dest} Old Town`],
-        destination_coords: null,
-        markers: [{ name: `Destination: ${dest}`, type: 'destination', coords: [20.5937, 78.9629] }],
-        trip_summary: {
-          destination: dest,
-          days: days,
-          budget_level: tier,
-          currency: curr,
-          region: regionName,
-          interests: interests
-        }
-      };
-    }
-
     async function planTrip() {
       const destination = document.getElementById('plannerDest').value.trim();
       if (!destination) {
@@ -3119,29 +3036,21 @@ LANDMARKS: ${dest} City Center, ${dest} Old Town${mustVisit ? ', ' + mustVisit :
       document.getElementById('plannerLoading').classList.remove('hidden');
 
       try {
-        let data = null;
-        try {
-          const res = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              destination, days, budget_level: budgetTier, budget_amount: budgetAmount,
-              currency, region: reg.name, interests: selectedInterests, must_visit: mustVisit, travel_pace: pace
-            })
-          });
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            destination, days, budget_level: budgetTier, budget_amount: budgetAmount,
+            currency, region: reg.name, interests: selectedInterests, must_visit: mustVisit, travel_pace: pace
+          })
+        });
 
-          if (res.ok) {
-            data = await res.json();
-          }
-        } catch (fetchErr) {
-          console.warn('Backend fetch failed, activating smart local generator', fetchErr);
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || 'Failed to generate itinerary');
         }
 
-        // If backend returned nothing or network failed, use client-side smart fallback
-        if (!data || !data.itinerary) {
-          data = buildClientFallbackItinerary(destination, days, budgetTier, currency, reg.name, selectedInterests, mustVisit, pace);
-        }
-
+        const data = await res.json();
         currentTrip = data;
         try { sessionStorage.setItem('roamai_active_trip', JSON.stringify(data)); } catch (e) {}
 
