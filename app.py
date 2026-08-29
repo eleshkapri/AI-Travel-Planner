@@ -164,31 +164,54 @@ def generate_itinerary(req: TripRequest):
     models_to_try = [
         "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
-        "gemma2-9b-it",
-        "mixtral-8x7b-32768"
+        "llama3-70b-8192",
+        "llama3-8b-8192",
+        "qwen-2.5-32b",
+        "deepseek-r1-distill-llama-70b"
     ]
 
     response_text = None
     last_error = None
+    is_auth_error = False
+    is_rate_limit = False
 
     for model_name in models_to_try:
         try:
             completion = client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
                 model=model_name,
+                temperature=0.7,
+                max_tokens=2048,
             )
             response_text = completion.choices[0].message.content
             if response_text:
                 break
         except Exception as e:
-            last_error = "Model busy or unavailable. Falling back..."
+            err_msg = str(e).lower()
+            last_error = str(e)
+            if "invalid_api_key" in err_msg or "unauthorized" in err_msg or "401" in err_msg:
+                is_auth_error = True
+                break
+            if "rate_limit" in err_msg or "429" in err_msg or "too many requests" in err_msg:
+                is_rate_limit = True
             continue
 
     if not response_text:
-        raise HTTPException(
-            status_code=503,
-            detail="AI Generation service is currently experiencing high load. Please try again in a few moments."
-        )
+        if is_auth_error:
+            raise HTTPException(
+                status_code=401,
+                detail="GROQ_API_KEY is invalid, expired, or unauthorized. Please verify your API key in Vercel Project Settings."
+            )
+        elif is_rate_limit:
+            raise HTTPException(
+                status_code=429,
+                detail="Groq AI free tier rate limit exceeded (requests per minute). Please wait 30–60 seconds and try again."
+            )
+        else:
+            raise HTTPException(
+                status_code=503,
+                detail="AI Generation service is temporarily busy. Please try again in a few moments."
+            )
 
     raw_landmarks = []
     if "LANDMARKS:" in response_text:
