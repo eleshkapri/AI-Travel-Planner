@@ -1044,12 +1044,35 @@ HTML_CONTENT = """<!DOCTYPE html>
     .light-theme .nav-tab.active {
       color: #FF5E36 !important;
     }
-    .light-theme #mob-home,
-    .light-theme #mob-planner,
-    .light-theme #mob-budget,
-    .light-theme #mob-packing,
-    .light-theme #mob-saved {
-      color: #475569;
+    #mobileBottomNav {
+      background-color: rgba(14, 20, 32, 0.95) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.4);
+    }
+    .light-theme #mobileBottomNav {
+      background-color: rgba(255, 255, 255, 0.95) !important;
+      border-top: 1px solid rgba(203, 213, 225, 0.8) !important;
+      box-shadow: 0 -4px 25px rgba(11, 19, 43, 0.08) !important;
+    }
+    #mobileBottomNav button {
+      color: #9CA3AF;
+      transition: all 0.2s ease;
+      border-radius: 0.75rem;
+    }
+    #mobileBottomNav button.active-mob-tab {
+      color: #FF5E36 !important;
+      font-weight: 800 !important;
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+    .light-theme #mobileBottomNav button {
+      color: #64748B !important;
+    }
+    .light-theme #mobileBottomNav button.active-mob-tab {
+      color: #FF5E36 !important;
+      font-weight: 800 !important;
+      background-color: rgba(255, 94, 54, 0.12) !important;
     }
     .light-theme .travel-sky-pattern {
       background: radial-gradient(circle at 15% 15%, rgba(255, 94, 54, 0.12) 0%, transparent 55%),
@@ -1145,24 +1168,24 @@ HTML_CONTENT = """<!DOCTYPE html>
   </header>
 
   <!-- Modern Mobile Bottom Navigation Bar (Docked / Thumb-Friendly) -->
-  <nav id="mobileBottomNav" class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-cardDark/95 backdrop-blur-2xl border-t border-cardBorder px-1.5 sm:px-2 py-1.5 sm:py-2 flex items-center justify-around text-xs shadow-2xl" style="padding-bottom: max(0.4rem, env(safe-area-inset-bottom));">
-    <button onclick="switchPage('home')" id="mob-home" class="flex flex-col items-center gap-0.5 text-coralPrimary font-extrabold py-1 px-2 rounded-xl transition bg-white/5">
+  <nav id="mobileBottomNav" class="lg:hidden fixed bottom-0 left-0 right-0 z-50 px-1.5 sm:px-2 py-1.5 sm:py-2 flex items-center justify-around text-xs shadow-2xl" style="padding-bottom: max(0.4rem, env(safe-area-inset-bottom));">
+    <button onclick="switchPage('home')" id="mob-home" class="active-mob-tab flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">🌟</span>
       <span class="text-[9px] sm:text-[10px] leading-tight">Home</span>
     </button>
-    <button onclick="switchPage('planner')" id="mob-planner" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2 rounded-xl transition">
+    <button onclick="switchPage('planner')" id="mob-planner" class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">🚀</span>
       <span class="text-[9px] sm:text-[10px] leading-tight">Planner</span>
     </button>
-    <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2 rounded-xl transition">
+    <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">💰</span>
       <span class="text-[9px] sm:text-[10px] leading-tight">Budget</span>
     </button>
-    <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2 rounded-xl transition">
+    <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">🎒</span>
       <span class="text-[9px] sm:text-[10px] leading-tight">Packing</span>
     </button>
-    <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2 rounded-xl transition">
+    <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center gap-0.5 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">📂</span>
       <span class="text-[9px] sm:text-[10px] leading-tight">Saved (<span id="mobSavedCount">0</span>)</span>
     </button>
@@ -2696,10 +2719,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         const m = document.getElementById(`mob-${p}`);
         if (m) {
           const isAct = (p === page);
-          m.classList.toggle('text-coralPrimary', isAct);
-          m.classList.toggle('font-extrabold', isAct);
-          m.classList.toggle('bg-white/5', isAct);
-          m.classList.toggle('text-gray-400', !isAct);
+          m.classList.toggle('active-mob-tab', isAct);
         }
       });
       if (page === 'saved') renderSaved();
@@ -4245,7 +4265,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 </body>
 </html>"""
 
-@app.get("/", response_class=HTMLResponse)
+@app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def serve_index():
     return HTMLResponse(content=HTML_CONTENT, status_code=200)
 
