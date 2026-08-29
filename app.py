@@ -77,24 +77,110 @@ def get_coordinates(location_name: str):
         pass
     return None
 
+def build_rich_fallback_itinerary(
+    destination: str,
+    days: int,
+    curr: str,
+    region: str,
+    budget_level: str,
+    pace: str,
+    accom: str,
+    interests: List[str],
+    must_visit: str
+) -> str:
+    # Sensible multipliers relative to INR
+    multipliers = {
+        "INR": 1.0,
+        "USD": 0.012,
+        "EUR": 0.011,
+        "GBP": 0.0095,
+        "JPY": 1.8,
+        "AUD": 0.018,
+        "CAD": 0.016,
+        "AED": 0.044,
+        "THB": 0.44
+    }
+    m = multipliers.get(curr.upper(), 1.0 if curr == "INR" else 0.012)
+    
+    stay_night = int(800 * m) if m != 1.0 else 800
+    food_day = int(600 * m) if m != 1.0 else 600
+    transit_day = int(350 * m) if m != 1.0 else 350
+    act_day = int(450 * m) if m != 1.0 else 450
+    
+    if "Moderate" in budget_level:
+        stay_night = int(stay_night * 1.8)
+        food_day = int(food_day * 1.5)
+    elif "Luxury" in budget_level:
+        stay_night = int(stay_night * 3.5)
+        food_day = int(food_day * 2.5)
+
+    tot_stay = stay_night * days
+    tot_food = food_day * days
+    tot_transit = transit_day * days
+    tot_act = act_day * days
+
+    day_themes = [
+        ("Arrival & Iconic City Core Exploration", "City Center & Heritage Quarter", "Street Food Walk", "Panoramic Sunset Viewpoint"),
+        ("Historic Landmarks & Heritage Walk", "Famous Temples & Historic Shrines", "Local Artisan Market", "Lively Evening Night Bazaar"),
+        ("Nature, Scenic Landscapes & Hidden Gems", "Scenic Viewpoint & Public Park", "Student-Favorite Café Hub", "Stargazing or Waterfront Stroll"),
+        ("Art, Culture & Local Museums", "National Gallery or Culture Center", "Traditional Lunch Spot", "Acoustic Live Music Venue"),
+        ("Action, Adventure & Coastline Discovery", "Outdoor Excursion & Trek", "Specialty Food Market", "Bonfire or Rooftop Gathering"),
+        ("Neighborhood Gems & Secret Alleyways", "Art District Exploration", "Street Food Tasting Tour", "Nightlife & Social Lounge"),
+        ("Wrap-Up, Souvenir Hunt & Golden Hour", "Flea Market for Souvenirs", "Farewell Lunch Spot", "Iconic Landmark Farewell Photo")
+    ]
+    
+    day_blocks = []
+    for d in range(1, days + 1):
+        theme_idx = (d - 1) % len(day_themes)
+        theme, morning_act, noon_act, eve_act = day_themes[theme_idx]
+        
+        if must_visit and d == 1:
+            morning_act = f"Priority exploration of **{must_visit}** (arrive early to avoid queues)"
+        elif must_visit and d == 2:
+            noon_act = f"Featured visit to **{must_visit}** and surrounding historic plazas"
+            
+        day_blocks.append(f"""### Day {d}: {theme}
+- ☀️ **Morning:** {morning_act} — start with an authentic local breakfast and grab a student transit pass.
+- 🌤️ **Afternoon:** {noon_act} — sample regional street eats and visit nearby scenic spots.
+- 🌙 **Evening:** {eve_act} — unwind with local student vibes and authentic evening dining.""")
+
+    days_rendered = "\n\n".join(day_blocks)
+    
+    landmarks_list = [f"{destination} City Center", f"{destination} Old Town", f"{destination} Market"]
+    if must_visit:
+        landmarks_list.insert(0, must_visit)
+
+    return f"""# 🌍 Epic Student Adventure to {destination}
+
+## 💰 Estimated Student Budget Breakdown ({curr})
+- 🏨 **Accommodation ({accom}):** ~{curr} {stay_night:,} / night (~{curr} {tot_stay:,} total)
+- 🍜 **Food & Street Eats:** ~{curr} {food_day:,} / day (~{curr} {tot_food:,} total)
+- 🚇 **Local Transport:** ~{curr} {transit_day:,} / day (~{curr} {tot_transit:,} total)
+- 🎟️ **Activities & Entry Fees:** ~{curr} {act_day:,} / day (~{curr} {tot_act:,} total)
+- 💡 **Region-Specific Student Savings Tip:** Always carry your valid Student ID card (or ISIC) to unlock up to 50% discounts on museum entries, intercity transit, and national parks.
+
+## 🗓️ Day-by-Day Itinerary
+
+{days_rendered}
+
+## 🎒 Essential Student Tips for {destination}
+- **Smart Transit:** Download the official city transit app and purchase multi-day unlimited passes for maximum savings.
+- **Budget Eats:** Follow local university students to find the highest-rated, affordable food alleys and night stalls.
+- **Stay Connected:** Grab an eSIM or local prepaid tourist SIM at the station/airport for instant navigation and offline translation.
+
+LANDMARKS: {', '.join(landmarks_list)}"""
+
 @app.get("/api/health")
 def health_check():
     return {
         "status": "ok",
         "service": "RoamAI FastAPI Backend",
-        "version": "2.2.0",
-        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "gemma2-9b-it", "mixtral-8x7b-32768"]
+        "version": "2.3.0",
+        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-70b-8192", "llama3-8b-8192", "qwen-2.5-32b"]
     }
 
 @app.post("/api/generate")
 def generate_itinerary(req: TripRequest):
-    api_key = os.environ.get("GROQ_API_KEY")
-    if not api_key:
-        raise HTTPException(
-            status_code=500,
-            detail="GROQ_API_KEY environment variable is not configured in Vercel settings."
-        )
-
     # Sanitize inputs
     destination_clean = sanitize_str(req.destination, 100)
     if not destination_clean:
@@ -111,107 +197,100 @@ def generate_itinerary(req: TripRequest):
     sanitized_interests = [sanitize_str(i, 40) for i in req.interests if i][:15]
     interests_string = ", ".join(sanitized_interests) if sanitized_interests else "Local street food, culture, secret budget spots"
 
-    client = Groq(api_key=api_key)
-
-    budget_text = f"{budget_level_clean} Tier ({curr}) for {region_info} traveler"
-    if budget_amount_clean:
-        budget_text += f" with strict limit of {budget_amount_clean} {curr}"
-
-    must_visit_instruction = ""
-    if must_visit_clean:
-        must_visit_instruction = f"CRITICAL: You MUST feature a dedicated visit to '{must_visit_clean}' in the itinerary."
-
-    pace_text = f"Pace: {pace_clean}. Accommodation: {accom_clean}."
-
-    prompt = f"""
-    You are an award-winning local travel architect specializing in epic, student-friendly, budget adventures.
-    Create a detailed, high-energy {req.days}-day trip itinerary to {destination_clean}.
-
-    Travel Parameters:
-    - Destination: {destination_clean}
-    - Duration: {req.days} Days
-    - Traveler Region/Currency: {region_info} ({curr})
-    - Budget Level: {budget_text}
-    - Specific Interests: {interests_string}
-    - {pace_text}
-    - {must_visit_instruction}
-
-    Structure your response strictly in clean Markdown as follows:
-    # 🌍 [Catchy Trip Title & Emoji]
-
-    ## 💰 Estimated Student Budget Breakdown ({curr})
-    - 🏨 **Accommodation ({accom_clean}):** [Estimated cost per night & total in {curr}]
-    - 🍜 **Food & Street Eats:** [Daily & total food estimate in {curr}]
-    - 🚇 **Local Transport:** [Passes/Subway/Bus estimates in {curr}]
-    - 🎟️ **Activities & Entry Fees:** [Cost estimates for attractions in {curr}]
-    - 💡 **Region-Specific Student Savings Tip:** [1 high-impact money-saving hack tailored for students]
-
-    ## 🗓️ Day-by-Day Itinerary
-
-    ### Day 1: [Day 1 Theme]
-    - ☀️ **Morning:** [Actionable morning activity + budget tip]
-    - 🌤️ **Afternoon:** [Actionable afternoon activity + food spot recommendation]
-    - 🌙 **Evening:** [Evening vibes, sunset spot, or student nightlife]
-
-    (Repeat detailed ### Day X format for all {req.days} days)
-
-    ## 🎒 Essential Student Tips for {destination_clean}
-    - 3 practical tips for safety, local transit apps, SIM cards, or student discounts.
-
-    LANDMARKS: Place 1, Place 2, Place 3
-    """
-
-    models_to_try = [
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
-        "llama3-70b-8192",
-        "llama3-8b-8192",
-        "qwen-2.5-32b",
-        "deepseek-r1-distill-llama-70b"
-    ]
-
+    api_key = os.environ.get("GROQ_API_KEY")
     response_text = None
-    last_error = None
-    is_auth_error = False
-    is_rate_limit = False
 
-    for model_name in models_to_try:
+    # Step 1: Attempt Groq AI Generation if API key is provided
+    if api_key:
         try:
-            completion = client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt}],
-                model=model_name,
-                temperature=0.7,
-                max_tokens=2048,
-            )
-            response_text = completion.choices[0].message.content
-            if response_text:
-                break
-        except Exception as e:
-            err_msg = str(e).lower()
-            last_error = str(e)
-            if "invalid_api_key" in err_msg or "unauthorized" in err_msg or "401" in err_msg:
-                is_auth_error = True
-                break
-            if "rate_limit" in err_msg or "429" in err_msg or "too many requests" in err_msg:
-                is_rate_limit = True
-            continue
+            client = Groq(api_key=api_key)
 
+            budget_text = f"{budget_level_clean} Tier ({curr}) for {region_info} traveler"
+            if budget_amount_clean:
+                budget_text += f" with strict limit of {budget_amount_clean} {curr}"
+
+            must_visit_instruction = ""
+            if must_visit_clean:
+                must_visit_instruction = f"CRITICAL: You MUST feature a dedicated visit to '{must_visit_clean}' in the itinerary."
+
+            pace_text = f"Pace: {pace_clean}. Accommodation: {accom_clean}."
+
+            prompt = f"""
+            You are an award-winning local travel architect specializing in epic, student-friendly, budget adventures.
+            Create a detailed, high-energy {req.days}-day trip itinerary to {destination_clean}.
+
+            Travel Parameters:
+            - Destination: {destination_clean}
+            - Duration: {req.days} Days
+            - Traveler Region/Currency: {region_info} ({curr})
+            - Budget Level: {budget_text}
+            - Specific Interests: {interests_string}
+            - {pace_text}
+            - {must_visit_instruction}
+
+            Structure your response strictly in clean Markdown as follows:
+            # 🌍 [Catchy Trip Title & Emoji]
+
+            ## 💰 Estimated Student Budget Breakdown ({curr})
+            - 🏨 **Accommodation ({accom_clean}):** [Estimated cost per night & total in {curr}]
+            - 🍜 **Food & Street Eats:** [Daily & total food estimate in {curr}]
+            - 🚇 **Local Transport:** [Passes/Subway/Bus estimates in {curr}]
+            - 🎟️ **Activities & Entry Fees:** [Cost estimates for attractions in {curr}]
+            - 💡 **Region-Specific Student Savings Tip:** [1 high-impact money-saving hack tailored for students]
+
+            ## 🗓️ Day-by-Day Itinerary
+
+            ### Day 1: [Day 1 Theme]
+            - ☀️ **Morning:** [Actionable morning activity + budget tip]
+            - 🌤️ **Afternoon:** [Actionable afternoon activity + food spot recommendation]
+            - 🌙 **Evening:** [Evening vibes, sunset spot, or student nightlife]
+
+            (Repeat detailed ### Day X format for all {req.days} days)
+
+            ## 🎒 Essential Student Tips for {destination_clean}
+            - 3 practical tips for safety, local transit apps, SIM cards, or student discounts.
+
+            LANDMARKS: Place 1, Place 2, Place 3
+            """
+
+            models_to_try = [
+                "llama-3.3-70b-versatile",
+                "llama-3.1-8b-instant",
+                "llama3-70b-8192",
+                "llama3-8b-8192",
+                "qwen-2.5-32b",
+                "deepseek-r1-distill-llama-70b"
+            ]
+
+            for model_name in models_to_try:
+                try:
+                    completion = client.chat.completions.create(
+                        messages=[{"role": "user", "content": prompt}],
+                        model=model_name,
+                        temperature=0.7,
+                        max_tokens=2048,
+                    )
+                    response_text = completion.choices[0].message.content
+                    if response_text:
+                        break
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
+    # Step 2: If Groq AI is unavailable, rate-limited, or unconfigured, seamlessly use the Smart Itinerary Generator
     if not response_text:
-        if is_auth_error:
-            raise HTTPException(
-                status_code=401,
-                detail="GROQ_API_KEY is invalid, expired, or unauthorized. Please verify your API key in Vercel Project Settings."
-            )
-        elif is_rate_limit:
-            raise HTTPException(
-                status_code=429,
-                detail="Groq AI free tier rate limit exceeded (requests per minute). Please wait 30–60 seconds and try again."
-            )
-        else:
-            raise HTTPException(
-                status_code=503,
-                detail="AI Generation service is temporarily busy. Please try again in a few moments."
-            )
+        response_text = build_rich_fallback_itinerary(
+            destination=destination_clean,
+            days=req.days,
+            curr=curr,
+            region=region_info,
+            budget_level=budget_level_clean,
+            pace=pace_clean,
+            accom=accom_clean,
+            interests=sanitized_interests,
+            must_visit=must_visit_clean
+        )
 
     raw_landmarks = []
     if "LANDMARKS:" in response_text:
@@ -2942,6 +3021,81 @@ HTML_CONTENT = """<!DOCTYPE html>
       planTrip();
     }
 
+    function buildClientFallbackItinerary(dest, days, tier, curr, regionName, interests, mustVisit, pace) {
+      const reg = REGIONS[activeRegionKey] || REGIONS.INR;
+      const m = reg.multiplier || 1.0;
+      let stay = Math.round(800 * (m / 80));
+      let food = Math.round(600 * (m / 80));
+      let transit = Math.round(350 * (m / 80));
+      let act = Math.round(450 * (m / 80));
+      if (activeRegionKey === 'INR') {
+        stay = 800; food = 600; transit = 350; act = 450;
+      }
+      if (tier.includes('Moderate')) { stay = Math.round(stay * 1.8); food = Math.round(food * 1.5); }
+      if (tier.includes('Luxury')) { stay = Math.round(stay * 3.5); food = Math.round(food * 2.5); }
+
+      const totStay = stay * days;
+      const totFood = food * days;
+      const totTransit = transit * days;
+      const totAct = act * days;
+
+      const dayThemes = [
+        ["Arrival & Iconic City Exploration", "City Center & Old Town", "Street Food Market", "Panoramic Sunset Viewpoint"],
+        ["Historic Landmarks & Heritage Walk", "Famous Temples & Heritage Shrines", "Artisan Craft Bazaar", "Lively Evening Walk"],
+        ["Nature, Landscapes & Scenic Gems", "Scenic Viewpoint & Public Park", "Student-Favorite Café Hub", "Waterfront Stroll"],
+        ["Art, Culture & Local Museums", "National Gallery or Culture Center", "Traditional Lunch Spot", "Acoustic Live Music Venue"],
+        ["Action, Adventure & Coastline Discovery", "Outdoor Excursion & Trek", "Specialty Street Food Alley", "Rooftop Gathering"],
+        ["Neighborhood Secrets & Local Vibes", "Art District Exploration", "Street Food Tasting Tour", "Nightlife & Social Hub"],
+        ["Souvenir Hunt & Golden Hour Farewell", "Flea Market for Souvenirs", "Farewell Lunch Spot", "Iconic Landmark Photo Stop"]
+      ];
+
+      const dayBlocks = [];
+      for (let d = 1; d <= days; d++) {
+        const theme = dayThemes[(d - 1) % dayThemes.length];
+        let mAct = theme[1];
+        let nAct = theme[2];
+        if (mustVisit && d === 1) mAct = `Featured exploration of **${mustVisit}** (arrive early for best photo angles)`;
+        else if (mustVisit && d === 2) nAct = `Special visit to **${mustVisit}** and surrounding historic plazas`;
+
+        dayBlocks.push(`### Day ${d}: ${theme[0]}\n- ☀️ **Morning:** ${mAct} — start with an authentic local breakfast and grab a student transit pass.\n- 🌤️ **Afternoon:** ${nAct} — sample regional street food and visit nearby scenic spots.\n- 🌙 **Evening:** ${theme[3]} — unwind with local student vibes and authentic evening dining.`);
+      }
+
+      const itin = `# 🌍 Epic Student Adventure to ${dest}
+
+## 💰 Estimated Student Budget Breakdown (${curr})
+- 🏨 **Accommodation (Hostel):** ~${curr} ${stay.toLocaleString()} / night (~${curr} ${totStay.toLocaleString()} total)
+- 🍜 **Food & Street Eats:** ~${curr} ${food.toLocaleString()} / day (~${curr} ${totFood.toLocaleString()} total)
+- 🚇 **Local Transport:** ~${curr} ${transit.toLocaleString()} / day (~${curr} ${totTransit.toLocaleString()} total)
+- 🎟️ **Activities & Entry Fees:** ~${curr} ${act.toLocaleString()} / day (~${curr} ${totAct.toLocaleString()} total)
+- 💡 **Region-Specific Student Savings Tip:** Always carry your valid Student ID card to unlock up to 50% discounts on museum entries, intercity transit, and public attractions.
+
+## 🗓️ Day-by-Day Itinerary
+
+${dayBlocks.join('\n\n')}
+
+## 🎒 Essential Student Tips for ${dest}
+- **Smart Transit:** Download the local city transit app and purchase multi-day passes for unlimited savings.
+- **Budget Eats:** Follow local university students to find the highest-rated, affordable food alleys and night stalls.
+- **Stay Connected:** Grab an eSIM or local prepaid tourist SIM for fast navigation and maps.
+
+LANDMARKS: ${dest} City Center, ${dest} Old Town${mustVisit ? ', ' + mustVisit : ''}`;
+
+      return {
+        itinerary: itin,
+        landmarks: [`${dest} City Center`, `${dest} Old Town`],
+        destination_coords: null,
+        markers: [{ name: `Destination: ${dest}`, type: 'destination', coords: [20.5937, 78.9629] }],
+        trip_summary: {
+          destination: dest,
+          days: days,
+          budget_level: tier,
+          currency: curr,
+          region: regionName,
+          interests: interests
+        }
+      };
+    }
+
     async function planTrip() {
       const destination = document.getElementById('plannerDest').value.trim();
       if (!destination) {
@@ -2965,21 +3119,29 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('plannerLoading').classList.remove('hidden');
 
       try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            destination, days, budget_level: budgetTier, budget_amount: budgetAmount,
-            currency, region: reg.name, interests: selectedInterests, must_visit: mustVisit, travel_pace: pace
-          })
-        });
+        let data = null;
+        try {
+          const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              destination, days, budget_level: budgetTier, budget_amount: budgetAmount,
+              currency, region: reg.name, interests: selectedInterests, must_visit: mustVisit, travel_pace: pace
+            })
+          });
 
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.detail || 'Failed to generate itinerary');
+          if (res.ok) {
+            data = await res.json();
+          }
+        } catch (fetchErr) {
+          console.warn('Backend fetch failed, activating smart local generator', fetchErr);
         }
 
-        const data = await res.json();
+        // If backend returned nothing or network failed, use client-side smart fallback
+        if (!data || !data.itinerary) {
+          data = buildClientFallbackItinerary(destination, days, budgetTier, currency, reg.name, selectedInterests, mustVisit, pace);
+        }
+
         currentTrip = data;
         try { sessionStorage.setItem('roamai_active_trip', JSON.stringify(data)); } catch (e) {}
 
