@@ -406,8 +406,14 @@ HTML_CONTENT = """<!DOCTYPE html>
   <!-- html2pdf for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- Vanilla Tilt (3D Card Physics) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+  <!-- Vanilla Tilt (3D Card Physics - Desktop Only to ensure 60fps buttery smooth touch on mobile) -->
+  <script>
+    if (window.innerWidth >= 1024 && !('ontouchstart' in window)) {
+      const tiltScript = document.createElement('script');
+      tiltScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js';
+      document.head.appendChild(tiltScript);
+    }
+  </script>
 
   <style>
     html {
@@ -431,37 +437,53 @@ HTML_CONTENT = """<!DOCTYPE html>
     /* Responsive Mobile Layout & Touch Rules */
     @media (max-width: 768px) {
       .glass-card {
-        padding: 1.25rem !important;
+        padding: 1.15rem !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        transform: none !important;
+        transition: border-color 0.2s ease !important;
+      }
+      .glass-card:hover {
+        transform: none !important;
+      }
+      .orb-1, .orb-2, .orb-3 {
+        animation: none !important;
+        filter: blur(35px) !important;
+        opacity: 0.3 !important;
+        transform: none !important;
       }
       #map {
-        min-height: 320px !important;
+        min-height: 300px !important;
       }
       #plannerTopGrids {
-        gap: 1.25rem !important;
+        gap: 1rem !important;
       }
       #plannerMapCard {
-        min-height: 400px !important;
+        min-height: 360px !important;
       }
       .itinerary-prose h1 {
-        font-size: 1.4rem !important;
+        font-size: 1.35rem !important;
       }
       .itinerary-prose h2 {
-        font-size: 1.2rem !important;
+        font-size: 1.15rem !important;
       }
     }
     @media (max-width: 480px) {
       .brand-logo-title {
-        font-size: 1.1rem !important;
+        font-size: 1.05rem !important;
       }
       #heroDestInput {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
       }
     }
-    @media (pointer: coarse) {
-      button, a, select, input[type="range"], .chip-tag, .hotspot-card {
-        touch-action: manipulation;
-      }
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+    button, a, select, input, .chip-tag, .hotspot-card {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
     }
 
     /* ========================================================
@@ -1055,21 +1077,18 @@ HTML_CONTENT = """<!DOCTYPE html>
 
   <!-- ==================== PROPERLY DESIGNED NAVBAR WITH REGION SELECTOR ==================== -->
   <header id="mainHeader" class="sticky top-0 z-50 backdrop-blur-xl border-b border-cardBorder shadow-2xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-1.5 sm:gap-4">
       
       <!-- Brand Logo (Left) -->
       <div class="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" onclick="switchPage('home')">
-        <div class="flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coralPrimary to-amberAccent p-0.5 shadow-lg shadow-coralPrimary/30">
-          <div class="w-full h-full bg-spaceDark rounded-[10px] sm:rounded-[14px] flex items-center justify-center">
-            <span class="text-xl sm:text-2xl">✈️</span>
+        <div class="flex items-center justify-center w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-br from-coralPrimary to-amberAccent p-0.5 shadow-lg shadow-coralPrimary/30 shrink-0">
+          <div class="w-full h-full bg-spaceDark rounded-[9px] sm:rounded-[14px] flex items-center justify-center">
+            <span class="text-base sm:text-2xl">✈️</span>
           </div>
         </div>
-        <div>
-          <div class="flex items-center gap-1 sm:gap-1.5">
-            <span class="text-lg sm:text-xl font-extrabold tracking-tight brand-logo-title">RoamAI</span>
-            <span class="text-[9px] sm:text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase">Student</span>
-          </div>
-          <p class="hidden sm:block text-[11px] text-gray-400 font-medium">Smart AI Travel Architect</p>
+        <div class="flex items-center gap-1.5">
+          <span class="text-lg sm:text-xl font-extrabold tracking-tight brand-logo-title">RoamAI</span>
+          <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase">Student</span>
         </div>
       </div>
 
@@ -1089,7 +1108,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         <button
           id="themeToggleBtn"
           onclick="toggleThemeMood()"
-          class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 flex items-center justify-center text-xs sm:text-sm text-gray-300 hover:text-white transition shadow-sm"
+          class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 flex items-center justify-center text-xs sm:text-sm text-gray-300 hover:text-white transition shadow-sm shrink-0"
           title="Toggle Light / Dark Mode"
           aria-label="Toggle Theme Mood"
         >
@@ -1097,28 +1116,28 @@ HTML_CONTENT = """<!DOCTYPE html>
         </button>
 
         <!-- Region & Currency Selector -->
-        <div class="relative flex items-center">
-          <span class="absolute left-2.5 text-xs sm:text-sm pointer-events-none" id="navRegionFlag">🇮🇳</span>
+        <div class="relative flex items-center shrink-0">
+          <span class="absolute left-2 text-xs sm:text-sm pointer-events-none" id="navRegionFlag">🇮🇳</span>
           <select
             id="navRegionSelector"
             onchange="onRegionChange(this.value)"
-            class="pl-7 sm:pl-8 pr-6 sm:pr-7 py-1.5 sm:py-2 max-w-[105px] sm:max-w-none truncate bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 rounded-xl text-[11px] sm:text-xs font-semibold text-white focus:outline-none focus:border-coralPrimary cursor-pointer shadow-sm transition"
+            class="pl-6 sm:pl-8 pr-5 sm:pr-7 py-1.5 sm:py-2 max-w-[82px] xs:max-w-[100px] sm:max-w-none truncate bg-cardDark/90 border border-white/15 hover:border-coralPrimary/50 rounded-xl text-[10px] sm:text-xs font-semibold text-white focus:outline-none focus:border-coralPrimary cursor-pointer shadow-sm transition"
           >
-            <option value="INR" data-flag="🇮🇳" data-curr="INR" data-sym="₹" data-name="India" selected>🇮🇳 India (INR ₹)</option>
-            <option value="USD" data-flag="🇺🇸" data-curr="USD" data-sym="$" data-name="United States">🇺🇸 USA (USD $)</option>
-            <option value="EUR" data-flag="🇪🇺" data-curr="EUR" data-sym="€" data-name="Europe">🇪🇺 Europe (EUR €)</option>
-            <option value="GBP" data-flag="🇬🇧" data-curr="GBP" data-sym="£" data-name="United Kingdom">🇬🇧 UK (GBP £)</option>
-            <option value="JPY" data-flag="🇯🇵" data-curr="JPY" data-sym="¥" data-name="Japan">🇯🇵 Japan (JPY ¥)</option>
-            <option value="AUD" data-flag="🇦🇺" data-curr="AUD" data-sym="A$" data-name="Australia">🇦🇺 Australia (AUD A$)</option>
-            <option value="CAD" data-flag="🇨🇦" data-curr="CAD" data-sym="C$" data-name="Canada">🇨🇦 Canada (CAD C$)</option>
-            <option value="AED" data-flag="🇦🇪" data-curr="AED" data-sym="AED" data-name="UAE">🇦🇪 UAE (AED)</option>
-            <option value="THB" data-flag="🇹🇭" data-curr="THB" data-sym="฿" data-name="Thailand">🇹🇭 Thailand (THB ฿)</option>
+            <option value="INR" data-flag="🇮🇳" data-curr="INR" data-sym="₹" data-name="India" selected>🇮🇳 INR ₹</option>
+            <option value="USD" data-flag="🇺🇸" data-curr="USD" data-sym="$" data-name="United States">🇺🇸 USD $</option>
+            <option value="EUR" data-flag="🇪🇺" data-curr="EUR" data-sym="€" data-name="Europe">🇪🇺 EUR €</option>
+            <option value="GBP" data-flag="🇬🇧" data-curr="GBP" data-sym="£" data-name="United Kingdom">🇬🇧 GBP £</option>
+            <option value="JPY" data-flag="🇯🇵" data-curr="JPY" data-sym="¥" data-name="Japan">🇯🇵 JPY ¥</option>
+            <option value="AUD" data-flag="🇦🇺" data-curr="AUD" data-sym="A$" data-name="Australia">🇦🇺 AUD A$</option>
+            <option value="CAD" data-flag="🇨🇦" data-curr="CAD" data-sym="C$" data-name="Canada">🇨🇦 CAD C$</option>
+            <option value="AED" data-flag="🇦🇪" data-curr="AED" data-sym="AED" data-name="UAE">🇦🇪 AED</option>
+            <option value="THB" data-flag="🇹🇭" data-curr="THB" data-sym="฿" data-name="Thailand">🇹🇭 THB ฿</option>
           </select>
         </div>
 
         <!-- Plan Button -->
-        <button onclick="switchPage('planner')" class="btn-gradient text-[11px] sm:text-sm px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-xl flex items-center gap-1 sm:gap-1.5 whitespace-nowrap shadow-md">
-          <span>⚡</span><span class="hidden xs:inline">Plan Trip</span><span class="xs:hidden">Plan</span>
+        <button onclick="switchPage('planner')" class="hidden xs:flex btn-gradient text-[11px] sm:text-sm px-2.5 sm:px-5 py-1.5 sm:py-2.5 rounded-xl items-center gap-1 sm:gap-1.5 whitespace-nowrap shadow-md">
+          <span>⚡</span><span class="hidden sm:inline">Plan Trip</span><span class="sm:hidden">Plan</span>
         </button>
       </div>
 
@@ -1126,72 +1145,72 @@ HTML_CONTENT = """<!DOCTYPE html>
   </header>
 
   <!-- Modern Mobile Bottom Navigation Bar (Docked / Thumb-Friendly) -->
-  <nav id="mobileBottomNav" class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-cardDark/95 backdrop-blur-2xl border-t border-cardBorder px-2 py-2 flex items-center justify-around text-xs shadow-2xl" style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
-    <button onclick="switchPage('home')" id="mob-home" class="flex flex-col items-center gap-0.5 text-coralPrimary font-extrabold py-1 px-2.5 rounded-xl transition bg-white/5">
+  <nav id="mobileBottomNav" class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-cardDark/95 backdrop-blur-2xl border-t border-cardBorder px-1.5 sm:px-2 py-1.5 sm:py-2 flex items-center justify-around text-xs shadow-2xl" style="padding-bottom: max(0.4rem, env(safe-area-inset-bottom));">
+    <button onclick="switchPage('home')" id="mob-home" class="flex flex-col items-center gap-0.5 text-coralPrimary font-extrabold py-1 px-2 rounded-xl transition bg-white/5">
       <span class="text-base leading-none">🌟</span>
-      <span class="text-[10px] leading-tight">Home</span>
+      <span class="text-[9px] sm:text-[10px] leading-tight">Home</span>
     </button>
-    <button onclick="switchPage('planner')" id="mob-planner" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2.5 rounded-xl transition">
+    <button onclick="switchPage('planner')" id="mob-planner" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">🚀</span>
-      <span class="text-[10px] leading-tight">Planner</span>
+      <span class="text-[9px] sm:text-[10px] leading-tight">Planner</span>
     </button>
-    <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2.5 rounded-xl transition">
+    <button onclick="switchPage('budget')" id="mob-budget" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">💰</span>
-      <span class="text-[10px] leading-tight">Budget</span>
+      <span class="text-[9px] sm:text-[10px] leading-tight">Budget</span>
     </button>
-    <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2.5 rounded-xl transition">
+    <button onclick="switchPage('packing')" id="mob-packing" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">🎒</span>
-      <span class="text-[10px] leading-tight">Packing</span>
+      <span class="text-[9px] sm:text-[10px] leading-tight">Packing</span>
     </button>
-    <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2.5 rounded-xl transition">
+    <button onclick="switchPage('saved')" id="mob-saved" class="flex flex-col items-center gap-0.5 text-gray-400 py-1 px-2 rounded-xl transition">
       <span class="text-base leading-none">📂</span>
-      <span class="text-[10px] leading-tight">Saved (<span id="mobSavedCount">0</span>)</span>
+      <span class="text-[9px] sm:text-[10px] leading-tight">Saved (<span id="mobSavedCount">0</span>)</span>
     </button>
   </nav>
 
   <!-- ==================== MAIN CONTENT ==================== -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-28 lg:pb-12 relative" style="z-index: 10;">
+  <main class="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 pb-28 lg:pb-12 relative" style="z-index: 10;">
 
     <!-- Region Information Alert Banner -->
-    <div id="regionInfoBanner" class="mb-8 p-4 rounded-2xl bg-gradient-to-r from-coralPrimary/10 via-amberAccent/10 to-cyanAccent/10 border border-coralPrimary/30 flex items-center justify-between text-xs sm:text-sm text-gray-200">
-      <div class="flex items-center gap-3">
-        <span class="text-2xl" id="bannerFlag">🇮🇳</span>
-        <div>
-          <span class="font-bold text-amberAccent" id="bannerRegionTitle">Active Region: India (INR ₹)</span>
-          <p class="text-xs text-gray-400" id="bannerRegionTip">
+    <div id="regionInfoBanner" class="mb-6 sm:mb-8 p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-coralPrimary/10 via-amberAccent/10 to-cyanAccent/10 border border-coralPrimary/30 flex items-center justify-between text-xs sm:text-sm text-gray-200">
+      <div class="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+        <span class="text-xl sm:text-2xl shrink-0 mt-0.5 sm:mt-0" id="bannerFlag">🇮🇳</span>
+        <div class="min-w-0 flex-1">
+          <span class="font-bold text-amberAccent text-xs sm:text-sm block" id="bannerRegionTitle">Active Region: India (INR ₹)</span>
+          <p class="text-[11px] sm:text-xs text-gray-400 mt-0.5 leading-snug sm:leading-normal" id="bannerRegionTip">
             Student Perks: Use IRCTC student concessions for rail travel & Google Pay/UPI for zero-fee local food stalls.
           </p>
         </div>
       </div>
-      <button onclick="switchPage('planner')" class="hidden sm:inline-block px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition">
+      <button onclick="switchPage('planner')" class="hidden md:inline-block px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-bold text-white transition shrink-0 ml-2">
         Explore Plans →
       </button>
     </div>
     
     <!-- PAGE 1: DISCOVER -->
-    <section id="page-home" class="space-y-20">
+    <section id="page-home" class="space-y-12 sm:space-y-20">
       
       <!-- HERO SECTION WITH 3D DEPTH & PREVIEW WIDGET -->
-      <div class="relative rounded-3xl overflow-hidden glass-card p-8 sm:p-12 lg:p-14 border border-white/15 shadow-2xl">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      <div class="relative rounded-3xl overflow-hidden glass-card p-5 sm:p-10 lg:p-14 border border-white/15 shadow-2xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           
           <!-- Hero Left Column -->
-          <div class="lg:col-span-7 space-y-6">
-            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-amberAccent shadow-inner">
-              <span class="w-2 h-2 rounded-full bg-emeraldAccent animate-ping"></span>
-              <span class="text-white">Next-Gen Student Travel Architect</span>
-              <span class="text-gray-400">•</span>
-              <span>Sub-Second AI Engine</span>
+          <div class="lg:col-span-7 space-y-5 sm:space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] sm:text-xs font-semibold text-amberAccent shadow-inner max-w-full">
+              <span class="w-2 h-2 rounded-full bg-emeraldAccent shrink-0 animate-ping"></span>
+              <span class="text-white truncate">Next-Gen Student Travel</span>
+              <span class="text-gray-400 hidden sm:inline">•</span>
+              <span class="hidden sm:inline">Sub-Second AI Engine</span>
             </div>
 
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
               Plan Epic Student Adventures <br/>
               <span class="bg-clip-text text-transparent bg-gradient-to-r from-coralPrimary via-amberAccent to-cyanAccent animate-text-shimmer">
                 On Any Budget in Seconds.
               </span>
             </h1>
 
-            <p class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-xl">
+            <p class="text-gray-300 text-xs sm:text-base leading-relaxed max-w-xl">
               Day-by-day itineraries, verified local student discounts, interactive 3D map pins, and offline PDF exports powered by high-speed Groq AI.
             </p>
 
@@ -3892,28 +3911,33 @@ HTML_CONTENT = """<!DOCTYPE html>
       let width = (canvas.width = window.innerWidth);
       let height = (canvas.height = window.innerHeight);
 
+      const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
+
       window.addEventListener('resize', () => {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
       });
 
-      // 1. Cruising Airplanes with Contrails
-      const planeCount = 8;
+      // 1. Cruising Airplanes with Contrails (Adaptive for Mobile)
+      const planeCount = isMobile ? 2 : 6;
       const planes = [];
       for (let i = 0; i < planeCount; i++) {
         planes.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          speed: Math.random() * 0.8 + 0.6,
+          speed: isMobile ? (Math.random() * 0.5 + 0.4) : (Math.random() * 0.8 + 0.6),
           angle: (Math.random() * Math.PI * 0.6) - 0.3,
-          size: Math.random() * 4 + 12,
+          size: isMobile ? (Math.random() * 2 + 10) : (Math.random() * 4 + 12),
           history: [],
           color: i % 2 === 0 ? '#FF5E36' : '#06B6D4'
         });
       }
 
       // 2. Floating Hot Air Balloons
-      const balloons = [
+      const balloons = isMobile ? [
+        { x: width * 0.15, y: height * 0.45, vy: -0.15, vx: 0.08, radius: 10, hue: '#FFA000', phase: 0 },
+        { x: width * 0.82, y: height * 0.72, vy: -0.12, vx: -0.05, radius: 11, hue: '#FF5E36', phase: 1.5 }
+      ] : [
         { x: width * 0.12, y: height * 0.40, vy: -0.25, vx: 0.12, radius: 13, hue: '#FFA000', phase: 0 },
         { x: width * 0.85, y: height * 0.70, vy: -0.20, vx: -0.08, radius: 15, hue: '#FF5E36', phase: 1.5 },
         { x: width * 0.50, y: height * 0.82, vy: -0.28, vx: 0.10, radius: 12, hue: '#8B5CF6', phase: 3 },
@@ -3921,19 +3945,19 @@ HTML_CONTENT = """<!DOCTYPE html>
       ];
 
       // 3. Shimmering Compass Stars & Firefly Embers
-      const starCount = 55;
+      const starCount = isMobile ? 12 : 45;
       const stars = [];
       for (let i = 0; i < starCount; i++) {
         stars.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
-          size: Math.random() * 3 + 1.5,
-          isCompass: Math.random() > 0.6,
+          vx: (Math.random() - 0.5) * (isMobile ? 0.15 : 0.3),
+          vy: (Math.random() - 0.5) * (isMobile ? 0.15 : 0.3),
+          size: Math.random() * 2 + 1.2,
+          isCompass: !isMobile && Math.random() > 0.65,
           color: Math.random() > 0.5 ? 'rgba(255, 160, 0, ' : 'rgba(6, 182, 212, ',
-          alpha: Math.random() * 0.6 + 0.3,
-          pulse: Math.random() * 0.03 + 0.015
+          alpha: Math.random() * 0.5 + 0.3,
+          pulse: Math.random() * 0.02 + 0.01
         });
       }
 
@@ -3945,15 +3969,17 @@ HTML_CONTENT = """<!DOCTYPE html>
       ];
 
       let mouse = { x: null, y: null, ripple: 0 };
-      window.addEventListener('mousemove', (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-        mouse.ripple = (mouse.ripple + 1) % 50;
-      });
-      window.addEventListener('mouseleave', () => {
-        mouse.x = null;
-        mouse.y = null;
-      });
+      if (!isMobile) {
+        window.addEventListener('mousemove', (e) => {
+          mouse.x = e.clientX;
+          mouse.y = e.clientY;
+          mouse.ripple = (mouse.ripple + 1) % 50;
+        });
+        window.addEventListener('mouseleave', () => {
+          mouse.x = null;
+          mouse.y = null;
+        });
+      }
 
       function drawPlane(p, isLight) {
         ctx.save();
@@ -3962,24 +3988,18 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         const planeColor = isLight ? (p.color === '#06B6D4' ? '#0284C7' : '#EA580C') : p.color;
         ctx.fillStyle = planeColor;
-        ctx.shadowColor = isLight ? 'rgba(2, 132, 199, 0.4)' : planeColor;
-        ctx.shadowBlur = isLight ? 6 : 10;
+        if (!isMobile) {
+          ctx.shadowColor = isLight ? 'rgba(2, 132, 199, 0.4)' : planeColor;
+          ctx.shadowBlur = isLight ? 6 : 10;
+        }
         ctx.beginPath();
-        // Nose
         ctx.moveTo(p.size * 1.1, 0);
-        // Right wing
         ctx.lineTo(-p.size * 0.4, p.size * 0.9);
-        // Right body indent
         ctx.lineTo(-p.size * 0.2, p.size * 0.2);
-        // Tail wing right
         ctx.lineTo(-p.size * 0.85, p.size * 0.5);
-        // Tail tip
         ctx.lineTo(-p.size * 0.7, 0);
-        // Tail wing left
         ctx.lineTo(-p.size * 0.85, -p.size * 0.5);
-        // Left body indent
         ctx.lineTo(-p.size * 0.2, -p.size * 0.2);
-        // Left wing
         ctx.lineTo(-p.size * 0.4, -p.size * 0.9);
         ctx.closePath();
         ctx.fill();
@@ -3991,21 +4011,20 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.save();
         ctx.translate(b.x, b.y);
 
-        // Balloon envelope
         ctx.fillStyle = b.hue;
-        ctx.shadowColor = isLight ? 'rgba(0,0,0,0.2)' : b.hue;
-        ctx.shadowBlur = 10;
+        if (!isMobile) {
+          ctx.shadowColor = isLight ? 'rgba(0,0,0,0.2)' : b.hue;
+          ctx.shadowBlur = 8;
+        }
         ctx.beginPath();
         ctx.arc(0, 0, b.radius, 0, Math.PI, true);
         ctx.quadraticCurveTo(-b.radius * 0.9, b.radius * 1.1, 0, b.radius * 1.4);
         ctx.quadraticCurveTo(b.radius * 0.9, b.radius * 1.1, b.radius, 0);
         ctx.fill();
 
-        // Basket
         ctx.fillStyle = isLight ? '#334155' : 'rgba(255, 255, 255, 0.8)';
         ctx.fillRect(-b.radius * 0.25, b.radius * 1.65, b.radius * 0.5, b.radius * 0.35);
 
-        // Strings
         ctx.strokeStyle = isLight ? 'rgba(15, 23, 42, 0.55)' : 'rgba(255, 255, 255, 0.4)';
         ctx.lineWidth = 0.9;
         ctx.beginPath();
@@ -4025,11 +4044,13 @@ HTML_CONTENT = """<!DOCTYPE html>
           ? (s.color.includes('255, 160') ? 'rgba(217, 119, 6, ' : 'rgba(2, 132, 199, ')
           : s.color;
         ctx.fillStyle = starColor + alpha + ')';
-        ctx.shadowColor = isLight ? 'rgba(217, 119, 6, 0.7)' : starColor + '0.8)';
-        ctx.shadowBlur = 8;
+        if (!isMobile) {
+          ctx.shadowColor = isLight ? 'rgba(217, 119, 6, 0.7)' : starColor + '0.8)';
+          ctx.shadowBlur = 6;
+        }
 
         ctx.beginPath();
-        const rOuter = s.size * 2.3;
+        const rOuter = s.size * 2.2;
         const rInner = s.size * 0.55;
         for (let i = 0; i < 4; i++) {
           const a = (i * Math.PI) / 2;
@@ -4042,21 +4063,28 @@ HTML_CONTENT = """<!DOCTYPE html>
         ctx.restore();
       }
 
+      let animRunning = true;
+      document.addEventListener('visibilitychange', () => {
+        animRunning = !document.hidden;
+        if (animRunning) requestAnimationFrame(animate);
+      });
+
       function animate() {
+        if (!animRunning) return;
         ctx.clearRect(0, 0, width, height);
         const isLight = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
 
         // 1. Draw Global Great-Circle Flight Arcs
         ctx.save();
         ctx.setLineDash([8, 14]);
-        ctx.lineWidth = isLight ? 2 : 1;
-        ctx.strokeStyle = isLight ? 'rgba(234, 88, 12, 0.45)' : 'rgba(255, 160, 0, 0.15)';
+        ctx.lineWidth = isLight ? 1.5 : 1;
+        ctx.strokeStyle = isLight ? 'rgba(234, 88, 12, 0.35)' : 'rgba(255, 160, 0, 0.12)';
         ctx.beginPath();
         ctx.moveTo(0, height * 0.3);
         ctx.quadraticCurveTo(width * 0.5, height * 0.1, width, height * 0.45);
         ctx.stroke();
 
-        ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.45)' : 'rgba(6, 182, 212, 0.12)';
+        ctx.strokeStyle = isLight ? 'rgba(2, 132, 199, 0.35)' : 'rgba(6, 182, 212, 0.1)';
         ctx.beginPath();
         ctx.moveTo(0, height * 0.7);
         ctx.quadraticCurveTo(width * 0.4, height * 0.85, width, height * 0.6);
@@ -4065,16 +4093,16 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         // 2. Draw Destination Waypoint Pulses
         waypoints.forEach(wp => {
-          wp.pulseRadius = (wp.pulseRadius + 0.35) % 50;
-          const pAlpha = (1 - wp.pulseRadius / 50) * (isLight ? 0.7 : 0.4);
+          wp.pulseRadius = (wp.pulseRadius + 0.3) % 50;
+          const pAlpha = (1 - wp.pulseRadius / 50) * (isLight ? 0.6 : 0.35);
           ctx.beginPath();
           ctx.arc(wp.x, wp.y, wp.pulseRadius, 0, Math.PI * 2);
           ctx.strokeStyle = isLight ? `rgba(2, 132, 199, ${pAlpha})` : `rgba(6, 182, 212, ${pAlpha})`;
-          ctx.lineWidth = isLight ? 1.8 : 1;
+          ctx.lineWidth = isLight ? 1.5 : 1;
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.arc(wp.x, wp.y, 3.5, 0, Math.PI * 2);
+          ctx.arc(wp.x, wp.y, 3, 0, Math.PI * 2);
           ctx.fillStyle = isLight ? '#0284C7' : '#06B6D4';
           ctx.fill();
         });
@@ -4088,8 +4116,8 @@ HTML_CONTENT = """<!DOCTYPE html>
           if (s.y < 0) s.y = height;
           if (s.y > height) s.y = 0;
 
-          s.alpha += Math.sin(Date.now() * s.pulse) * 0.007;
-          const curAlpha = Math.max(0.3, Math.min(0.95, s.alpha));
+          s.alpha += Math.sin(Date.now() * s.pulse) * 0.006;
+          const curAlpha = Math.max(0.25, Math.min(0.9, s.alpha));
 
           if (s.isCompass) {
             drawCompassStar(s, curAlpha, isLight);
@@ -4106,9 +4134,9 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         // 4. Update & Draw Hot Air Balloons
         balloons.forEach(b => {
-          b.phase += 0.02;
+          b.phase += 0.015;
           b.y += b.vy;
-          b.x += b.vx + Math.sin(b.phase) * 0.15;
+          b.x += b.vx + Math.sin(b.phase) * 0.12;
           if (b.y < -40) {
             b.y = height + 40;
             b.x = Math.random() * width;
@@ -4121,59 +4149,59 @@ HTML_CONTENT = """<!DOCTYPE html>
           p.x += Math.cos(p.angle) * p.speed;
           p.y += Math.sin(p.angle) * p.speed;
 
-          // Record contrail point
-          p.history.push({ x: p.x, y: p.y });
-          if (p.history.length > 40) p.history.shift();
+          if (!isMobile) {
+            p.history.push({ x: p.x, y: p.y });
+            if (p.history.length > 25) p.history.shift();
 
-          // Draw jet contrail
-          if (p.history.length > 2) {
-            ctx.save();
-            ctx.setLineDash([4, 6]);
-            ctx.lineWidth = isLight ? 2 : 1.2;
-            for (let i = 0; i < p.history.length - 1; i++) {
-              const trailAlpha = (i / p.history.length) * (isLight ? 0.7 : 0.4);
-              ctx.strokeStyle = isLight 
-                ? `rgba(2, 132, 199, ${trailAlpha})`
-                : `rgba(255, 255, 255, ${trailAlpha})`;
-              ctx.beginPath();
-              ctx.moveTo(p.history[i].x, p.history[i].y);
-              ctx.lineTo(p.history[i + 1].x, p.history[i + 1].y);
-              ctx.stroke();
+            if (p.history.length > 2) {
+              ctx.save();
+              ctx.setLineDash([4, 6]);
+              ctx.lineWidth = isLight ? 1.5 : 1;
+              for (let i = 0; i < p.history.length - 1; i++) {
+                const trailAlpha = (i / p.history.length) * (isLight ? 0.6 : 0.35);
+                ctx.strokeStyle = isLight 
+                  ? `rgba(2, 132, 199, ${trailAlpha})`
+                  : `rgba(255, 255, 255, ${trailAlpha})`;
+                ctx.beginPath();
+                ctx.moveTo(p.history[i].x, p.history[i].y);
+                ctx.lineTo(p.history[i + 1].x, p.history[i + 1].y);
+                ctx.stroke();
+              }
+              ctx.restore();
             }
-            ctx.restore();
           }
 
           // Screen wrapping
-          if (p.x > width + 60) {
-            p.x = -60;
+          if (p.x > width + 50) {
+            p.x = -50;
             p.y = Math.random() * height;
             p.history = [];
           }
-          if (p.y > height + 60) {
-            p.y = -60;
+          if (p.y > height + 50) {
+            p.y = -50;
             p.history = [];
           }
-          if (p.y < -60) {
-            p.y = height + 60;
+          if (p.y < -50) {
+            p.y = height + 50;
             p.history = [];
           }
 
           drawPlane(p, isLight);
         });
 
-        // 6. Interactive Mouse Compass Radar Ring
-        if (mouse.x !== null && mouse.y !== null) {
+        // 6. Interactive Mouse Compass Radar Ring (Desktop only)
+        if (!isMobile && mouse.x !== null && mouse.y !== null) {
           ctx.save();
           ctx.beginPath();
-          ctx.arc(mouse.x, mouse.y, 45, 0, Math.PI * 2);
-          ctx.strokeStyle = isLight ? 'rgba(225, 29, 72, 0.45)' : 'rgba(255, 94, 54, 0.25)';
-          ctx.lineWidth = 1.2;
+          ctx.arc(mouse.x, mouse.y, 40, 0, Math.PI * 2);
+          ctx.strokeStyle = isLight ? 'rgba(225, 29, 72, 0.4)' : 'rgba(255, 94, 54, 0.2)';
+          ctx.lineWidth = 1;
           ctx.setLineDash([4, 4]);
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.arc(mouse.x, mouse.y, 20, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(255, 160, 0, 0.35)';
+          ctx.arc(mouse.x, mouse.y, 18, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(255, 160, 0, 0.3)';
           ctx.lineWidth = 1;
           ctx.stroke();
           ctx.restore();
