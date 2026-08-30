@@ -365,6 +365,12 @@ HTML_CONTENT = """<!DOCTYPE html>
   <title>RoamAI • Next-Gen AI Student Travel Planner</title>
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/921/921490.png" />
 
+
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
