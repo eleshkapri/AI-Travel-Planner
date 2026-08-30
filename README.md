@@ -3,7 +3,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Groq LPU](https://img.shields.io/badge/AI-Groq%20LPU%20Ultra--Fast-F55036.svg)](https://groq.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Custom](https://img.shields.io/badge/License-Source--Available%20(Anti--Rebrand)-red.svg)](LICENSE)
 
 **RoamAI** is an ultra-fast, intelligent travel architect engineered specifically for students, backpackers, and budget-conscious explorers. Built with high-speed **Groq LPUs**, RoamAI delivers complete day-by-day itineraries, interactive GPS maps, adaptive packing checklists, regional currency budgeting, and offline PDF exports in seconds.
 
@@ -102,9 +102,15 @@ Navigate to **`http://localhost:8000`** in your browser.
 
 ---
 
-## 📄 License
+## 📄 License & Intellectual Property
+ 
+Copyright (c) 2026 **Elesh Kapri**. All rights reserved.
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **RoamAI Source-Available & Anti-Rebranding License**:
+- ✅ **Permitted**: Viewing source code, local self-hosting, academic study, research, and personal non-commercial trip planning.
+- ❌ **Strictly Prohibited**: Cloning/forking to rebrand, rename, remove original author credits, resell, redistribute, or release as a separate product/service under another name without prior express written permission from Elesh Kapri.
+
+See the full [LICENSE](LICENSE) file for complete legal terms.
 
 ---
 

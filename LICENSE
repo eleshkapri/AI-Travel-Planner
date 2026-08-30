@@ -1,21 +1,22 @@
-MIT License
+RoamAI Source-Available & Anti-Rebranding License
 
-Copyright (c) 2026 [Elesh kapri]
+Copyright (c) 2026 Elesh Kapri. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is hereby granted to any person obtaining a copy of this software and associated documentation files (the "Software") to view the source code, download, study, and run the Software locally solely for personal, non-commercial, educational, and evaluation purposes, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. NO REBRANDING OR UNAUTHORIZED REDISTRIBUTION:
+   You may NOT modify the software, change the application name, alter or remove the author credentials, remove trademarks, logos, or branding, or publish, host, distribute, sublicense, or release the Software (or any derivative work based upon it) under your own name or any other entity's name as a separate product, service, or repository.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. ATTRIBUTION REQUIREMENT:
+   Any permitted educational or personal use, academic reference, or citation of the Software must retain the original copyright notice, author attribution ("Created by Elesh Kapri"), and links to the original repository (https://github.com/eleshkapri/AI-Travel-Planner).
+
+3. NO COMMERCIAL USE:
+   You may NOT use, deploy, host, sell, monetize, or exploit this Software, its UI design, its source code, or its services for any commercial purpose without prior express written permission from the copyright holder.
+
+4. NO PUBLIC CLONING / RESELLING AS A SERVICE:
+   Hosting or deploying a public clone or fork of this website/service, whether free or paid, rebranded or unbranded, is strictly prohibited without prior written consent from Elesh Kapri.
+
+5. INTELLECTUAL PROPERTY:
+   All rights, title, and interest in and to the Software, including but not limited to the codebase, user interface design, visual assets, unique algorithms, and trademarks ("RoamAI"), remain the exclusive intellectual property of Elesh Kapri.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
