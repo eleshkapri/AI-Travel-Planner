@@ -250,13 +250,10 @@ def generate_itinerary(req: TripRequest):
             """
 
             models_to_try = [
+                "llama-3.3-70b-versatile",
                 "llama-3.1-8b-instant",
                 "llama3-70b-8192",
-                "llama3-8b-8192",
-                "gemma2-9b-it",
-                "llama-3.2-3b-preview",
-                "llama-3.2-1b-preview",
-                "llama-3.2-11b-vision-preview"
+                "gemma2-9b-it"
             ]
 
             for model_name in models_to_try:
@@ -3008,10 +3005,6 @@ HTML_CONTENT = """<!DOCTYPE html>
         }
       });
       applyHotspotFilters();
-    }
-
-    function filterHotspotGrid(category) {
-      setHotspotCategory(category);
     }
 
     function applyHotspotFilters() {
