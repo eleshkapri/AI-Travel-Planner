@@ -437,14 +437,26 @@ HTML_CONTENT = """<!DOCTYPE html>
       color: #0B132B !important;
     }
 
-    /* Responsive Mobile Layout & Touch Rules */
+    /* Responsive Mobile Layout & Touch Rules (Applied ONLY on Mobile/Tablet <=768px) */
     @media (max-width: 768px) {
+      #bgParticleCanvas {
+        transform: translate3d(0, 0, 0) !important;
+        -webkit-transform: translate3d(0, 0, 0) !important;
+        will-change: transform !important;
+      }
       .glass-card {
         padding: 1.15rem !important;
-        backdrop-filter: blur(12px) !important;
-        -webkit-backdrop-filter: blur(12px) !important;
-        transform: none !important;
+        background-color: rgba(18, 24, 38, 0.92) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        transform: translateZ(0) !important;
+        -webkit-transform: translateZ(0) !important;
         transition: border-color 0.2s ease !important;
+      }
+      .light-theme .glass-card {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
       }
       .glass-card:hover {
         transform: none !important;
@@ -452,7 +464,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       .orb-1, .orb-2, .orb-3 {
         animation: none !important;
         filter: blur(35px) !important;
-        opacity: 0.3 !important;
+        opacity: 0.25 !important;
         transform: none !important;
       }
       #map {
@@ -479,6 +491,13 @@ HTML_CONTENT = """<!DOCTYPE html>
         padding-left: 0.85rem !important;
         padding-right: 0.85rem !important;
       }
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none !important;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none !important;
+      scrollbar-width: none !important;
     }
     * {
       -webkit-tap-highlight-color: transparent;
@@ -2145,38 +2164,37 @@ HTML_CONTENT = """<!DOCTYPE html>
       </div>
 
       <!-- Overall Progress & Vibe Selector Toolbar -->
-      <div class="glass-card p-6 sm:p-7 rounded-3xl border border-white/10 space-y-5 shadow-xl">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">📍</span>
-            <div>
-              <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Itinerary & Destination Vibe</span>
-              <div class="flex items-center gap-2 mt-0.5">
-                <select
-                  id="packVibeSelector"
-                  onchange="onPackVibeChange(this.value)"
-                  class="px-3 py-1.5 bg-spaceDark border border-white/15 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-emeraldAccent"
-                >
-                  <option value="auto">📍 Auto-detect from Itinerary / Planner</option>
-                  <option value="beach">🏖️ Beach, Island & Coastal (Goa, Bali, Phuket)</option>
-                  <option value="mountain">🏔️ Mountains, Hiking & Trekking (Manali, Alps)</option>
-                  <option value="city">🏙️ City Sightseeing & Culture (Tokyo, Rome, London)</option>
-                  <option value="winter">❄️ Cold Weather & Snow (Alps, Sapporo, Kashmir)</option>
-                  <option value="hostel">🎒 Classic Backpacker & Hostel Dorm</option>
-                </select>
-                <span id="packVibeBadge" class="text-[10px] font-bold px-2 py-1 rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">Auto Active</span>
-              </div>
+      <div class="glass-card p-5 sm:p-7 rounded-3xl border border-white/10 space-y-5 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div class="space-y-1.5 w-full sm:w-auto">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span>📍</span> Itinerary & Destination Vibe
+              </span>
+              <span id="packVibeBadge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emeraldAccent/20 text-emeraldAccent border border-emeraldAccent/30">Auto Active</span>
             </div>
+            <select
+              id="packVibeSelector"
+              onchange="onPackVibeChange(this.value)"
+              class="w-full sm:w-auto px-3 py-2 bg-spaceDark border border-white/15 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-emeraldAccent shadow-sm"
+            >
+              <option value="auto">📍 Auto-detect from Itinerary / Planner</option>
+              <option value="beach">🏖️ Beach, Island & Coastal (Goa, Bali, Phuket)</option>
+              <option value="mountain">🏔️ Mountains, Hiking & Trekking (Manali, Alps)</option>
+              <option value="city">🏙️ City Sightseeing & Culture (Tokyo, Rome, London)</option>
+              <option value="winter">❄️ Cold Weather & Snow (Alps, Sapporo, Kashmir)</option>
+              <option value="hostel">🎒 Classic Backpacker & Hostel Dorm</option>
+            </select>
           </div>
 
-          <div class="flex items-center gap-2">
-            <button onclick="checkAllPacking(true)" class="btn-secondary px-3 py-1.5 rounded-xl text-xs font-semibold">
+          <div class="flex items-center gap-2 pt-1 sm:pt-0">
+            <button onclick="checkAllPacking(true)" class="btn-secondary flex-1 sm:flex-initial px-3 py-1.5 rounded-xl text-xs font-semibold text-center">
               ✅ Check All
             </button>
-            <button onclick="checkAllPacking(false)" class="btn-secondary px-3 py-1.5 rounded-xl text-xs font-semibold">
+            <button onclick="checkAllPacking(false)" class="btn-secondary flex-1 sm:flex-initial px-3 py-1.5 rounded-xl text-xs font-semibold text-center">
               🔄 Uncheck All
             </button>
-            <button onclick="resetPackingDefaults()" class="p-1.5 rounded-xl text-xs text-gray-400 hover:text-red-400 hover:bg-white/5 transition" title="Reset to Defaults">
+            <button onclick="resetPackingDefaults()" class="p-2 rounded-xl text-xs text-gray-400 hover:text-red-400 hover:bg-white/5 transition shrink-0" title="Reset to Defaults">
               🗑️
             </button>
           </div>
@@ -2195,7 +2213,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       </div>
 
       <!-- Add Custom Item Card -->
-      <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
+      <div class="glass-card p-5 sm:p-6 rounded-3xl border border-white/10 space-y-4 shadow-xl">
         <h3 class="text-sm font-bold text-white flex items-center gap-2">
           <span>➕</span> Add Custom Item
         </h3>
@@ -2231,8 +2249,8 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- Category Filter Pills -->
-      <div class="flex flex-wrap gap-2 items-center" id="packCategoryFilterPills">
+      <!-- Category Filter Pills (Horizontal Swipe on Mobile) -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:flex-wrap no-scrollbar" id="packCategoryFilterPills">
         <!-- Injected via JS -->
       </div>
 
@@ -3892,7 +3910,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       pillContainer.innerHTML = pills.map(p => `
         <button
           onclick="filterPackingCategory('${p.key}')"
-          class="text-xs px-3.5 py-1.5 rounded-full border transition flex items-center gap-1.5 ${activePackFilter === p.key ? 'bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-bold border-transparent shadow-md' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20'}"
+          class="text-xs px-3.5 py-1.5 rounded-full border transition shrink-0 whitespace-nowrap flex items-center gap-1.5 ${activePackFilter === p.key ? 'bg-gradient-to-r from-coralPrimary to-amberAccent text-white font-bold border-transparent shadow-md' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20'}"
         >
           <span>${p.icon}</span>
           <span>${p.label}</span>
@@ -4014,15 +4032,15 @@ HTML_CONTENT = """<!DOCTYPE html>
       }, { passive: true });
 
       // 1. Cruising Airplanes with Contrails (Adaptive for Mobile)
-      const planeCount = isMobile ? 2 : 6;
+      const planeCount = isMobile ? 3 : 6;
       const planes = [];
       for (let i = 0; i < planeCount; i++) {
         planes.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          speed: isMobile ? (Math.random() * 0.5 + 0.4) : (Math.random() * 0.8 + 0.6),
+          speed: isMobile ? (Math.random() * 0.6 + 0.5) : (Math.random() * 0.8 + 0.6),
           angle: (Math.random() * Math.PI * 0.6) - 0.3,
-          size: isMobile ? (Math.random() * 2 + 10) : (Math.random() * 4 + 12),
+          size: isMobile ? (Math.random() * 3 + 11) : (Math.random() * 4 + 12),
           history: [],
           color: i % 2 === 0 ? '#FF5E36' : '#06B6D4'
         });
@@ -4030,8 +4048,9 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       // 2. Floating Hot Air Balloons
       const balloons = isMobile ? [
-        { x: width * 0.15, y: height * 0.45, vy: -0.15, vx: 0.08, radius: 10, hue: '#FFA000', phase: 0 },
-        { x: width * 0.82, y: height * 0.72, vy: -0.12, vx: -0.05, radius: 11, hue: '#FF5E36', phase: 1.5 }
+        { x: width * 0.18, y: height * 0.45, vy: -0.20, vx: 0.08, radius: 13, hue: '#FFA000', phase: 0 },
+        { x: width * 0.80, y: height * 0.72, vy: -0.16, vx: -0.06, radius: 14, hue: '#FF5E36', phase: 1.5 },
+        { x: width * 0.48, y: height * 0.88, vy: -0.22, vx: 0.10, radius: 12, hue: '#06B6D4', phase: 3 }
       ] : [
         { x: width * 0.12, y: height * 0.40, vy: -0.25, vx: 0.12, radius: 13, hue: '#FFA000', phase: 0 },
         { x: width * 0.85, y: height * 0.70, vy: -0.20, vx: -0.08, radius: 15, hue: '#FF5E36', phase: 1.5 },
@@ -4040,14 +4059,14 @@ HTML_CONTENT = """<!DOCTYPE html>
       ];
 
       // 3. Shimmering Compass Stars & Firefly Embers
-      const starCount = isMobile ? 12 : 45;
+      const starCount = isMobile ? 22 : 45;
       const stars = [];
       for (let i = 0; i < starCount; i++) {
         stars.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * (isMobile ? 0.15 : 0.3),
-          vy: (Math.random() - 0.5) * (isMobile ? 0.15 : 0.3),
+          vx: (Math.random() - 0.5) * (isMobile ? 0.2 : 0.3),
+          vy: (Math.random() - 0.5) * (isMobile ? 0.2 : 0.3),
           size: Math.random() * 2 + 1.2,
           isCompass: !isMobile && Math.random() > 0.65,
           color: Math.random() > 0.5 ? 'rgba(255, 160, 0, ' : 'rgba(6, 182, 212, ',
@@ -4172,10 +4191,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 
         requestAnimationFrame(animate);
 
-        // Pause canvas redraw while mobile user is scrolling to keep scrolling locked at 60/120fps
-        if (isMobile && isScrolling) return;
-
-        // Delta-time throttle
+        // Delta-time throttle (smooth 30fps on mobile to keep touch responsive, 60fps on desktop)
         if (now - lastFrameTime < targetInterval) return;
         lastFrameTime = now;
 
@@ -4257,26 +4273,25 @@ HTML_CONTENT = """<!DOCTYPE html>
           p.x += Math.cos(p.angle) * p.speed;
           p.y += Math.sin(p.angle) * p.speed;
 
-          if (!isMobile) {
-            p.history.push({ x: p.x, y: p.y });
-            if (p.history.length > 25) p.history.shift();
+          const maxHistory = isMobile ? 14 : 25;
+          p.history.push({ x: p.x, y: p.y });
+          if (p.history.length > maxHistory) p.history.shift();
 
-            if (p.history.length > 2) {
-              ctx.save();
-              ctx.setLineDash([4, 6]);
-              ctx.lineWidth = isLight ? 1.5 : 1;
-              for (let i = 0; i < p.history.length - 1; i++) {
-                const trailAlpha = (i / p.history.length) * (isLight ? 0.6 : 0.35);
-                ctx.strokeStyle = isLight 
-                  ? `rgba(2, 132, 199, ${trailAlpha})`
-                  : `rgba(255, 255, 255, ${trailAlpha})`;
-                ctx.beginPath();
-                ctx.moveTo(p.history[i].x, p.history[i].y);
-                ctx.lineTo(p.history[i + 1].x, p.history[i + 1].y);
-                ctx.stroke();
-              }
-              ctx.restore();
+          if (p.history.length > 2) {
+            ctx.save();
+            ctx.setLineDash([4, 6]);
+            ctx.lineWidth = isLight ? 1.5 : 1;
+            for (let i = 0; i < p.history.length - 1; i++) {
+              const trailAlpha = (i / p.history.length) * (isLight ? 0.6 : 0.35);
+              ctx.strokeStyle = isLight 
+                ? `rgba(2, 132, 199, ${trailAlpha})`
+                : `rgba(255, 255, 255, ${trailAlpha})`;
+              ctx.beginPath();
+              ctx.moveTo(p.history[i].x, p.history[i].y);
+              ctx.lineTo(p.history[i + 1].x, p.history[i + 1].y);
+              ctx.stroke();
             }
+            ctx.restore();
           }
 
           // Screen wrapping
@@ -4324,22 +4339,24 @@ HTML_CONTENT = """<!DOCTYPE html>
       updateSavedCount();
       initThemeMood();
 
-      // 2. Restore saved region (prevent resetting to INR on reload)
+      // 2. Initialize animated moving travel sky background canvas immediately
+      initBackgroundCanvas();
+
+      // 3. Restore saved region (prevent resetting to INR on reload)
       const savedRegion = localStorage.getItem('roamai_selected_region') || 'INR';
       onRegionChange(savedRegion, false);
 
-      // 3. Restore saved active page (prevent automatically resetting to home on reload)
+      // 4. Restore saved active page (prevent automatically resetting to home on reload)
       const hashPage = window.location.hash.replace('#', '');
       const savedPage = hashPage || localStorage.getItem('roamai_active_page') || 'home';
       switchPage(savedPage, false);
 
-      // 4. Restore Trip Architect Form Draft & Active Itinerary (prevents info loss on reload)
+      // 5. Restore Trip Architect Form Draft & Active Itinerary (prevents info loss on reload)
       initPlannerDraft();
 
-      // 5. Defer non-critical background canvas and offline vault rendering to idle frames (avoids main-thread blocking on mobile startup)
+      // 6. Defer packing checklist and offline vault rendering to idle frames
       const scheduleIdle = window.requestIdleCallback || function(cb) { setTimeout(cb, 16); };
       scheduleIdle(() => {
-        initBackgroundCanvas();
         renderPacking();
         renderSaved();
       });
