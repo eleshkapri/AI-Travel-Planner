@@ -4,6 +4,7 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel, Field
 from groq import Groq
@@ -15,6 +16,9 @@ app = FastAPI(
     description="Next-Gen 3D Modern Student Travel Planner powered by Groq AI",
     version="2.2.0"
 )
+
+# GZip Compression Middleware (Reduces HTML/JSON payload size by up to 80% on mobile)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Security Response Headers Middleware
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -401,22 +405,18 @@ HTML_CONTENT = """<!DOCTYPE html>
 
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 
-  <!-- Marked.js (Markdown parser) -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Marked.js & DOMPurify (Deferred parser & sanitizer) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js" defer></script>
 
-  <!-- DOMPurify (XSS Sanitizer) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js"></script>
-
-  <!-- html2pdf for PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-  <!-- Vanilla Tilt (3D Card Physics - Desktop Only to ensure 60fps buttery smooth touch on mobile) -->
+  <!-- Vanilla Tilt (3D Card Physics - Desktop Only to guarantee 60fps buttery smooth touch on mobile) -->
   <script>
     if (window.innerWidth >= 1024 && !('ontouchstart' in window)) {
       const tiltScript = document.createElement('script');
       tiltScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js';
+      tiltScript.defer = true;
       document.head.appendChild(tiltScript);
     }
   </script>
@@ -1294,7 +1294,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="lg:col-span-5 flex justify-center">
             <div class="w-full max-w-sm glass-card p-6 rounded-3xl border border-white/20 shadow-2xl space-y-4 transform lg:rotate-1 hover:rotate-0 transition duration-500" data-tilt data-tilt-max="10">
               <div class="relative rounded-2xl overflow-hidden aspect-video">
-                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover" />
+                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80" alt="Tokyo Trip Preview" loading="lazy" decoding="async" class="w-full h-full object-cover" />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                 <div class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/80 backdrop-blur-md text-[10px] font-bold text-amberAccent border border-white/10 flex items-center gap-1.5">
                   <span class="w-1.5 h-1.5 rounded-full bg-amberAccent"></span> Live Itinerary Preview
@@ -1401,7 +1401,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="beach nightlife" data-cost-inr="2000" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Goa, India', 4, 'Student (Low)', ['Nightlife', 'Beaches', 'Street Food'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" alt="Goa Beaches" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" alt="Goa Beaches" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1423,7 +1423,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="mountain adventure nature" data-cost-inr="1800" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Manali, Himachal Pradesh, India', 4, 'Student (Low)', ['Nature', 'Adventure', 'Hiking'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=600&q=80" alt="Manali Mountains" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=600&q=80" alt="Manali Mountains" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -1445,7 +1445,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="culture" data-cost-inr="2200" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Jaipur, Rajasthan, India', 3, 'Student (Low)', ['History', 'Culture', 'Street Food'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=600&q=80" alt="Jaipur Palace" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=600&q=80" alt="Jaipur Palace" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1467,7 +1467,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="adventure mountain" data-cost-inr="1600" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Rishikesh, Uttarakhand, India', 3, 'Student (Low)', ['Adventure', 'Nature', 'Culture'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=600&q=80" alt="Rishikesh River & Bridges" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=600&q=80" alt="Rishikesh River & Bridges" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1489,7 +1489,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="culture" data-cost-inr="1400" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Varanasi, Uttar Pradesh, India', 3, 'Student (Low)', ['History', 'Culture', 'Street Food'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1571536802807-30451e3955d8?auto=format&fit=crop&w=600&q=80" alt="Varanasi Ganga Ghats" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1571536802807-30451e3955d8?auto=format&fit=crop&w=600&q=80" alt="Varanasi Ganga Ghats" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -1511,7 +1511,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="nature beach" data-cost-inr="2100" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Munnar, Kerala, India', 4, 'Student (Low)', ['Nature', 'Culture', 'Photography'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=600&q=80" alt="Munnar Tea Hills" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=600&q=80" alt="Munnar Tea Hills" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -1533,7 +1533,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="mountain adventure nature" data-cost-inr="2400" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Leh Ladakh, India', 5, 'Student (Low)', ['Adventure', 'Nature', 'Hiking'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=600&q=80" alt="Leh Ladakh Pangong Lake" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=600&q=80" alt="Leh Ladakh Pangong Lake" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1555,7 +1555,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="national" data-cat="nature adventure" data-cost-inr="1900" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Shillong, Meghalaya, India', 4, 'Student (Low)', ['Nature', 'Adventure', 'Photography'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80" alt="Meghalaya Living Root Bridge & Waterfalls" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80" alt="Meghalaya Living Root Bridge & Waterfalls" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1581,7 +1581,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture nightlife" data-cost-inr="4200" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Tokyo, Japan', 4, 'Student (Low)', ['Street Food', 'Anime & Pop Culture', 'History'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80" alt="Tokyo City" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80" alt="Tokyo City" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇯🇵)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1603,7 +1603,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="beach nature" data-cost-inr="2500" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Bali, Indonesia', 5, 'Student (Low)', ['Nature', 'Beaches', 'Adventure'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80" alt="Bali Beach" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80" alt="Bali Beach" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇮🇩)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -1625,7 +1625,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="beach nightlife" data-cost-inr="2300" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Bangkok, Thailand', 4, 'Student (Low)', ['Street Food', 'Nightlife', 'Beaches'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=600&q=80" alt="Bangkok Temples" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=600&q=80" alt="Bangkok Temples" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇹🇭)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -1647,7 +1647,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture" data-cost-inr="5000" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Rome, Italy', 3, 'Moderate', ['History', 'Museums', 'Street Food'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80" alt="Rome Colosseum" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80" alt="Rome Colosseum" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇮🇹)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1669,7 +1669,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="nightlife culture" data-cost-inr="5500" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Amsterdam, Netherlands', 3, 'Student (Low)', ['Nightlife', 'Museums', 'Street Food'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=600&q=80" alt="Amsterdam Canals" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=600&q=80" alt="Amsterdam Canals" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇳🇱)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -1691,7 +1691,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture nature" data-cost-inr="3800" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Kyoto, Japan', 3, 'Student (Low)', ['History', 'Nature', 'Street Food'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80" alt="Kyoto Shrine" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80" alt="Kyoto Shrine" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇯🇵)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
               </div>
@@ -1713,7 +1713,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="culture" data-cost-inr="5200" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Paris, France', 3, 'Moderate', ['Museums', 'Culture', 'Photography'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80" alt="Paris Eiffel Tower" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80" alt="Paris Eiffel Tower" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇫🇷)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -1735,7 +1735,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           <div class="hotspot-card glass-card rounded-3xl p-5 space-y-4 cursor-pointer group flex flex-col justify-between" data-scope="international" data-cat="nightlife adventure" data-cost-inr="4500" data-tilt data-tilt-max="6" onclick="quickPlanHotspot('Dubai, UAE', 3, 'Student (Low)', ['Adventure', 'Sightseeing', 'Shopping'])">
             <div class="space-y-3">
               <div class="relative rounded-2xl overflow-hidden h-44">
-                <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80" alt="Dubai Skyline" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80" alt="Dubai Skyline" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇦🇪)</span>
                 <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
               </div>
@@ -2112,14 +2112,14 @@ HTML_CONTENT = """<!DOCTYPE html>
       <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div class="md:col-span-7 glass-card p-6 sm:p-8 rounded-3xl border border-white/10 space-y-5">
           <div class="grid grid-cols-2 gap-4">
-            <div><label class="text-xs font-bold text-gray-300">Days</label><input type="number" id="bDays" value="4" min="1" max="90" class="w-full px-3 py-2 bg-spaceDark border border-white/15 rounded-xl text-sm text-white" oninput="calcBudget()" /></div>
+            <div><label class="text-xs font-bold text-gray-300">Days</label><input type="number" id="bDays" value="4" min="1" max="90" class="w-full px-3 py-2 bg-spaceDark border border-white/15 rounded-xl text-sm text-white" oninput="debouncedCalcBudget()" /></div>
             <div><label class="text-xs font-bold text-gray-300">Region Currency</label><input type="text" id="bCurrDisplay" readonly value="INR (₹)" class="w-full px-3 py-2 bg-spaceDark/60 border border-white/10 rounded-xl text-sm text-amberAccent font-bold" /></div>
           </div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🚆 Flights / Trains</span><span id="bValTrans">₹3,000</span></div><input type="range" id="bTrans" min="0" max="50000" step="500" value="3000" class="w-full accent-coralPrimary cursor-pointer" oninput="calcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🏨 Hostel (Per Night)</span><span id="bValStay">₹800</span></div><input type="range" id="bStay" min="200" max="10000" step="100" value="800" class="w-full accent-cyanAccent cursor-pointer" oninput="calcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🍜 Food (Per Day)</span><span id="bValFood">₹600</span></div><input type="range" id="bFood" min="100" max="8000" step="100" value="600" class="w-full accent-amberAccent cursor-pointer" oninput="calcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🎟️ Activities (Per Day)</span><span id="bValAct">₹400</span></div><input type="range" id="bAct" min="0" max="5000" step="100" value="400" class="w-full accent-emeraldAccent cursor-pointer" oninput="calcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🛡️ Emergency Buffer</span><span id="bValBuf">₹1,500</span></div><input type="range" id="bBuf" min="0" max="15000" step="250" value="1500" class="w-full accent-purpleAccent cursor-pointer" oninput="calcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🚆 Flights / Trains</span><span id="bValTrans">₹3,000</span></div><input type="range" id="bTrans" min="0" max="50000" step="500" value="3000" class="w-full accent-coralPrimary cursor-pointer" oninput="debouncedCalcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🏨 Hostel (Per Night)</span><span id="bValStay">₹800</span></div><input type="range" id="bStay" min="200" max="10000" step="100" value="800" class="w-full accent-cyanAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🍜 Food (Per Day)</span><span id="bValFood">₹600</span></div><input type="range" id="bFood" min="100" max="8000" step="100" value="600" class="w-full accent-amberAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🎟️ Activities (Per Day)</span><span id="bValAct">₹400</span></div><input type="range" id="bAct" min="0" max="5000" step="100" value="400" class="w-full accent-emeraldAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span>🛡️ Emergency Buffer</span><span id="bValBuf">₹1,500</span></div><input type="range" id="bBuf" min="0" max="15000" step="250" value="1500" class="w-full accent-purpleAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
         </div>
 
         <div class="md:col-span-5 glass-card p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col justify-between">
@@ -2377,32 +2377,60 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     // ========================================================
-    // SMART GLASS NAVBAR AUTO-HIDE / REVEAL ON SCROLL
+    // PERFORMANCE UTILITIES: DEBOUNCING & THROTTLING
+    // ========================================================
+    function debounce(func, wait = 200) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    function throttle(func, limit = 50) {
+      let inThrottle;
+      return function(...args) {
+        if (!inThrottle) {
+          func.apply(this, args);
+          inThrottle = true;
+          setTimeout(() => inThrottle = false, limit);
+        }
+      };
+    }
+
+    // ========================================================
+    // SMART GLASS NAVBAR AUTO-HIDE / REVEAL ON SCROLL (RAF THROTTLED)
     // ========================================================
     let lastScrollY = window.scrollY;
-    const scrollThreshold = 10;
+    let scrollTicking = false;
+    const scrollThreshold = 12;
     const headerEl = document.getElementById('mainHeader');
 
     window.addEventListener('scroll', () => {
-      const currentScrollY = window.scrollY;
-      if (!headerEl) return;
-
-      if (currentScrollY > 70) {
-        headerEl.classList.add('nav-scrolled');
-        if (currentScrollY > lastScrollY + scrollThreshold) {
-          // Scrolling Down -> Hide Navbar with smooth upward slide
-          headerEl.classList.add('nav-hidden');
-        } else if (currentScrollY < lastScrollY - scrollThreshold) {
-          // Scrolling Up -> Reveal Navbar with smooth spring drop
-          headerEl.classList.remove('nav-hidden');
-        }
-      } else {
-        // At top of page -> Keep visible and clean
-        headerEl.classList.remove('nav-scrolled');
-        headerEl.classList.remove('nav-hidden');
+      if (!scrollTicking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          if (headerEl) {
+            if (currentScrollY > 70) {
+              headerEl.classList.add('nav-scrolled');
+              if (currentScrollY > lastScrollY + scrollThreshold) {
+                // Scrolling Down -> Hide Navbar with smooth upward slide
+                headerEl.classList.add('nav-hidden');
+              } else if (currentScrollY < lastScrollY - scrollThreshold) {
+                // Scrolling Up -> Reveal Navbar with smooth spring drop
+                headerEl.classList.remove('nav-hidden');
+              }
+            } else {
+              // At top of page -> Keep visible and clean
+              headerEl.classList.remove('nav-scrolled');
+              headerEl.classList.remove('nav-hidden');
+            }
+          }
+          lastScrollY = Math.max(0, currentScrollY);
+          scrollTicking = false;
+        });
+        scrollTicking = true;
       }
-
-      lastScrollY = Math.max(0, currentScrollY);
     }, { passive: true });
 
     // ========================================================
@@ -2760,6 +2788,8 @@ HTML_CONTENT = """<!DOCTYPE html>
       } catch (e) {}
     }
 
+    const debouncedSavePlannerDraft = debounce(savePlannerDraft, 300);
+
     function initPlannerDraft() {
       try {
         // Clean up any legacy persistent localStorage from prior versions
@@ -2791,11 +2821,11 @@ HTML_CONTENT = """<!DOCTYPE html>
           }
         }
 
-        // 2. Attach Auto-Save listeners to all form controls
+        // 2. Attach Debounced Auto-Save listeners to all form controls
         ['plannerDest', 'plannerDays', 'plannerTier', 'plannerBudgetCap', 'plannerMustVisit', 'plannerPace'].forEach(id => {
           const el = document.getElementById(id);
           if (el) {
-            el.addEventListener('input', savePlannerDraft);
+            el.addEventListener('input', debouncedSavePlannerDraft);
             el.addEventListener('change', savePlannerDraft);
           }
         });
@@ -3176,18 +3206,46 @@ HTML_CONTENT = """<!DOCTYPE html>
       }
     }
 
+    let isPdfLibLoading = false;
+    function loadPdfEngine(callback) {
+      if (typeof html2pdf !== 'undefined') {
+        callback();
+        return;
+      }
+      if (isPdfLibLoading) {
+        showToast('PDF engine is initializing, please wait a moment...', 'info');
+        return;
+      }
+      isPdfLibLoading = true;
+      showToast('Loading PDF engine on demand...', 'info', 2500);
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+      s.async = true;
+      s.onload = () => {
+        isPdfLibLoading = false;
+        callback();
+      };
+      s.onerror = () => {
+        isPdfLibLoading = false;
+        showToast('Failed to load PDF library. Please check your connection.', 'error');
+      };
+      document.head.appendChild(s);
+    }
+
     function downloadTripPDF() {
       if (!currentTrip) return;
-      showToast('Generating and downloading your PDF itinerary...', 'info');
-      const el = document.getElementById('itineraryView');
-      const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `Trip_to_${currentTrip.trip_summary.destination}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-      html2pdf().set(opt).from(el).save();
+      loadPdfEngine(() => {
+        showToast('Generating and downloading your PDF itinerary...', 'info');
+        const el = document.getElementById('itineraryView');
+        const opt = {
+          margin: [10, 10, 10, 10],
+          filename: `Trip_to_${currentTrip.trip_summary.destination}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(el).save();
+      });
     }
 
     // --- Robust Saved Trips Storage & Management ---
@@ -3353,20 +3411,22 @@ HTML_CONTENT = """<!DOCTYPE html>
       const trip = trips.find(t => String(t.id) === String(id));
       if (!trip) return;
 
-      showToast('Preparing PDF export...', 'info');
-      const tempDiv = document.createElement('div');
-      tempDiv.className = 'itinerary-prose p-6 bg-slate-900 text-white rounded-xl';
-      tempDiv.innerHTML = safeMarkdown(trip.itinerary);
+      loadPdfEngine(() => {
+        showToast('Preparing PDF export...', 'info');
+        const tempDiv = document.createElement('div');
+        tempDiv.className = 'itinerary-prose p-6 bg-slate-900 text-white rounded-xl';
+        tempDiv.innerHTML = safeMarkdown(trip.itinerary);
 
-      const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `Trip_to_${trip.destination.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
+        const opt = {
+          margin: [10, 10, 10, 10],
+          filename: `Trip_to_${trip.destination.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
 
-      html2pdf().set(opt).from(tempDiv).save();
+        html2pdf().set(opt).from(tempDiv).save();
+      });
     }
 
     function deleteSavedTrip(id) {
@@ -3430,6 +3490,8 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('bTotal').innerText = `${sym}${Math.round(total).toLocaleString()}`;
       document.getElementById('bAvg').innerText = `Avg ${sym}${Math.round(total / days).toLocaleString()} / day`;
     }
+
+    const debouncedCalcBudget = debounce(calcBudget, 20);
 
     // ========================================================
     // SMART PACKING CHECKLIST SYSTEM
@@ -3939,10 +4001,24 @@ HTML_CONTENT = """<!DOCTYPE html>
 
       const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
 
-      window.addEventListener('resize', () => {
+      // Debounce window resize to eliminate layout thrashing
+      window.addEventListener('resize', debounce(() => {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-      });
+      }, 150), { passive: true });
+
+      // Throttle & pause canvas when touch-scrolling on mobile to prioritize main thread for UI
+      let isScrolling = false;
+      let scrollTimer = null;
+      window.addEventListener('scroll', () => {
+        if (isMobile) {
+          isScrolling = true;
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(() => {
+            isScrolling = false;
+          }, 120);
+        }
+      }, { passive: true });
 
       // 1. Cruising Airplanes with Contrails (Adaptive for Mobile)
       const planeCount = isMobile ? 2 : 6;
@@ -4090,13 +4166,26 @@ HTML_CONTENT = """<!DOCTYPE html>
       }
 
       let animRunning = true;
+      let lastFrameTime = 0;
+      const targetInterval = isMobile ? 33 : 16; // 30fps on mobile (saves 50% CPU/GPU), 60fps on desktop
+
       document.addEventListener('visibilitychange', () => {
         animRunning = !document.hidden;
         if (animRunning) requestAnimationFrame(animate);
       });
 
-      function animate() {
+      function animate(now = 0) {
         if (!animRunning) return;
+
+        requestAnimationFrame(animate);
+
+        // Pause canvas redraw while mobile user is scrolling to keep scrolling locked at 60/120fps
+        if (isMobile && isScrolling) return;
+
+        // Delta-time throttle
+        if (now - lastFrameTime < targetInterval) return;
+        lastFrameTime = now;
+
         ctx.clearRect(0, 0, width, height);
         const isLight = document.documentElement.classList.contains('light-theme') || document.body.classList.contains('light-theme');
 
@@ -4232,40 +4321,35 @@ HTML_CONTENT = """<!DOCTYPE html>
           ctx.stroke();
           ctx.restore();
         }
-
-        requestAnimationFrame(animate);
       }
 
       animate();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Immediately update saved trips count badge in navbar
+      // 1. Critical first paints: Badge count & Theme Mood & Page Switch
       updateSavedCount();
-
-      // 2. Initialize Theme Mood (Detects user device preference first)
       initThemeMood();
 
-      // 3. Initialize animated moving travel sky canvas background
-      initBackgroundCanvas();
-
-      // 4. Restore saved region (prevent resetting to INR on reload)
+      // 2. Restore saved region (prevent resetting to INR on reload)
       const savedRegion = localStorage.getItem('roamai_selected_region') || 'INR';
       onRegionChange(savedRegion, false);
 
-      // 5. Restore saved active page (prevent automatically resetting to home on reload)
+      // 3. Restore saved active page (prevent automatically resetting to home on reload)
       const hashPage = window.location.hash.replace('#', '');
       const savedPage = hashPage || localStorage.getItem('roamai_active_page') || 'home';
       switchPage(savedPage, false);
 
-      // 6. Restore Trip Architect Form Draft & Active Itinerary (prevents info loss on reload)
+      // 4. Restore Trip Architect Form Draft & Active Itinerary (prevents info loss on reload)
       initPlannerDraft();
 
-      // 7. Render packing checklist
-      renderPacking();
-
-      // 8. Render saved itineraries from persistent vault
-      renderSaved();
+      // 5. Defer non-critical background canvas and offline vault rendering to idle frames (avoids main-thread blocking on mobile startup)
+      const scheduleIdle = window.requestIdleCallback || function(cb) { setTimeout(cb, 16); };
+      scheduleIdle(() => {
+        initBackgroundCanvas();
+        renderPacking();
+        renderSaved();
+      });
     });
   </script>
 </body>
@@ -4273,7 +4357,9 @@ HTML_CONTENT = """<!DOCTYPE html>
 
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def serve_index():
-    return HTMLResponse(content=HTML_CONTENT, status_code=200)
+    response = HTMLResponse(content=HTML_CONTENT, status_code=200)
+    response.headers["Cache-Control"] = "public, max-age=600, stale-while-revalidate=86400"
+    return response
 
 if __name__ == "__main__":
     import uvicorn
