@@ -3543,36 +3543,36 @@ APP_JS = r"""// ========================================================
       veil.style.display = 'flex';
       if (bar) bar.style.transform = 'scaleX(0)';
 
-      // Theatrical 3.0-Second Progress Sequence (Paced to complete at 3.0s)
+      // Theatrical 2.4-Second Progress Sequence (Paced to complete at 2.4s)
       setTimeout(() => {
         if (bar) bar.style.transform = 'scaleX(0.30)';
         if (status) status.innerText = '🧭 CALIBRATING 9-REGION DESTINATIONS & CLIMATE';
-      }, 600);
+      }, 450);
 
       setTimeout(() => {
         if (bar) bar.style.transform = 'scaleX(0.60)';
         if (status) status.innerText = '📍 MAPPING STUDENT BUDGET HOTSPOTS & GPS PINS';
-      }, 1300);
+      }, 980);
 
       setTimeout(() => {
         if (bar) bar.style.transform = 'scaleX(0.85)';
         if (status) status.innerText = '🗺️ COMPOSING CURATED ITINERARY BLUEPRINT · GROQ AI';
-      }, 2050);
+      }, 1550);
 
       setTimeout(() => {
         if (bar) bar.style.transform = 'scaleX(1)';
         if (status) status.innerText = '✨ EXPEDITION READY · EMBARK ON YOUR JOURNEY';
-      }, 2700);
+      }, 2050);
 
-      // Reaches Ready State exactly at 3.0 seconds (3000ms)
+      // Reaches Ready State exactly at 2.4 seconds (2400ms)
       setTimeout(() => {
         veil.classList.add('ready');
-      }, 3000);
+      }, 2400);
 
-      // Auto-triggers dramatic curtain-raiser after ~4.6s if user has not interacted
+      // Auto-triggers dramatic curtain-raiser after 3.6s if user has not interacted
       let autoDismissTimer = setTimeout(() => {
         window.dismissVeil();
-      }, 4600);
+      }, 3600);
 
       // Click anywhere on veil or on button to dismiss immediately
       const onClickDismiss = (e) => {
