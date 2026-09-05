@@ -449,7 +449,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=600&q=80" alt="Goa Beaches" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -471,7 +471,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=600&q=80" alt="Manali Mountains" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.8</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -493,7 +493,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=600&q=80" alt="Jaipur Palace" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -515,7 +515,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=600&q=80" alt="Rishikesh River & Bridges" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -537,7 +537,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1571536802807-30451e3955d8?auto=format&fit=crop&w=600&q=80" alt="Varanasi Ganga Ghats" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.8</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -559,7 +559,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=600&q=80" alt="Munnar Tea Hills" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.8</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -581,7 +581,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=600&q=80" alt="Leh Ladakh Pangong Lake" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -603,7 +603,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80" alt="Meghalaya Living Root Bridge & Waterfalls" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-emeraldAccent border border-emeraldAccent/30 flex items-center gap-1">🇮🇳 National</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -629,7 +629,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=600&q=80" alt="Tokyo City" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇯🇵)</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -651,7 +651,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80" alt="Bali Beach" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇮🇩)</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.8</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -673,7 +673,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=600&q=80" alt="Bangkok Temples" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇹🇭)</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.8</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -695,7 +695,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80" alt="Rome Colosseum" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇮🇹)</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -717,7 +717,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1512470876302-972faa2aa9a4?auto=format&fit=crop&w=600&q=80" alt="Amsterdam Canals" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇳🇱)</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.8</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -739,7 +739,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80" alt="Kyoto Shrine" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇯🇵)</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.9</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.9</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -761,7 +761,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=600&q=80" alt="Paris Eiffel Tower" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇫🇷)</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.8</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -783,7 +783,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="relative rounded-2xl overflow-hidden h-44">
                 <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80" alt="Dubai Skyline" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                 <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-spaceDark/85 backdrop-blur-md text-[10px] font-extrabold text-cyanAccent border border-cyanAccent/30 flex items-center gap-1">✈️ International (🇦🇪)</span>
-                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent">⭐ 4.8</span>
+                <span class="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-bold text-amberAccent flex items-center gap-1"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>4.8</span>
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -904,7 +904,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4">
-            <div class="flex items-center gap-1 text-amberAccent text-xs">⭐⭐⭐⭐⭐</div>
+            <div class="flex items-center gap-1 text-amber-400 text-xs"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg></div>
             <p class="text-xs text-gray-300 leading-relaxed italic">"Planned our 5-day Goa college trip in 10 seconds. The hostel tips and budget calculator saved each of us ₹4,000!"</p>
             <div class="flex items-center gap-3 pt-2 border-t border-white/5">
               <div class="w-8 h-8 rounded-full bg-coralPrimary/30 flex items-center justify-center font-bold text-xs text-coralPrimary">AK</div>
@@ -916,7 +916,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
           </div>
 
           <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4">
-            <div class="flex items-center gap-1 text-amberAccent text-xs">⭐⭐⭐⭐⭐</div>
+            <div class="flex items-center gap-1 text-amber-400 text-xs"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg></div>
             <p class="text-xs text-gray-300 leading-relaxed italic">"The Tokyo ramen spots and subway pass suggestions were spot on. The interactive map made navigation super easy."</p>
             <div class="flex items-center gap-3 pt-2 border-t border-white/5">
               <div class="w-8 h-8 rounded-full bg-cyanAccent/30 flex items-center justify-center font-bold text-xs text-cyanAccent">SL</div>
@@ -928,7 +928,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
           </div>
 
           <div class="glass-card p-6 rounded-3xl border border-white/10 space-y-4">
-            <div class="flex items-center gap-1 text-amberAccent text-xs">⭐⭐⭐⭐⭐</div>
+            <div class="flex items-center gap-1 text-amber-400 text-xs"><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><svg class="w-3 h-3 inline-block fill-amber-400 text-amber-400 -mt-0.5" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg></div>
             <p class="text-xs text-gray-300 leading-relaxed italic">"Exporting the PDF itinerary for my Europe backpack tour gave me offline access throughout Rome and Amsterdam!"</p>
             <div class="flex items-center gap-3 pt-2 border-t border-white/5">
               <div class="w-8 h-8 rounded-full bg-emeraldAccent/30 flex items-center justify-center font-bold text-xs text-emeraldAccent">MR</div>

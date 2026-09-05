@@ -539,6 +539,34 @@ APP_CSS = r""":root {
       color: #0C4A6E !important;
     }
 
+    /* Essential Tips Items & Day Cards Typography in Light Theme */
+    .tip-item-card {
+      transition: all 0.2s ease;
+    }
+    .light-theme .tip-item-card {
+      background: #FFFFFF !important;
+      border: 1px solid #E2E8F0 !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    }
+    .light-theme .tip-item-card .tip-text {
+      color: #334155 !important;
+    }
+    .light-theme .tip-item-card .tip-text strong {
+      color: #0F172A !important;
+      font-weight: 700 !important;
+    }
+    .light-theme .day-card-body strong {
+      color: #0F172A !important;
+      font-weight: 700 !important;
+    }
+    .light-theme .day-card-body span,
+    .light-theme .day-card-body div {
+      color: #334155 !important;
+    }
+    .light-theme .day-card h4 {
+      color: #0F172A !important;
+    }
+
     /* Interactive Day Cards Styling */
     .day-card {
       transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);

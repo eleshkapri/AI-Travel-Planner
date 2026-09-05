@@ -1207,7 +1207,7 @@ APP_JS = r"""// ========================================================
       /* --- Marker styling by type --- */
       const markerConfig = {
         destination: { color: '#FF6B4A', icon: '📍', label: 'Destination', glow: 'rgba(255,107,74,0.4)' },
-        must_visit:  { color: '#FFB347', icon: '⭐', label: 'Must Visit',  glow: 'rgba(255,179,71,0.4)' },
+        must_visit:  { color: '#FFB347', icon: '★', label: 'Must Visit',  glow: 'rgba(255,179,71,0.4)' },
         landmark:    { color: '#4AEAFF', icon: '🏛️', label: 'Landmark',   glow: 'rgba(74,234,255,0.35)' }
       };
 
@@ -1317,6 +1317,23 @@ APP_JS = r"""// ========================================================
     function escapeHtml(str) {
       if (!str) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Convert markdown asterisks/stars (**bold**, *italic*) to clean HTML and eliminate raw asterisks
+    function formatInlineMarkdown(str) {
+      if (!str) return '';
+      let s = String(str).trim();
+      // Strip leading bullet markers if present
+      s = s.replace(/^[\-\*•]\s+/, '');
+      // HTML-escape to prevent script injection
+      s = escapeHtml(s);
+      // Double asterisks / stars: **bold** -> strong tag
+      s = s.replace(/\*\*([^*]+?)\*\*/g, '<strong class="font-bold text-slate-900 dark:text-white">$1</strong>');
+      // Single asterisks / stars: *italic* -> em tag
+      s = s.replace(/\*([^*]+?)\*/g, '<em class="italic text-slate-800 dark:text-gray-200">$1</em>');
+      // Clean up any remaining stray asterisks
+      s = s.replace(/\*{1,3}/g, '');
+      return s;
     }
 
     function parseItineraryMarkdown(markdown) {
@@ -1463,11 +1480,9 @@ APP_JS = r"""// ========================================================
 
     function renderDayCard(d) {
       const isStudent = (currentTrip && currentTrip.trip_summary && currentTrip.trip_summary.student_mode !== false);
-      const safeName = escapeHtml(d.landmarkName);
-      const safeZone = escapeHtml(d.zone);
-      let safeMorning = escapeHtml(d.morning);
-      let safeAfternoon = escapeHtml(d.afternoon);
-      let safeEvening = escapeHtml(d.evening);
+      let rawMorning = d.morning || '';
+      let rawAfternoon = d.afternoon || '';
+      let rawEvening = d.evening || '';
       let rawCleanHack = sanitizeTipContent(d.hack);
 
       const budgetInfo = getAdaptedBudget(currentTrip, isStudent);
@@ -1476,19 +1491,19 @@ APP_JS = r"""// ========================================================
 
       // Cleanse and enrich content when switching between Student and Standard Traveler Modes
       if (!isStudent) {
-        safeMorning = safeMorning
+        rawMorning = rawMorning
           .replace(/Flash your student ID card at the entry gate for 30% to 50% concession tickets\./gi, 'Pre-book priority admission online for effortless skip-the-line entry.')
           .replace(/Carry a refillable water bottle and flash your student ID card at ticket counters for instant 30% to 50% concession discounts\./gi, 'Reserve priority admission tickets online 48 hours in advance to bypass main queuing lines.')
           .replace(/indie backpacker/gi, 'panoramic boutique')
           .replace(/hostel/gi, 'hotel')
           .replace(/dorm/gi, 'private suite');
 
-        safeAfternoon = safeAfternoon
+        rawAfternoon = rawAfternoon
           .replace(/Eat where local university students eat; follow the crowds to backstreet family-run kitchens for 50% cheaper authentic regional meals\./gi, 'Explore celebrated neighborhood family-run kitchens and historic culinary spots for authentic regional flavors.')
           .replace(/budget street food stall/gi, 'celebrated local kitchen & artisan eatery')
           .replace(/cheap student/gi, 'authentic regional');
 
-        safeEvening = safeEvening
+        rawEvening = rawEvening
           .replace(/indie backpacker rooftop cafe/gi, 'scenic rooftop lounge')
           .replace(/communal hostel lounge/gi, 'serene heritage terrace lounge')
           .replace(/communal hostel hearth/gi, 'refined fireside terrace lounge')
@@ -1507,8 +1522,13 @@ APP_JS = r"""// ========================================================
         }
       }
 
-      let safeHack = escapeHtml(sanitizeTipContent(rawCleanHack));
-      const safeJsName = d.landmarkName.replace(/'/g, "\'");
+      const safeName = formatInlineMarkdown(d.landmarkName);
+      const safeZone = formatInlineMarkdown(d.zone);
+      const safeMorning = formatInlineMarkdown(rawMorning);
+      const safeAfternoon = formatInlineMarkdown(rawAfternoon);
+      const safeEvening = formatInlineMarkdown(rawEvening);
+      const safeHack = formatInlineMarkdown(sanitizeTipContent(rawCleanHack));
+      const safeJsName = String(d.landmarkName || '').replace(/['*]/g, '');
 
       let hackBoxHtml = '';
       if (safeHack) {
@@ -1556,9 +1576,9 @@ APP_JS = r"""// ========================================================
           </div>
         </div>
         <div id="body-${d.day}" class="day-card-body pt-2 space-y-2.5 text-xs text-gray-300 border-t border-white/5">
-          ${safeMorning ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02]"><span class="text-base leading-none select-none">☀️</span><div class="min-w-0"><strong class="text-white">Morning:</strong> ${safeMorning}</div></div>` : ''}
-          ${safeAfternoon ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02]"><span class="text-base leading-none select-none">🌤️</span><div class="min-w-0"><strong class="text-white">Afternoon:</strong> ${safeAfternoon}</div></div>` : ''}
-          ${safeEvening ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02]"><span class="text-base leading-none select-none">🌙</span><div class="min-w-0"><strong class="text-white">Evening:</strong> ${safeEvening}</div></div>` : ''}
+          ${safeMorning ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02] border border-white/5"><span class="text-base leading-none select-none">☀️</span><div class="min-w-0"><strong class="text-white dark:text-white font-bold mr-1">Morning:</strong>${safeMorning}</div></div>` : ''}
+          ${safeAfternoon ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02] border border-white/5"><span class="text-base leading-none select-none">🌤️</span><div class="min-w-0"><strong class="text-white dark:text-white font-bold mr-1">Afternoon:</strong>${safeAfternoon}</div></div>` : ''}
+          ${safeEvening ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02] border border-white/5"><span class="text-base leading-none select-none">🌙</span><div class="min-w-0"><strong class="text-white dark:text-white font-bold mr-1">Evening:</strong>${safeEvening}</div></div>` : ''}
           ${hackBoxHtml}
           ${budgetMain ? `<div class="flex items-center justify-between pt-1 text-[11px] text-gray-400"><span class="text-emeraldAccent font-semibold">💰 Target: ${budgetMain}</span><span class="text-gray-500 text-[10px]">${budgetDetail}</span></div>` : ''}
         </div>
@@ -1743,9 +1763,9 @@ APP_JS = r"""// ========================================================
                 .replace(/hostel/gi, 'hotel');
             }
             return `
-              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2">
-                <span class="text-coralPrimary text-sm leading-none">✓</span>
-                <div class="text-xs text-gray-300 dark:text-gray-300 light:text-slate-700">${escapeHtml(tip)}</div>
+              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 tip-item-card flex items-start gap-2.5 transition">
+                <span class="text-coralPrimary text-sm leading-none select-none mt-0.5 font-bold">✓</span>
+                <div class="text-xs text-gray-300 dark:text-gray-300 tip-text leading-relaxed">${formatInlineMarkdown(tip)}</div>
               </div>
             `;
           }).join('');
@@ -2041,12 +2061,12 @@ APP_JS = r"""// ========================================================
             `;
           }
 
-          const safeName = escapeHtml(d.landmarkName);
-          const safeZone = escapeHtml(d.zone);
-          const safeMorning = escapeHtml(d.morning);
-          const safeAfternoon = escapeHtml(d.afternoon);
-          const safeEvening = escapeHtml(d.evening);
-          const safeHack = escapeHtml(d.hack);
+          const safeName = formatInlineMarkdown(d.landmarkName);
+          const safeZone = formatInlineMarkdown(d.zone);
+          const safeMorning = formatInlineMarkdown(d.morning);
+          const safeAfternoon = formatInlineMarkdown(d.afternoon);
+          const safeEvening = formatInlineMarkdown(d.evening);
+          const safeHack = formatInlineMarkdown(d.hack);
           const safeBudget = escapeHtml(d.budget);
 
           daysHtml += `
@@ -2089,7 +2109,7 @@ APP_JS = r"""// ========================================================
               ${isStudent ? '🎒 Essential Student Travel Hacks & Guidance' : '🗺️ Essential Traveler Guidance & Local Tips'}
             </div>
             <div style="font-size: 10.5px; color: #334155; line-height: 1.5; display: flex; flex-direction: column; gap: 4px;">
-              ${parsed.tips.map(t => `<div>• ${escapeHtml(t)}</div>`).join('')}
+              ${parsed.tips.map(t => `<div>• ${formatInlineMarkdown(t)}</div>`).join('')}
             </div>
           </div>
         `;
