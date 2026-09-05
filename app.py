@@ -1,5 +1,6 @@
 import os
 import re
+import math
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
@@ -43,12 +44,193 @@ app.add_middleware(
 )
 
 # In-memory coordinate cache to optimize performance & reduce external OSM lookups
-COORD_CACHE = {}
+COORD_CACHE = {
+    # Goa
+    "goa": [15.2993, 74.1240],
+    "goa, india": [15.2993, 74.1240],
+    "calangute beach": [15.5425, 73.7556],
+    "calangute beach, goa": [15.5425, 73.7556],
+    "baga beach & tito's lane": [15.5574, 73.7510],
+    "baga beach, goa": [15.5574, 73.7510],
+    "fort aguada & 17th-century lighthouse": [15.4924, 73.7736],
+    "fort aguada, goa": [15.4924, 73.7736],
+    "anjuna flea market & curties cliff": [15.5764, 73.7440],
+    "anjuna flea market, goa": [15.5764, 73.7440],
+    "chapora fort & vagator bluff": [15.6060, 73.7353],
+    "chapora fort, goa": [15.6060, 73.7353],
+    "fontainhas latin quarter (panaji)": [15.4967, 73.8311],
+    "fontainhas, panaji, goa": [15.4967, 73.8311],
+    "panaji": [15.4989, 73.8278],
+    "panaji, goa": [15.4989, 73.8278],
+    "basilica of bom jesus (old goa)": [15.5007, 73.9117],
+    "basilica of bom jesus, goa": [15.5007, 73.9117],
+    "se cathedral (old goa)": [15.5034, 73.9126],
+    "se cathedral, goa": [15.5034, 73.9126],
+    "miramar beach & dona paula viewpoint": [15.4767, 73.8067],
+    "miramar beach, goa": [15.4767, 73.8067],
+    "reis magos fort & cultural center": [15.4965, 73.8091],
+    "reis magos fort, goa": [15.4965, 73.8091],
+    "divar island village ferry": [15.5251, 73.9078],
+    "divar island, goa": [15.5251, 73.9078],
+    "dudhsagar waterfalls trek": [15.3156, 74.3143],
+    "dudhsagar falls, goa": [15.3156, 74.3143],
+    "sahakari spice farm & plantations": [15.4167, 74.0167],
+    "sahakari spice farm, goa": [15.4167, 74.0167],
+    "colva beach & coastal promenade": [15.2858, 73.9105],
+    "colva beach, goa": [15.2858, 73.9105],
+    "benaulim beach & artisan crafts": [15.2570, 73.9160],
+    "benaulim beach, goa": [15.2570, 73.9160],
+    "cabo de rama fort & cliff": [15.0874, 73.9199],
+    "cabo de rama fort, goa": [15.0874, 73.9199],
+    "agonda beach & turtle sanctuary": [15.0423, 73.9865],
+    "agonda beach, goa": [15.0423, 73.9865],
+    "palolem beach & crescent bay": [15.0093, 74.0242],
+    "palolem beach, goa": [15.0093, 74.0242],
+    "butterfly beach & secret marine cove": [15.0195, 74.0016],
+    "butterfly beach, goa": [15.0195, 74.0016],
+    "arambol sweet water lake": [15.6790, 73.7050],
+    "arambol beach, goa": [15.6790, 73.7050],
+    "morjim beach (turtle nesting shore)": [15.6225, 73.7299],
+    "morjim beach, goa": [15.6225, 73.7299],
+    "chorao island & salim ali bird sanctuary": [15.5186, 73.8647],
+    "chorao island, goa": [15.5186, 73.8647],
+
+    # Manali & Kasol
+    "manali": [32.2396, 77.1887],
+    "manali, himachal pradesh, india": [32.2396, 77.1887],
+    "old manali village & cafes": [32.2530, 77.1764],
+    "hadimba devi temple & cedar woods": [32.2483, 77.1804],
+    "vashisht hot water sulfur springs": [32.2612, 77.1912],
+    "jogini waterfall trek": [32.2678, 77.1978],
+    "solang valley adventure hub": [32.3167, 77.1583],
+    "rohtang pass & snow plateau": [32.3716, 77.2466],
+    "sethan igloo village & hampta trail": [32.2030, 77.2280],
+    "kasol backpacker market & parvati river": [32.0100, 77.3150],
+    "chalal pine forest trail": [32.0150, 77.3250],
+    "manikaran sahib gurudwara & springs": [32.0270, 77.3480],
+    "tosh village & glacier viewpoints": [32.0180, 77.4490],
+    "kheerganga hot springs trek": [31.9890, 77.5140],
+    "naggar castle & roerich gallery": [32.1150, 77.1680],
+    "jana waterfall & local dhaba": [32.1350, 77.1920],
+
+    # Jaipur & Udaipur
+    "jaipur": [26.9124, 75.7873],
+    "jaipur, rajasthan, india": [26.9124, 75.7873],
+    "hawa mahal (palace of winds)": [26.9239, 75.8267],
+    "amer fort & elephant ramparts": [26.9855, 75.8513],
+    "city palace & courtyards": [26.9258, 75.8237],
+    "jantar mantar unesco observatory": [26.9248, 75.8246],
+    "nahargarh fort sunset bastion": [26.9372, 75.8156],
+    "jal mahal (water palace)": [26.9535, 75.8462],
+    "bapu bazaar & johari jewels": [26.9198, 75.8231],
+    "albert hall state museum": [26.9117, 75.8194],
+    "udaipur": [24.5854, 73.7125],
+    "lake pichola & boat jetty (udaipur)": [24.5765, 73.6800],
+    "city palace of udaipur": [24.5764, 73.6835],
+    "jag mandir island palace": [24.5681, 73.6780],
+    "monsoon palace (sajjangarh)": [24.5950, 73.6370],
+    "saheliyon-ki-bari fountains": [24.6015, 73.6854],
+    "fatehsagar lake promenade": [24.5986, 73.6740],
+
+    # Rishikesh
+    "rishikesh": [30.0869, 78.2676],
+    "rishikesh, uttarakhand, india": [30.0869, 78.2676],
+    "laxman jhula & suspension bridge": [30.1264, 78.3262],
+    "ram jhula & riverside ghats": [30.1189, 78.3144],
+    "triveni ghat (maha ganga aarti)": [30.1040, 78.2936],
+    "the beatles ashram (chaurasi kutia)": [30.1147, 78.3128],
+    "neer garh waterfall hike": [30.1444, 78.3378],
+    "shivpuri white-water rafting camp": [30.1420, 78.3890],
+    "vashistha meditative cave": [30.1580, 78.4120],
+    "kunjapuri devi sunrise temple": [30.1650, 78.3050],
+    "parmarth niketan ashram": [30.1170, 78.3130],
+
+    # Varanasi
+    "varanasi": [25.3176, 82.9739],
+    "varanasi, uttar pradesh, india": [25.3176, 82.9739],
+    "dashashwamedh ghat (grand evening aarti)": [25.3078, 83.0106],
+    "assi ghat (sunrise subah-e-banaras)": [25.2917, 83.0069],
+    "kashi vishwanath golden corridor": [25.3109, 83.0107],
+    "manikarnika sacred cremation ghat": [25.3108, 83.0142],
+    "sarnath dhamek stupa & deer park": [25.3811, 83.0214],
+    "banaras hindu university (bhu campus)": [25.2677, 82.9913],
+    "ramnagar fort & antique museum": [25.2688, 83.0289],
+    "godowlia market & chaat alleys": [25.3100, 83.0080],
+
+    # Munnar & Kochi
+    "munnar": [10.0889, 77.0595],
+    "munnar, kerala, india": [10.0889, 77.0595],
+    "fort kochi chinese fishing nets": [9.9657, 76.2422],
+    "mattancherry jew town & palace": [9.9575, 76.2592],
+    "eravikulam national park (nilgiri tahr)": [10.1500, 77.0500],
+    "tata tea museum & gardens": [10.0910, 77.0600],
+    "mattupetty dam & lake speedboating": [10.1060, 77.1240],
+    "top station western ghats vista": [10.1250, 77.2450],
+    "attukad misty waterfall": [10.0530, 77.0420],
+
+    # Leh Ladakh
+    "leh ladakh": [34.1526, 77.5771],
+    "leh ladakh, india": [34.1526, 77.5771],
+    "shanti stupa sunrise dome": [34.1680, 77.5810],
+    "leh royal palace": [34.1650, 77.5860],
+    "khardung la (high altitude pass)": [34.2789, 77.6044],
+    "nubra valley & hunder sand dunes": [34.5800, 77.4700],
+    "diskit monastery & maitreya buddha": [34.5420, 77.5600],
+    "pangong tso turquoise alpine lake": [33.7595, 78.6674],
+    "magnetic hill & gravity illusion": [34.1900, 77.3500],
+    "thiksey monastery gompa": [34.0580, 77.6670],
+
+    # Shillong & Meghalaya
+    "shillong": [25.5788, 91.8933],
+    "shillong, meghalaya, india": [25.5788, 91.8933],
+    "police bazar & live music cafes": [25.5760, 91.8840],
+    "ward's lake & cherry blossoms": [25.5740, 91.8880],
+    "elephant falls three-tier cascade": [25.5360, 91.8240],
+    "umiam lake (barapani watersports)": [25.6600, 91.9000],
+    "laitlum grand canyons": [25.4500, 91.9000],
+    "nohkalikai falls & cherrapunji": [25.2750, 91.7000],
+    "double decker living root bridge": [25.2500, 91.6700],
+    "dawki umngot crystal river": [25.1850, 92.0190],
+    "mawlynnong cleanest village": [25.2010, 91.9160],
+
+    # Tokyo
+    "tokyo": [35.6762, 139.6503],
+    "tokyo, japan": [35.6762, 139.6503],
+    "shibuya crossing & hachiko": [35.6595, 139.7005],
+    "senso-ji temple & asakusa street": [35.7148, 139.7967],
+    "akihabara anime & gaming district": [35.6984, 139.7731],
+    "shinjuku gyoen national garden": [35.6852, 139.7101],
+    "tokyo skytree panorama deck": [35.7101, 139.8107],
+    "meiji shrine & yoyogi forest": [35.6764, 139.6993],
+    "harajuku takeshita street fashion": [35.6716, 139.7032],
+    "tsukiji outer fish & seafood market": [35.6655, 139.7708],
+
+    # Bali
+    "bali": [-8.4095, 115.1889],
+    "bali, indonesia": [-8.4095, 115.1889],
+    "ubud monkey forest sanctuary": [-8.5194, 115.2606],
+    "tegallalang emerald rice terraces": [-8.4312, 115.2778],
+    "tanah lot sea temple & waves": [-8.6212, 115.0868],
+    "uluwatu cliff temple & kecak dance": [-8.8291, 115.0849],
+    "canggu echo beach surf breaks": [-8.6500, 115.1300],
+    "mount batur volcano sunrise trek": [-8.2421, 115.3753],
+    "nusa penida kelingking cliff bay": [-8.7500, 115.4700],
+
+    # Bangkok & Phuket
+    "bangkok": [13.7563, 100.5018],
+    "bangkok, thailand": [13.7563, 100.5018],
+    "grand palace & emerald buddha": [13.7500, 100.4914],
+    "wat arun (temple of dawn)": [13.7437, 100.4889],
+    "chatuchak weekend market": [13.7999, 100.5508],
+    "khao san road backpacker alley": [13.7589, 100.4974],
+    "patong beach & bangla nightlife": [7.8960, 98.2970],
+    "old phuket town sino-portuguese lanes": [7.8840, 98.3880],
+    "phi phi islands & maya bay": [7.7407, 98.7784]
+}
 
 def sanitize_str(val: Optional[str], max_len: int = 120) -> str:
     if not val:
         return ""
-    # Strip non-printable / control characters except basic punctuation
     cleaned = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', str(val)).strip()
     return cleaned[:max_len]
 
@@ -59,52 +241,328 @@ class TripRequest(BaseModel):
     budget_amount: Optional[str] = Field(default="", max_length=40)
     currency: Optional[str] = Field(default="USD", max_length=10)
     region: Optional[str] = Field(default="Global / USD", max_length=80)
-    interests: List[str] = Field(default=[], max_items=25)
+    interests: List[str] = Field(default=[], max_length=25)
     must_visit: Optional[str] = Field(default="", max_length=120)
     travel_pace: Optional[str] = Field(default="Balanced", max_length=40)
     accommodation_style: Optional[str] = Field(default="Hostel / Backpacker", max_length=60)
+    student_mode: Optional[bool] = Field(default=True)
 
-def get_coordinates(location_name: str):
+def get_destination_key(dest_str: Optional[str]) -> Optional[str]:
+    if not dest_str:
+        return None
+    dest_lower = dest_str.lower()
+    aliases = {
+        "goa": ["goa"],
+        "manali": ["manali", "kasol", "kullu"],
+        "jaipur": ["jaipur", "udaipur", "jodhpur", "rajasthan"],
+        "rishikesh": ["rishikesh", "haridwar", "dehradun"],
+        "varanasi": ["varanasi", "kashi", "banaras"],
+        "leh": ["leh", "ladakh"],
+        "tokyo": ["tokyo", "japan", "kyoto", "osaka"]
+    }
+    for k, words in aliases.items():
+        if any(w in dest_lower for w in words):
+            return k
+    return None
+
+def get_coordinates(location_name: str, destination_context: Optional[str] = None):
     if not location_name:
         return None
-    loc_key = location_name.strip().lower()
-    if loc_key in COORD_CACHE:
-        return COORD_CACHE[loc_key]
+    raw = location_name.strip()
+    cleaned = raw.lower()
+    cleaned = re.sub(r'^(destination:\s*|must visit:\s*)', '', cleaned).strip()
+    
+    # 1. Exact match on cleaned full query
+    if cleaned in COORD_CACHE:
+        return COORD_CACHE[cleaned]
+    
+    # 2. Extract primary landmark name if comma-separated
+    parts = [p.strip() for p in cleaned.split(",") if p.strip()]
+    primary = parts[0] if parts else cleaned
+    
+    # 3. Check within DESTINATION_DB for the given destination if available
+    dest_ctx = destination_context or (parts[1] if len(parts) > 1 else None)
+    dest_key = get_destination_key(dest_ctx) if dest_ctx else None
+    if dest_key and "DESTINATION_DB" in globals() and dest_key in DESTINATION_DB:
+        db_info = DESTINATION_DB[dest_key]
+        for lm in db_info.get("landmarks", []):
+            lm_name = lm[0].lower()
+            if primary in lm_name or lm_name in primary:
+                return lm[1]
+            p_tokens = set(re.findall(r'\b[a-z]{3,}\b', primary))
+            l_tokens = set(re.findall(r'\b[a-z]{3,}\b', lm_name))
+            if len(p_tokens & l_tokens) >= 2:
+                return lm[1]
+
+    # 4. Direct exact match on primary landmark
+    if primary in COORD_CACHE:
+        return COORD_CACHE[primary]
+        
+    # 5. Safe substring match against COORD_CACHE
+    for k, v in COORD_CACHE.items():
+        if len(k) < 4 or len(primary) < 4:
+            continue
+        # Primary landmark inside cached key (e.g. "shanti stupa" in "shanti stupa sunrise dome")
+        if primary in k:
+            return v
+        # Cached key inside primary only if it's a specific landmark (not a short city name)
+        if (len(k) >= 10 or " " in k) and k in primary:
+            return v
+
+    # 6. Geocoding via Nominatim fallback
     try:
-        geolocator = Nominatim(user_agent="roamai_travel_architect_v3_secure")
+        geolocator = Nominatim(user_agent="roamai_travel_architect_v4_secure")
         location = geolocator.geocode(location_name, timeout=5)
+        if not location and len(parts) > 1:
+            location = geolocator.geocode(parts[0], timeout=5)
         if location:
-            coords = [location.latitude, location.longitude]
-            COORD_CACHE[loc_key] = coords
+            coords = [round(location.latitude, 5), round(location.longitude, 5)]
+            COORD_CACHE[cleaned] = coords
+            COORD_CACHE[primary] = coords
             return coords
     except Exception:
         pass
+
     return None
 
-def generate_fallback_itinerary(destination: str, days: int, curr: str, region_info: str, budget_level: str, accom_style: str, interests: list, must_visit: str, pace: str) -> str:
+DESTINATION_DB = {
+    "goa": {
+        "title": "Sun-Kissed Coastlines, Portuguese Forts & Tropical Shacks",
+        "default_coords": [15.2993, 74.1240],
+        "dishes": ["Goan Fish Curry Thali", "Poi with Ros Omelette", "Chorizo Pao", "Bebinca Dessert", "Kingfish Rava Fry"],
+        "savings_tip": "Rent an automatic scooter (~₹350/day) to slash transit costs by 70% compared to local taxis. Eat at authentic local bhojanalayas for ₹150 hearty fish thalis.",
+        "transit_tip": "Use Kadamba state shuttle buses for budget inter-city travel between Panaji, Mapusa, and Margao (₹20-40 per ticket).",
+        "landmarks": [
+            ("Calangute Beach", [15.5425, 73.7556], "North Beach Strip", "Sunbathing, beach volleyball, and watersports along Goa's most famous coastal strip."),
+            ("Baga Beach & Tito's Lane", [15.5574, 73.7510], "North Nightlife Hub", "Beach shacks, live music, and evening student social gatherings."),
+            ("Fort Aguada & 17th-Century Lighthouse", [15.4924, 73.7736], "Historic North Coast", "Portuguese coastal fortification with panoramic Arabian Sea views."),
+            ("Anjuna Flea Market & Curties Cliff", [15.5764, 73.7440], "Bohemian North", "Handmade crafts, hippie clothing, and cliffside sunset acoustic sessions."),
+            ("Chapora Fort & Vagator Bluff", [15.6060, 73.7353], "North Hilltop", "Iconic Dil Chahta Hai ramparts overlooking red cliffs and Ozran Beach."),
+            ("Fontainhas Latin Quarter (Panaji)", [15.4967, 73.8311], "Central Heritage", "Pastel Portuguese colonial villas, quaint bakeries, and art galleries."),
+            ("Basilica of Bom Jesus (Old Goa)", [15.5007, 73.9117], "UNESCO Heritage Center", "16th-century baroque architecture and resting place of St. Francis Xavier."),
+            ("Se Cathedral (Old Goa)", [15.5034, 73.9126], "UNESCO Heritage Center", "Historic grand cathedral housing the legendary Golden Bell."),
+            ("Miramar Beach & Dona Paula Viewpoint", [15.4767, 73.8067], "Central Coast", "Breezy promenade where the Mandovi river merges into the Arabian Sea."),
+            ("Reis Magos Fort & Cultural Center", [15.4965, 73.8091], "Mandovi Riverfront", "Restored bastion showcasing Mario Miranda cartoons and harbor vistas."),
+            ("Divar Island Village Ferry", [15.5251, 73.9078], "River Island Escape", "Scenic hop-on car ferry across Mandovi river to tranquil heritage villages."),
+            ("Dudhsagar Waterfalls Trek", [15.3156, 74.3143], "Western Ghats Frontier", "Four-tiered majestic 310m waterfall enveloped in lush biodiversity jungle."),
+            ("Sahakari Spice Farm & Plantations", [15.4167, 74.0167], "Ponda Hinterland", "Guided organic spice walking tour with traditional Goan buffet lunch."),
+            ("Colva Beach & Coastal Promenade", [15.2858, 73.9105], "South Goa Shore", "Endless white sand shorelines, traditional fishing boats, and calm shacks."),
+            ("Benaulim Beach & Artisan Crafts", [15.2570, 73.9160], "South Coast Village", "Calm swimming waters, dolphin-spotting boat trips, and seaside dinners."),
+            ("Cabo de Rama Fort & Cliff", [15.0874, 73.9199], "Dramatic South Bastion", "Ancient cliffside citadel with breathtaking 270-degree turquoise sea vistas."),
+            ("Agonda Beach & Turtle Sanctuary", [15.0423, 73.9865], "Quiet South Shore", "Pristine, peaceful shores known for Olive Ridley turtle nesting and sunset tranquility."),
+            ("Palolem Beach & Crescent Bay", [15.0093, 74.0242], "Iconic South Paradise", "Gentle shallow turquoise bay, kayak rentals, and colorful beach cottages."),
+            ("Butterfly Beach & Secret Marine Cove", [15.0195, 74.0016], "Hidden South Enclave", "Secluded semicircular bay accessible by boat or jungle hike, famous for dolphins."),
+            ("Arambol Sweet Water Lake", [15.6790, 73.7050], "Far North Bohemian Haven", "Freshwater lagoon meeting the ocean, drum circles, and jungle trails."),
+            ("Morjim Beach (Turtle Nesting Shore)", [15.6225, 73.7299], "North Wildlife Sanctuary", "Protected serene beach known as Little Russia, perfect for quiet reading and sunset."),
+            ("Chorao Island & Salim Ali Bird Sanctuary", [15.5186, 73.8647], "Mangrove Estuary", "Serene canoe rides through estuarine mangrove swamps spotting kingfishers.")
+        ]
+    },
+    "manali": {
+        "title": "Himalayan Alpine Passes, Pine Valleys & Backpacker Trails",
+        "default_coords": [32.2396, 77.1887],
+        "dishes": ["Siddu with Ghee & Chutney", "Kullu Trout Fish", "Tibetan Thukpa & Momos", "Dham Feast", "Mittha Sweet Rice"],
+        "savings_tip": "Stay in backpacker hostels in Old Manali or Vashisht for ₹400-600/night with mountain views. Use shared HRTC local buses to Solang and Naggar for ₹25 instead of expensive cabs.",
+        "transit_tip": "Local Himachal Road Transport Corporation (HRTC) green buses connect Manali, Kullu, and Naggar every 30 minutes at budget student fares.",
+        "landmarks": [
+            ("Old Manali Village & Cafes", [32.2530, 77.1764], "Old Manali", "Cobblestone alleys, indie bakeries, apple orchards, and acoustic rooftop jams."),
+            ("Hadimba Devi Temple & Cedar Woods", [32.2483, 77.1804], "Cedar Forest", "Ancient 16th-century pagoda-style timber shrine surrounded by giant deodars."),
+            ("Vashisht Hot Water Sulfur Springs", [32.2612, 77.1912], "Thermal Springs", "Natural therapeutic hot sulfur baths and scenic rooftop cafes."),
+            ("Jogini Waterfall Trek", [32.2678, 77.1978], "Nature Trail", "Cascading multi-tiered alpine waterfall hike through pine forests and orchards."),
+            ("Solang Valley Adventure Hub", [32.3167, 77.1583], "Alpine Valley", "Paragliding, zorbing, ropeways, and stunning snowcapped Pir Panjal views."),
+            ("Rohtang Pass & Snow Plateau", [32.3716, 77.2466], "High Altitude Pass", "High-altitude 3,978m gateway with breathtaking 360-degree Himalayan vistas."),
+            ("Sethan Igloo Village & Hampta Trail", [32.2030, 77.2280], "Offbeat Enclave", "Traditional Buddhist horse-riding hamlet overlooking the Dhauladhar range."),
+            ("Kasol Backpacker Market & Parvati River", [32.0100, 77.3150], "Parvati Valley", "Riverside Israeli bakeries, psychedelic art cafes, and pine woods."),
+            ("Chalal Pine Forest Trail", [32.0150, 77.3250], "Parvati Valley", "Tranquil hiking trail along the crystal turquoise Parvati river."),
+            ("Manikaran Sahib Gurudwara & Springs", [32.0270, 77.3480], "Sacred Valley", "Famous geothermal hot springs, free community langar, and sacred river ghats."),
+            ("Tosh Village & Glacier Viewpoints", [32.0180, 77.4490], "Upper Parvati", "Cliff-hanging village with dramatic views of snow peaks and glacier streams."),
+            ("Kheerganga Hot Springs Trek", [31.9890, 77.5140], "Alpine Summit", "Rewarding 12km forest trek culminating in natural hot sulfur springs atop the mountain."),
+            ("Naggar Castle & Roerich Gallery", [32.1150, 77.1680], "Heritage Valley", "15th-century wood-and-stone royal fortress overlooking the Beas valley."),
+            ("Jana Waterfall & Local Dhaba", [32.1350, 77.1920], "Hidden Falls", "Scenic waterfall setting serving authentic traditional Himachali food on leaf plates.")
+        ]
+    },
+    "jaipur": {
+        "title": "Royal Fortresses, Grand Palaces & Vibrant Bazaars",
+        "default_coords": [26.9124, 75.7873],
+        "dishes": ["Pyaaz Kachori & Lassi", "Dal Baati Churma", "Laal Maas", "Ghewar Sweet", "Mirchi Vada"],
+        "savings_tip": "Buy the Rajasthan Tourism composite student ticket (~₹100) which grants entry to Amer Fort, Hawa Mahal, Jantar Mantar, Nahargarh, and Albert Hall.",
+        "transit_tip": "Use the Jaipur Metro from Mansarovar to Badi Chaupar (₹15) to reach Old Pink City monuments instantly without traffic.",
+        "landmarks": [
+            ("Hawa Mahal (Palace of Winds)", [26.9239, 75.8267], "Pink City Core", "Iconic five-story pink sandstone honeycomb facade with 953 jharokhas."),
+            ("Amer Fort & Elephant Ramparts", [26.9855, 75.8513], "Amber Hills", "Massive hilltop Rajput fortress featuring Sheesh Mahal mirror mosaics."),
+            ("City Palace & Courtyards", [26.9258, 75.8237], "Royal Quarter", "Royal residence blending Mughal and Rajput architecture with Peacock Gate."),
+            ("Jantar Mantar UNESCO Observatory", [26.9248, 75.8246], "Historic Science", "World's largest stone sundial and 18th-century astronomical instruments."),
+            ("Nahargarh Fort Sunset Bastion", [26.9372, 75.8156], "Aravalli Ridge", "Edge-of-the-cliff ramparts with the best sunset panorama over Jaipur city."),
+            ("Jal Mahal (Water Palace)", [26.9535, 75.8462], "Man Sagar Lake", "Serene floating red sandstone palace in the center of Man Sagar Lake."),
+            ("Bapu Bazaar & Johari Jewels", [26.9198, 75.8231], "Pink City Bazaar", "Bustling traditional market for jaipuri quilts, mojris, and street snacks."),
+            ("Albert Hall State Museum", [26.9117, 75.8194], "Ram Niwas Garden", "Indo-Saracenic museum housing royal artifacts and lit up brilliantly at night."),
+            ("Lake Pichola & Boat Jetty (Udaipur)", [24.5765, 73.6800], "Lakeside Udaipur", "Romantic boat cruises past floating marble palaces on tranquil waters."),
+            ("City Palace of Udaipur", [24.5764, 73.6835], "Lakeside Citadel", "Sprawling lakeside palace complex with ornate balconies and mirror domes."),
+            ("Jag Mandir Island Palace", [24.5681, 73.6780], "Lake Island", "Garden palace on Lake Pichola surrounded by stone elephants and arches."),
+            ("Monsoon Palace (Sajjangarh)", [24.5950, 73.6370], "Hilltop Peak", "Hilltop palace built to track monsoon clouds, offering stunning sunset views.")
+        ]
+    },
+    "rishikesh": {
+        "title": "Yoga Capitals, Sacred Ganga Rapids & Beatles Trails",
+        "default_coords": [30.0869, 78.2676],
+        "dishes": ["Aloo Puri by the Ghats", "Ayurvedic Thali", "Wood-fired Pizza & Chai", "Garhwali Kafuli", "Fresh Fruit Smoothie Bowls"],
+        "savings_tip": "Stay in riverside backpacker camps or ashrams in Tapovan for ₹300-500/night. Rent a bicycle to navigate between Laxman Jhula and Ram Jhula.",
+        "transit_tip": "Shared Vikram three-wheelers ferry travelers between Rishikesh Bus Stand, Triveni Ghat, and Tapovan for just ₹15-20.",
+        "landmarks": [
+            ("Laxman Jhula & Suspension Bridge", [30.1264, 78.3262], "River Crossing", "Iconic iron suspension bridge across the emerald Ganga with views of riverside temples."),
+            ("Ram Jhula & Riverside Ghats", [30.1189, 78.3144], "Spiritual Hub", "Spiritual pedestrian bridge surrounded by Vedic ashrams, bookstores, and tea stalls."),
+            ("Triveni Ghat (Maha Ganga Aarti)", [30.1040, 78.2936], "Sacred Ghat", "Dusk ritual with synchronized brass lamps, Vedic chanting, and floating leaf diyas."),
+            ("The Beatles Ashram (Chaurasi Kutia)", [30.1147, 78.3128], "Rajaji Forest Edge", "Graffiti-covered meditation domes where The Beatles wrote the White Album in 1968."),
+            ("Neer Garh Waterfall Hike", [30.1444, 78.3378], "Jungle Trail", "Multi-tiered turquoise mountain spring waterfall with natural swimming pools."),
+            ("Shivpuri White-Water Rafting Camp", [30.1420, 78.3890], "Rapid Zone", "Grade III/IV adrenaline rapids through roller-coaster and golf-course gorges."),
+            ("Vashistha Meditative Cave", [30.1580, 78.4120], "Ganga Riverside", "Ancient peaceful meditation cave located right on a quiet white-sand river beach."),
+            ("Kunjapuri Devi Sunrise Temple", [30.1650, 78.3050], "Himalayan Ridge", "Ridge-top temple offering unforgettable sunrise panoramas of high Himalayan snow peaks."),
+            ("Parmarth Niketan Ashram", [30.1170, 78.3130], "Ghat Promenade", "Sprawling spiritual haven with clean gardens, yoga halls, and iconic Shiva statue.")
+        ]
+    },
+    "tokyo": {
+        "title": "Neon Metropolises, Ancient Shrines & Pop Culture",
+        "default_coords": [35.6762, 139.6503],
+        "dishes": ["Tonkotsu Ramen (Ichiran)", "Tsukiji Fresh Sushi", "Crispy Takoyaki", "Matcha Soft Serve", "Yakitori Skewers"],
+        "savings_tip": "Buy the 72-hour Tokyo Subway Ticket (~¥1,500) for unlimited rides on all Tokyo Metro and Toei Subway lines. Eat budget meals at 7-Eleven and Lawson.",
+        "transit_tip": "Use a digital Suica or Pasmo card on your smartphone for tap-and-go rides across all trains, buses, and convenience stores.",
+        "landmarks": [
+            ("Shibuya Crossing & Hachiko", [35.6595, 139.7005], "Shibuya", "World's busiest pedestrian intersection illuminated by giant neon screens."),
+            ("Senso-ji Temple & Asakusa Street", [35.7148, 139.7967], "Asakusa", "Tokyo's oldest Buddhist temple fronted by vibrant traditional food stalls."),
+            ("Akihabara Anime & Gaming District", [35.6984, 139.7731], "Akihabara", "Mecca of anime culture, retro arcade halls, manga stores, and electronics."),
+            ("Shinjuku Gyoen National Garden", [35.6852, 139.7101], "Shinjuku", "Lush sprawling oasis blending traditional Japanese, English, and French gardens."),
+            ("Tokyo Skytree Panorama Deck", [35.7101, 139.8107], "Sumida", "Tallest tower in the world offering views spanning Mount Fuji to Tokyo Bay."),
+            ("Meiji Shrine & Yoyogi Forest", [35.6764, 139.6993], "Harajuku", "Tranquil Shinto shrine enveloped in an evergreen forest of over 120,000 trees."),
+            ("Harajuku Takeshita Street Fashion", [35.6716, 139.7032], "Harajuku", "Bustling youth fashion alley famous for crepe stands, kawaii boutiques, and vintage shops."),
+            ("Tsukiji Outer Fish & Seafood Market", [35.6655, 139.7708], "Chuo", "Historic food market serving fresh sashimi, tamagoyaki, and grilled seafood.")
+        ]
+    },
+    "leh": {
+        "title": "Himalayan Moonscapes, High Mountain Passes & Buddhist Monasteries",
+        "default_coords": [34.1526, 77.5771],
+        "dishes": ["Ladakhi Thukpa & Skyu", "Butter Tea (Gur Gur Chai)", "Tingmo with Veggie Stew", "Chhurpi Yak Cheese", "Apricot Jam with Khambir Bread"],
+        "savings_tip": "Rent an Enfield or scooter in Leh Main Market for ₹800-1200/day to explore Sham Valley and Thiksey. Stay in traditional family homestays in Changspa for ₹500/night.",
+        "transit_tip": "Shared local JKSRTC buses and shared taxis run from Leh Bus Stand to Nubra, Pangong, and Thiksey at a fraction of private taxi union rates.",
+        "phases": [
+            ("Phase 1: Acclimatization & Central Indus Valley Monasteries", "Central Leh & Upper Indus", "Focus on gentle altitude acclimatization, royal palaces, Tibetan heritage bazaars, and hillside gompas."),
+            ("Phase 2: Ancient Silk Route & Sham Valley Moonland Circuit", "Sham Valley & Lower Ladakh", "Dramatic moonland canyons, magnetic anomalies, Basgo mud fortress, and millennium-old Alchi frescoes."),
+            ("Phase 3: Crossing Khardung La into Nubra Valley & Karakoram Frontiers", "Nubra & Shyok Valleys", "High passes at 5,359m, Bactrian camel safaris in Hunder dunes, Colossal Maitreya, and Balti villages."),
+            ("Phase 4: Changthang High Plateau, Alpine Lakes & Hanle Dark Sky Reserve", "Changthang & High Lakes", "134km turquoise Pangong Tso, high wetlands of Tso Moriri, white salt flats of Tso Kar, and Hanle astrophotography."),
+            ("Phase 5: The Great Zanskar Trans-Himalayan & Suru Valley Expedition", "Zanskar & Suru Valley", "Deep glacial valleys under 7,135m Nun-Kun peaks, cliffside Phuktal cave monastery, and ancient Padum capital.")
+        ],
+        "landmarks": [
+            ('Leh Main Market & Heritage Bazaar', [34.1642, 77.5848], 'Leh Center', 'Vibrant pedestrian market with Tibetan jewelry, pashmina shawls, and apricot stalls.'),
+            ('Leh Royal Palace & Tsemo Ridge', [34.1656, 77.5862], 'Old Town Ridge', 'Historic 17th-century nine-story Tibetan royal palace overlooking Leh city.'),
+            ('Shanti Stupa Sunrise Dome', [34.1685, 77.5815], 'Changspa Hill', 'White-domed Buddhist stupa offering spectacular 360-degree views of the Indus Valley.'),
+            ('Hall of Fame Military Museum', [34.1415, 77.545], 'Airport Road', 'Memorial museum built by Indian Army honoring Himalayan soldiers and Ladakhi culture.'),
+            ('Spituk Gompa Monastery', [34.1298, 77.5255], 'Spituk', '11th-century hilltop monastery overlooking the Indus river and airstrip.'),
+            ('Shey Palace & Monastic Sanctuary', [34.072, 77.634], 'Shey Valley', 'Former summer capital of Ladakh housing a giant copper-gilt Shakyamuni Buddha.'),
+            ('Thiksey Monastery (Mini Potala)', [34.0585, 77.6672], 'Indus Valley', "Twelve-story architectural wonder resembling Lhasa's Potala Palace."),
+            ('Hemis Monastery & Antique Museum', [33.9125, 77.707], 'Hemis Gorge', 'Largest and richest Buddhist monastery in Ladakh, famous for its annual masked dance festival.'),
+            ("Stakna Monastery (Tiger's Nose)", [34.004, 77.685], 'Indus Bank', 'Picturesque monastery perched dramatically on a rock resembling a tiger leaping.'),
+            ('Matho Monastery & Oracle Sanctuary', [33.998, 77.645], 'Matho Village', '500-year-old Sakya sect monastery renowned for its mysterious trance-oracle festivals.'),
+            ('Stok Royal Palace & Museum', [34.0025, 77.567], 'Stok Valley', 'Ancestral residence of the Ladakh royal family housing royal crowns and ancient thangkas.'),
+            ('Saboo Village & Nature Trails', [34.138, 77.625], 'Saboo Oasis', 'Tranquil green oasis village with traditional Ladakhi mud homes and medicinal springs.'),
+            ('Magnetic Hill Gravity Anomaly', [34.1912, 77.3524], 'Srinagar-Leh Highway', 'Famous optical illusion spot where parked vehicles appear to roll uphill.'),
+            ('Gurudwara Pathar Sahib', [34.185, 77.382], 'Highway Fortress', "Historic 16th-century Sikh shrine built to commemorate Guru Nanak's visit."),
+            ('Sangam (Indus & Zanskar Confluence)', [34.166, 77.334], 'Nimmu', 'Breathtaking meeting point of the brown Indus and emerald Zanskar rivers.'),
+            ('Basgo Fortress Ruins & Frescoes', [34.221, 77.284], 'Basgo Citadel', 'Dramatic medieval clay mud-brick fortress and UNESCO-recognized ancient Buddha temple.'),
+            ('Likir Monastery & Giant Maitreya', [34.293, 77.215], 'Likir Valley', 'Majestic monastery housing a 75-foot open-air golden Buddha amidst apricot orchards.'),
+            ('Alchi Choskor 11th-Century Murals', [34.223, 77.175], 'Alchi Oasis', 'World-renowned Kashmiri-Buddhist painted murals and woodcarvings on the Indus river bank.'),
+            ('Mangyu Hidden Monastic Hermitage', [34.246, 77.112], 'Hidden Canyon', 'Secluded 11th-century temple complex tucked away in a scenic mountain gorge.'),
+            ('Lamayuru Moonland & Ancient Gompa', [34.283, 76.774], 'Moonland Canyon', "Extraterrestrial lunar landscape cliffs and Ladakh's oldest Yungdrung Bon-Buddhist monastery."),
+            ('Wanla Historic Fortress & Temple', [34.254, 76.832], 'Wanla Gorge', 'Picturesque cliff-perched 14th-century monastery and royal defense ruins.'),
+            ('Tingmosgang Royal Fortress & Nunnery', [34.312, 77.015], 'Tingmosgang', '15th-century historical capital with royal fortress ruins and lush apple orchards.'),
+            ('Khardung La Pass (5,359m Summit)', [34.2789, 77.6044], 'High Altitude Pass', 'World-famous 5,359m high-altitude pass connecting Leh to the Nubra Valley.'),
+            ('Diskit Monastery & Colossal Buddha', [34.5422, 77.5615], 'Nubra Valley', '14th-century cliff monastery crowned with a colossal 32-meter golden Buddha.'),
+            ('Hunder Sand Dunes & Bactrian Camels', [34.583, 77.472], 'Nubra Desert', 'High-altitude cold desert sand dunes featuring double-humped Bactrian camel safaris.'),
+            ('Sumur Samstanling Monastery Oasis', [34.625, 77.628], 'Nubra Riverside', 'Peaceful 19th-century Gelugpa monastery surrounded by prayer flags and berry groves.'),
+            ('Panamik Sulfur Hot Springs', [34.789, 77.534], 'Upper Nubra', 'Natural therapeutic hot mineral sulfur pools near the Siachen glacier base.'),
+            ('Turtuk Balti Heritage Village', [34.889, 76.828], 'Shyok Valley', 'Picturesque border village rich in Balti Muslim heritage, stone houses, and apricots.'),
+            ('Tyakshi Indo-Pak Border Outpost', [34.845, 76.762], 'Northern Frontier', 'Northernmost point accessible to travelers with sweeping views of the Line of Control.'),
+            ('Ensa Gompa Hermitage', [34.72, 77.58], 'Karakoram Cliff', 'Solitary ancient hermitage perched high on a sheer rock overlooking the Nubra river.'),
+            ('Chang La Pass (5,360m Snow Summit)', [34.048, 77.93], 'Mountain Pass', 'Dramatic 5,360m snowy mountain pass en route to Pangong Lake.'),
+            ('Tangtse Caravan Serai & Valley', [34.027, 78.188], 'Tangtse Hub', 'Traditional trading outpost village with ancient petroglyphs and Changthang yak pastures.'),
+            ('Pangong Tso Alpine Lake (Spangmik)', [33.918, 78.657], 'Changthang Shore', 'Iconic 134km-long turquoise blue salt-water lake extending from India to Tibet.'),
+            ('Man & Merak Remote Shoreline', [33.824, 78.785], 'Far Pangong', 'Quiet traditional lakefront hamlets offering intimate homestays and crystal-clear star views.'),
+            ('Chushul War Memorial & Plains', [33.593, 78.658], 'Border Plateau', 'Historic 1962 battle memorial situated on a vast highland grassland plain.'),
+            ('Nyoma Indus Bend & Monastery', [33.2, 78.667], 'Nyoma Plains', 'Riverside township with high-altitude air strip and ancient Buddhist hermitage.'),
+            ('Hanle Dark Sky Reserve & Observatory', [32.78, 78.96], 'Hanle Basin', "India's premier certified International Dark Sky Reserve housing the Himalayan Chandra Telescope."),
+            ('Umling La Pass (19,024 ft World Highest)', [32.695, 79.28], 'Highest Motor Road', "World's highest motorable pass crossing 19,024 feet over the Karakoram range."),
+            ('Tso Moriri High Wetland (Korzok)', [32.967, 78.256], 'Rupshu Valley', 'Serene, remote Ramsar wetland lake inhabited by nomadic Changpa tribes and bar-headed geese.'),
+            ('Tso Kar Salt Lake & Wildlife Basin', [33.31, 78.005], 'Tso Kar Plains', 'White salt-crusted lake basin teeming with rare black-necked cranes and Tibetan wild asses (Kiang).'),
+            ('Puga Geothermal Sulfur Valley', [33.22, 78.33], 'Geothermal Basin', 'Eerily beautiful geothermal valley with bubbling mud springs, sulfur geysers, and steam vents.'),
+            ('Kargil Heritage Town & Riverwalk', [34.5539, 76.1349], 'Suru Riverfront', 'Historic Silk Route crossroads bustling with Balti brass bazaars and dry fruit markets.'),
+            ('Drass Kargil War Memorial & Tololing', [34.428, 75.76], 'Drass Valley', 'Second coldest inhabited place in the world and revered memorial honoring 1999 heroes.'),
+            ('Suru Valley & Nun-Kun Glacier Peaks', [34.11, 75.98], 'Suru Valley', 'Lush emerald mountain valley framed by the colossal 7,135m twin peaks of Nun and Kun.'),
+            ('Rangdum Fortress Monastery', [34.02, 76.32], 'Isolated Plateau', '18th-century Tibetan fortress monastery rising like an island in a vast windswept plain.'),
+            ('Pensi La Pass (Gateway to Zanskar)', [33.85, 76.37], 'Glacial Pass', '4,400m pass overlooking the colossal hanging tongue of the Drang-Drung Glacier.'),
+            ('Padum Ancient Zanskar Capital', [33.468, 76.879], 'Zanskar Center', 'Historic heart of Zanskar valley with traditional stupas, tea stalls, and apricot orchards.'),
+            ('Karsha Monastic City on Cliff', [33.525, 76.905], 'Karsha Ridge', "Zanskar's largest Gelugpa monastery complex cascading dramatically down a sheer mountain cliff."),
+            ('Phuktal Cliffside Cave Monastery', [33.272, 77.182], 'Tsarap Gorge', 'Legendary monastery constructed inside a massive natural cave over a limestone canyon.'),
+            ('Zangla Royal Palace & Nunnery', [33.665, 76.985], 'Zangla Valley', 'Cliffside ruins of the former Zangla kings where Hungarian scholar Csoma de Kőrös lived in 1823.'),
+            ('Shinku La Pass & Gombo Rangjon', [32.98, 77.2], 'Zanskar Frontier', 'Dramatic high pass guarded by the sacred monolithic rock tower of Gombo Rangjon.')
+        ]
+    },
+    "varanasi": {
+        "title": "Eternal Sacred Ghats, Spiritual Boat Rides & Ancient Lanes",
+        "default_coords": [25.3176, 82.9739],
+        "dishes": ["Banarasi Tamatar Chaat", "Malaiyo Saffron Froth", "Blue Lassi & Rabdi", "Kachori Jalebi Breakfast", "Baati Chokha"],
+        "savings_tip": "Take budget shared wooden rowboats at Assi Ghat for ₹100 per person at sunrise instead of expensive private motorboats.",
+        "transit_tip": "Explore the historic riverfront alleys on foot, and use e-rickshaws for ₹20-30 between Godowlia and Lanka (BHU).",
+        "landmarks": [
+            ("Dashashwamedh Ghat (Grand Evening Aarti)", [25.3078, 83.0106], "Main Riverfront", "Spectacular synchronized Maha Aarti with brass lamps and devotional hymns."),
+            ("Assi Ghat (Sunrise Subah-e-Banaras)", [25.2917, 83.0069], "Southern Ghat", "Serene dawn classical music, morning yoga, and boat embarkation point."),
+            ("Kashi Vishwanath Golden Corridor", [25.3109, 83.0107], "Sacred Core", "Revered golden-spire Jyotirlinga temple connecting directly to the Ganga."),
+            ("Manikarnika Sacred Cremation Ghat", [25.3108, 83.0142], "Historic Riverfront", "Ancient holy cremation ghat steeped in Hindu philosophy of Moksha."),
+            ("Sarnath Dhamek Stupa & Deer Park", [25.3811, 83.0214], "Buddhist Pilgrimage", "Sacred site where Lord Buddha delivered his first sermon post-enlightenment."),
+            ("Banaras Hindu University (BHU Campus)", [25.2677, 82.9913], "Lanka", "Sprawling heritage university campus housing the New Vishwanath Temple."),
+            ("Ramnagar Fort & Antique Museum", [25.2688, 83.0289], "Eastern Bank", "18th-century sandstone fortress of the Kashi Naresh with royal vintage car collections."),
+            ("Godowlia Market & Chaat Alleys", [25.3100, 83.0080], "Old City", "Bustling foodie haven famous for spicy tamatar chaat and silk sari weaving shops.")
+        ]
+    }
+}
+
+# Auto-populate COORD_CACHE with all default coords and landmarks from DESTINATION_DB
+for dest_k, dest_val in DESTINATION_DB.items():
+    if "default_coords" in dest_val:
+        COORD_CACHE[dest_k.lower()] = dest_val["default_coords"]
+    for lm in dest_val.get("landmarks", []):
+        if len(lm) > 1 and lm[1]:
+            COORD_CACHE[lm[0].lower().strip()] = lm[1]
+
+def generate_fallback_itinerary(
+    destination: str,
+    days: int,
+    curr: str,
+    region_info: str,
+    budget_level: str,
+    accom_style: str,
+    interests: list,
+    must_visit: str,
+    pace: str,
+    student_mode: bool = True
+) -> str:
     multipliers = {
-        "INR": 1.0,
-        "USD": 0.012,
-        "EUR": 0.011,
-        "GBP": 0.0095,
-        "JPY": 1.8,
-        "AUD": 0.018,
-        "CAD": 0.016,
-        "AED": 0.044,
-        "THB": 0.44
+        "INR": 1.0, "USD": 0.012, "EUR": 0.011, "GBP": 0.0095, "JPY": 1.8,
+        "AUD": 0.018, "CAD": 0.016, "AED": 0.044, "THB": 0.44
     }
     m = multipliers.get(curr, 0.012)
-    
-    tier_mult = 1.0
-    if "Moderate" in budget_level:
-        tier_mult = 1.8
-    elif "Luxury" in budget_level:
-        tier_mult = 3.5
+    tier_mult = 1.8 if ("Moderate" in budget_level or "Comfort" in budget_level) else (3.5 if ("Luxury" in budget_level or "Executive" in budget_level) else 1.0)
 
-    base_stay = int(800 * m * tier_mult)
-    base_food = int(500 * m * tier_mult)
-    base_trans = int(300 * m * tier_mult)
-    base_act = int(400 * m * tier_mult)
+    if student_mode:
+        base_stay = int(800 * m * tier_mult)
+        base_food = int(500 * m * tier_mult)
+        base_trans = int(300 * m * tier_mult)
+        base_act = int(400 * m * tier_mult)
+        if not accom_style or accom_style == "Hostel":
+            accom_style = "Hostel / Backpacker"
+    else:
+        base_stay = int(2200 * m * tier_mult)
+        base_food = int(1000 * m * tier_mult)
+        base_trans = int(600 * m * tier_mult)
+        base_act = int(800 * m * tier_mult)
+        if not accom_style or accom_style == "Hostel":
+            accom_style = "Boutique Hotel / Comfort Stay"
 
     total_stay = base_stay * days
     total_food = base_food * days
@@ -112,58 +570,222 @@ def generate_fallback_itinerary(destination: str, days: int, curr: str, region_i
     total_act = base_act * days
     est_total = total_stay + total_food + total_trans + total_act
 
-    mv_text = f" (including priority stop at {must_visit})" if must_visit else ""
-    interest_desc = ", ".join(interests) if interests else "Sightseeing, Local Street Food & Hidden Gems"
+    dest_lower = destination.lower()
+    dest_key = None
+    aliases = {
+        "goa": ["goa"],
+        "manali": ["manali", "kasol", "kullu"],
+        "jaipur": ["jaipur", "udaipur", "jodhpur", "rajasthan"],
+        "rishikesh": ["rishikesh", "haridwar", "dehradun"],
+        "varanasi": ["varanasi", "kashi", "banaras"],
+        "leh": ["leh", "ladakh"],
+        "tokyo": ["tokyo", "japan", "kyoto", "osaka"]
+    }
+    for main_key, words in aliases.items():
+        if any(w in dest_lower for w in words):
+            dest_key = main_key
+            break
+
+    dest_info = DESTINATION_DB.get(dest_key)
+
+    if dest_info:
+        raw_pool = dest_info["landmarks"]
+        title = dest_info["title"]
+        savings_hack = dest_info["savings_tip"] if student_mode else "Pre-book signature sightseeing entries and regional rail passes online in advance for priority skip-the-line access."
+        transit_hack = dest_info["transit_tip"] if student_mode else "Book express rail or trusted private vehicle hire for comfortable point-to-point transfers."
+        dishes = dest_info["dishes"]
+        dest_phases = dest_info.get("phases")
+    else:
+        clean_city = destination.split(",")[0].strip()
+        title = f"Cultural Discovery & Student Exploration in {clean_city}" if student_mode else f"Cultural Discovery & Curated Journey in {clean_city}"
+        savings_hack = "Carry a valid student identity card (ISIC) to unlock 20% to 50% concession discounts on transit passes, museums, and historical landmarks." if student_mode else "Purchase regional all-inclusive museum and transit passes to optimize entry costs and skip ticketing queues."
+        transit_hack = "Download local transit apps and offline map data to travel like a local on subways and buses."
+        dishes = ["Local Street Delicacies", "Regional Special Thali", "Artisan Bakery Pastries", "Famous Night Market Eats", "Street Noodle Bowls"]
+        dest_phases = None
+        raw_pool = [
+            ("Historic Old Town Quarter", None, "Heritage Quarter", f"Explore the historic old town center of {clean_city}, cobblestone alleys, and iconic central plazas."),
+            ("Waterfront Promenade & Marina", None, "Waterfront", "Stroll along scenic waterfront promenades and relax at bustling cafes."),
+            ("Panoramic Hilltop Viewpoint", None, "Panoramic Vista", "Hike or ride up to the top panoramic vantage point overlooking the entire cityscape."),
+            ("Grand Citadel & Fortress Ramparts", None, "Historic Bastion", "Explore centuries-old defensive walls, royal ramparts, and museum exhibits."),
+            ("Artisan Food Street & Night Market", None, "Market District", "Browse handmade local crafts, vintage clothing stalls, and authentic street food snacks."),
+            ("Botanical Gardens & Eco Trail", None, "Nature Sanctuary", "Unwind in lush gardens, scenic water bodies, and tranquil walking trails."),
+            ("Cultural Arts & National Museum", None, "Cultural District", "Tour premier art galleries, exhibitions, and creative workshops."),
+            ("Sunset Ridge & Acoustic Lounge", None, "Sunset Point", "Meet fellow travelers for golden-hour views followed by live music sessions."),
+            ("Mountain Valley & Waterfalls Trail", None, "Excursion", "Short scenic ride to surrounding countryside, lush valleys, and scenic rivers."),
+            ("Student Backpacker District" if student_mode else "Charming Bohemian Arts Quarter", None, "Youth Quarter" if student_mode else "Arts District", "Lively cafes, boutique shops, artisan bakeries, and vibrant street life."),
+            ("Ancient Sacred Temple & Shrines", None, "Sacred Architecture", "Visit prominent architectural landmarks steeped in centuries of heritage."),
+            ("Riverside Boardwalk & Pier", None, "Waterway", "Evening stroll along harbor docks, boat watching, and seafood restaurants."),
+            ("Pine Ridge Nature Sanctuary", None, "Eco Trail", "Quiet morning bird-watching trail and lush native flora exploration."),
+            ("Clocktower Plaza & Heritage Bazaar", None, "Commercial Core", "Discover antique treasures, spice traders, and energetic street bustle."),
+            ("Lakeside Promenade & Boat Jetty", None, "Lakeside", "Tranquil water breezes, rental boats, and waterside cafes."),
+            ("Royal Palace Courtyards", None, "Palace Grounds", "Historic royal palace courtyards, ornamental arches, and scenic grounds."),
+            ("Highland Panoramic Vista Point", None, "High Ridge", "Spectacular mountain ridge overlook with refreshing breezes and photo spots."),
+            ("Local Crafts & Flea Market", None, "Artisan Market", "Handmade souvenirs, jewelry stalls, and friendly local street traders."),
+            ("Hidden Emerald Springs & Falls", None, "Secret Spot", "Secluded natural freshwater swimming springs tucked in lush greenery."),
+            ("Sculpture Park & Open-Air Theatre", None, "Artistic Hub", "Modern sculpture exhibits, open-air performances, and park benches."),
+            ("Old Fisherman Wharf & Lighthouse", None, "Maritime Haven", "Historic coastal wooden piers, salty sea breezes, and fresh seafood stalls."),
+            ("Subterranean Historical Crypts", None, "Ancient Crypts", "Underground stone chambers and medieval archeological preservation tours."),
+            ("Sunken Gardens & Lotus Basin", None, "Lakeside Oasis", "Peaceful reflection pavilions surrounded by blooming lotus and weeping willows."),
+            ("Indie Bookshop Alley & Cafe Row", None, "Literary Quarter", "Secondhand bookstalls, vintage travel zines, and pour-over filter coffee."),
+            ("Alpine Foothills Pine Ridge Trail", None, "Highland Trail", "Crisp mountain air, aromatic pine needle trails, and dramatic valley views."),
+            ("Bustling Spice Merchant Alleys", None, "Old Bazaar", "Aromatic cinnamon, saffron, and tea vendors in centuries-old stone vaulted arcades."),
+            ("Highland Monastery & Bell Tower", None, "Hilltop Sanctuary", "Panoramic spiritual retreat featuring morning prayer bell chimes and tea gardens."),
+            ("Riverside Eco-Park & Kayak Pier", None, "Adventure Bank", "Low-cost kayak rentals, scenic river paddling, and green riverside lawns."),
+            ("Vintage Tramway Heritage Route", None, "Historic Transit", "Wooden antique streetcars winding through heritage neighborhoods and cafes."),
+            ("Astronomical Ridge & Observatory", None, "Star Plateau", "High-altitude clear sky pavilion for night astrophotography and stargazing gatherings."),
+            ("Cliffside Fortress & Watchtower", None, "Defensive Ridge", "Commanding views of ancient trade routes and royal defensive architecture."),
+            ("Riverside Artisan Village & Kilns", None, "Craft Hamlet", "Traditional ceramic potter workshops, stone carvers, and local textile weavers.")
+        ]
+
+    # Dynamically scale landmark pool with duration
+    if days <= 7:
+        target_count = min(max(days + 2, 5), len(raw_pool))
+    elif days <= 15:
+        target_count = min(max(days + 2, 14), len(raw_pool))
+    elif days <= 30:
+        target_count = min(max(days + 2, 28), len(raw_pool))
+    elif days <= 60:
+        target_count = min(max(int(days * 0.8) + 2, 45), len(raw_pool))
+    else:
+        target_count = min(max(int(days * 0.75) + 3, 65), len(raw_pool))
+    chosen_lms = raw_pool[:target_count]
+
+    lm_names = [re.sub(r'[\r\n,]+', '', item[0]).strip() for item in chosen_lms]
+    if must_visit:
+        mv_clean = re.sub(r'[\r\n,]+', '', must_visit).strip()
+        if mv_clean and mv_clean not in lm_names:
+            lm_names.insert(0, mv_clean)
+
+    if not dest_phases:
+        clean_city = destination.split(",")[0].strip()
+        dest_phases = [
+            (f"Phase 1: Historic Core & Iconic Landmarks", f"{clean_city} Old Town", f"Explore iconic central plazas, historic monuments, and orientation walking trails in {clean_city}."),
+            (f"Phase 2: Cultural Districts & Artisan Food Alleys", f"{clean_city} Cultural Quarter", "Immerse in local neighborhoods, vibrant street markets, and authentic regional culinary spots."),
+            (f"Phase 3: Panoramic Ridges & Waterfront Sanctuaries", "Scenic Vistas", "Hike scenic viewpoint trails, relax along tranquil waterside promenades, and explore lush parks."),
+            (f"Phase 4: Surrounding Valleys & Countryside Citadels", "Regional Excursions", "Explore surrounding countryside, historic valleys, ancient ruins, and heritage villages."),
+            (f"Phase 5: Off-the-Beaten-Path Secrets & Farewell Celebrations", "Hidden Gems", "Discover hidden viewpoints, quiet artisan cafes, and celebrate the journey's finale.")
+        ]
+
+    # Structure into thematic phases based on trip duration
+    if days >= 30:
+        num_phases = min(5, len(dest_phases))
+    elif days >= 18:
+        num_phases = min(4, len(dest_phases))
+    elif days >= 10:
+        num_phases = min(3, len(dest_phases))
+    elif days >= 5:
+        num_phases = min(2, len(dest_phases))
+    else:
+        num_phases = 1
+
+    phase_len = max(1, days // num_phases)
+    pool_size = max(1, len(chosen_lms) // num_phases)
+
+    if student_mode:
+        doc_header = f"# 🌍 {days}-Day Grand Explorer: {destination} — {title}"
+        budget_header = f"## 💰 Estimated Student Budget Breakdown ({curr})"
+        savings_tip_line = f"- 💡 **Region-Specific Student Savings Tip:** {savings_hack}"
+        tips_header = f"## 🎒 Essential Student Tips for {destination}"
+        transit_tip_line = f"- 🛵 **Local Transit:** {transit_hack}"
+        discount_tip_line = "- 💳 **Student Discounts:** Flash your student ID at transit ticketing booths and heritage sites for instant concessions."
+        stay_tip_line = "- 🛡️ **Safety & Social:** Stay in highly-rated youth hostels with social common areas to meet fellow backpackers and share rides/costs."
+    else:
+        doc_header = f"# 🌍 {days}-Day Curated Journey: {destination} — {title}"
+        budget_header = f"## 💰 Estimated Travel Budget Breakdown ({curr})"
+        savings_tip_line = f"- 💡 **Curated Traveler Secret:** {savings_hack}"
+        tips_header = f"## 🗺️ Essential Travel Tips & Guidance for {destination}"
+        transit_tip_line = f"- 🚆 **Local Transit:** {transit_hack}"
+        discount_tip_line = "- 💳 **Smart Booking & Payments:** Contactless cards and mobile payments are standard; carry minor local cash for artisan street vendors."
+        stay_tip_line = "- 🛡️ **Safety & Comfort:** Reserve central boutique hotels or premium guesthouses with concierge support."
 
     lines = [
-        f"# 🌍 {days}-Day Student Adventure: {destination}",
+        doc_header,
         "",
-        f"## 💰 Estimated Student Budget Breakdown ({curr})",
+        budget_header,
         f"- 🏨 **Accommodation ({accom_style}):** ~{base_stay:,} {curr} / night (~{total_stay:,} {curr} total for {days} days)",
-        f"- 🍜 **Food & Street Eats:** ~{base_food:,} {curr} / day (~{total_food:,} {curr} total)",
-        f"- 🚇 **Local Transport:** ~{base_trans:,} {curr} / day (~{total_trans:,} {curr} total with student transit passes)",
-        f"- 🎟️ **Activities & Entry Fees:** ~{base_act:,} {curr} / day (~{total_act:,} {curr} total with student ID discounts)",
+        f"- 🍜 **Food & Regional Dining:** ~{base_food:,} {curr} / day (~{total_food:,} {curr} total)",
+        f"- 🚇 **Local Transport:** ~{base_trans:,} {curr} / day (~{total_trans:,} {curr} total)",
+        f"- 🎟️ **Activities & Sightseeing:** ~{base_act:,} {curr} / day (~{total_act:,} {curr} total)",
         f"- 💡 **Estimated Total:** **~{est_total:,} {curr}** ({budget_level} Tier for {region_info})",
-        f"- 💡 **Region-Specific Student Savings Tip:** Always carry your valid International Student Identity Card (ISIC) or university ID to get up to 50% discount on museums, heritage monuments, and youth transport passes.",
+        savings_tip_line,
         "",
-        f"## 🗓️ Day-by-Day Itinerary ({pace} Pace{mv_text})",
+        f"## 🗓️ Day-by-Day Itinerary ({pace} Pace)",
         ""
     ]
 
-    day_themes = [
-        ("Arrival, Old Quarter Vibes & Street Food Walk", "Explore the historic old town, pick up a local SIM card, and join a free walking tour.", "Sample authentic street delicacies, visit iconic plazas, and grab budget lunch at a local market stall.", "Sunset viewpoint meetup, youth hostel social gathering, and exploring lively night markets."),
-        ("Iconic Heritage, Shrines & Cultural Immersion", "Early morning visit to top heritage landmarks before the crowds arrive.", "Cultural museum tour with student discount pass and authentic regional lunch.", "Evening stroll through artisan quarters, acoustic live cafes, or vibrant riverfront walk."),
-        ("Adventure Trek, Hidden Corners & Secret Viewpoints", "Scenic panoramic viewpoint hike or nature walk with breathtaking city vistas.", "Explore hipster vintage district, indie bookstores, and street art alleys.", "Budget-friendly night food crawl, local dessert spots, and sunset social meetup."),
-        ("Local Life, Waterfront Vibes & Hidden Markets", "Visit vibrant local morning produce market and try local specialty breakfast.", "Afternoon park picnic, bicycle route along scenic promenade or waterways.", "Student hangout district with affordable eateries, music bars, and local vibes."),
-        ("Art, Architecture & Photography Walk", "Sunrise photography at iconic monuments and quiet architectural gems.", "Modern art gallery and creative design district with student admission.", "Relax at rooftop garden / scenic bridge and enjoy street performances."),
-        ("Day Trip & Scenic Nature Escapes", "Short scenic train or bus ride to picturesque surrounding nature/valleys.", "Outdoor exploration, lake/mountain views, and picnic with fresh local snacks.", "Return to city center for celebratory group dinner with hostel travel buddies."),
-        ("Must-See Highlights & Farewell Sunset", "Revisit favorite hidden spots and pick up budget-friendly local souvenirs.", "Relaxed cafe hopping, journaling, and sampling unique regional specialties.", "Grand finale sunset meetup at the best viewpoint in the city followed by street food feast.")
+    evening_vibes = [
+        "Hike up to a scenic ridge viewpoint for an unforgettable golden-hour sunset over the horizon, followed by relaxing at a rooftop cafe.",
+        "Stroll through the bustling night market square, pick up fresh local dried fruits and pastries, and enjoy acoustic music sessions.",
+        "Unwind under crystal-clear night skies. Join a rooftop stargazing session or telescope gathering spotting constellations.",
+        "Gather around a warm communal hearth with fellow travelers, sharing trekking stories and route advice over hot local tea.",
+        "Quiet evening stroll along serene water promenades and historic stone alleys, soaking in centuries of cultural heritage and street lamps."
+    ]
+
+    student_hacks = [
+        "Take shared local transit or split a shared cab from the main stand for a fraction of private taxi rates. Keep local small change handy for vendors.",
+        "Carry a refillable water bottle and flash your student ID card at ticket counters for instant 30% to 50% concession discounts.",
+        "Check local transit timetables with your hostel reception the night before to catch early morning departures and beat tour crowds.",
+        "Eat where local university students eat; follow the crowds to backstreet family-run kitchens for 50% cheaper authentic regional meals.",
+        "Recharge all power banks and download offline map data; cellular reception can drop in remote mountain and rural valleys."
+    ]
+
+    pro_hacks = [
+        "Reserve priority entry time-slots online 48 hours in advance to bypass general admission ticketing queues.",
+        "Hire a certified local heritage docent at the ticket pavilion for deep cultural context and hidden architectural details.",
+        "Ask your hotel concierge for trusted private vehicle hire recommendations for full-day circuit excursions.",
+        "Book dinner reservations at least 24 hours in advance at celebrated heritage restaurants for scenic terrace seating.",
+        "Download offline map navigation and regional audio guide tracks before departing your accommodation each morning."
     ]
 
     for d in range(1, days + 1):
-        idx = (d - 1) % len(day_themes)
-        theme, morning, afternoon, evening = day_themes[idx]
-        
-        if must_visit and d == 1:
-            afternoon = f"Dedicated visit to **{must_visit}** — explore highlights, snap iconic photos, and take advantage of student discounts."
+        if num_phases > 1:
+            p_idx = min((d - 1) // phase_len, num_phases - 1)
+            p_title, p_zone, p_desc = dest_phases[p_idx]
 
-        lines.append(f"### Day {d}: {theme}")
-        lines.append(f"- ☀️ **Morning:** {morning}")
-        lines.append(f"- 🌤️ **Afternoon:** {afternoon}")
-        lines.append(f"- 🌙 **Evening:** {evening}")
+            if d == 1 or (d - 1) % phase_len == 0:
+                phase_start = p_idx * phase_len + 1
+                phase_end = min((p_idx + 1) * phase_len, days)
+                lines.append(f"### 📍 {p_title} (Days {phase_start}–{phase_end})")
+                lines.append(f"*{p_desc}*")
+                lines.append("")
+
+            phase_pool = chosen_lms[p_idx * pool_size : (p_idx + 1) * pool_size]
+            if not phase_pool:
+                phase_pool = chosen_lms
+            lm = phase_pool[(d - 1) % len(phase_pool)]
+        else:
+            lm = chosen_lms[(d - 1) % len(chosen_lms)]
+
+        lm_name, coords, zone, desc = lm
+        dish = dishes[(d - 1) % len(dishes)]
+        eve = evening_vibes[(d - 1) % len(evening_vibes)]
+
+        if student_mode:
+            hack = student_hacks[(d - 1) % len(student_hacks)]
+            hack_label = "Student Insider Hack"
+            m_concession = "Flash your student ID card at the entry gate for 30% to 50% concession tickets." if d % 2 == 0 else "Arrive early around 8:00 AM for stunning golden morning light and zero tourist crowds."
+        else:
+            hack = pro_hacks[(d - 1) % len(pro_hacks)]
+            hack_label = "Traveler Pro Tip"
+            m_concession = "Pre-book skip-the-line admissions online for effortless entry." if d % 2 == 0 else "Arrive early around 8:30 AM for serene morning light and unhurried photography."
+
+        if must_visit and d == 1:
+            desc = f"Dedicated priority visit to **{must_visit}** — explore signature sights, snap iconic photos, and take in the atmosphere."
+
+        lines.append(f"#### Day {d}: {lm_name} ({zone})")
+        lines.append(f"- ☀️ **Morning Exploration:** {desc} {m_concession} Spend 2.5 hours exploring the inner halls, panoramic viewpoints, and photography spots.")
+        lines.append(f"- 🌤️ **Afternoon Local Vibe & Eatery:** Head down to a celebrated local kitchen in {zone}. Savor authentic **{dish}** and explore surrounding artisan handicraft lanes.")
+        lines.append(f"- 🌙 **Evening Social & Sunset:** {eve}")
+        lines.append(f"- 💡 **{hack_label}:** {hack}")
+        lines.append(f"- 💰 **Daily Target Budget:** ~{base_stay + base_food + base_trans:,} {curr} (Stay: ~{base_stay:,} {curr} • Food: ~{base_food:,} {curr} • Transit: ~{base_trans:,} {curr})")
         lines.append("")
 
-    lines.append(f"## 🎒 Essential Student Tips for {destination}")
-    lines.append(f"- 📱 **Connectivity & Transit:** Download offline Google Maps and local transport apps before landing for seamless zero-data navigation.")
-    lines.append(f"- 💳 **Student Discounts:** Flash your student ID at transit ticketing booths and heritage sites for instant 20%–50% concessions.")
-    lines.append(f"- 🛡️ **Safety & Social:** Stay in highly-rated youth hostels with social common areas to meet fellow backpackers and share rides/costs.")
+    lines.append(tips_header)
+    lines.append(transit_tip_line)
+    lines.append(discount_tip_line)
+    lines.append(stay_tip_line)
     lines.append("")
-    
-    lm_list = [destination]
-    if must_visit:
-        lm_list.append(must_visit)
-    lm_list.extend(["City Center", "Old Town Plaza", "Central Station"])
-    lines.append(f"LANDMARKS: {', '.join(lm_list[:4])}")
+    lines.append(f"LANDMARKS: {' | '.join(lm_names)}")
 
     return "\n".join(lines)
 
@@ -194,6 +816,18 @@ def generate_itinerary(req: TripRequest):
     sanitized_interests = [sanitize_str(i, 40) for i in req.interests if i][:15]
     interests_string = ", ".join(sanitized_interests) if sanitized_interests else "Local street food, culture, secret budget spots"
 
+    if req.days <= 7:
+        target_lm_count = max(req.days + 1, 5)
+    elif req.days <= 15:
+        target_lm_count = min(req.days + 2, 16)
+    elif req.days <= 30:
+        target_lm_count = min(req.days + 2, 30)
+    elif req.days <= 60:
+        target_lm_count = min(int(req.days * 0.8) + 2, 48)
+    else:
+        target_lm_count = min(int(req.days * 0.75) + 3, 65)
+
+    is_student = bool(req.student_mode if req.student_mode is not None else True)
     api_key = os.environ.get("GROQ_API_KEY")
     response_text = None
 
@@ -211,9 +845,20 @@ def generate_itinerary(req: TripRequest):
 
             pace_text = f"Pace: {pace_clean}. Accommodation: {accom_clean}."
 
+            if is_student:
+                persona_text = "You are an award-winning local travel architect specializing in epic, student-friendly, budget adventures."
+                budget_hdr = f"## 💰 Estimated Student Budget Breakdown ({curr})"
+                savings_hdr = f"- 💡 **Region-Specific Student Savings Tip:** [1 high-impact money-saving hack tailored for students]"
+                tips_hdr = f"## 🎒 Essential Student Tips for {destination_clean}"
+            else:
+                persona_text = "You are an award-winning travel architect and cultural concierge specializing in refined, curated, immersive travel journeys."
+                budget_hdr = f"## 💰 Estimated Travel Budget Breakdown ({curr})"
+                savings_hdr = f"- 💡 **Curated Traveler Tip:** [1 high-impact local secret or priority booking tip for travelers]"
+                tips_hdr = f"## 🗺️ Essential Travel Tips & Guidance for {destination_clean}"
+
             prompt = f"""
-            You are an award-winning local travel architect specializing in epic, student-friendly, budget adventures.
-            Create a detailed, high-energy {req.days}-day trip itinerary to {destination_clean}.
+            {persona_text}
+            Create a detailed {req.days}-day trip itinerary to {destination_clean}.
 
             Travel Parameters:
             - Destination: {destination_clean}
@@ -224,29 +869,34 @@ def generate_itinerary(req: TripRequest):
             - {pace_text}
             - {must_visit_instruction}
 
+            CRITICAL DURATION & LANDMARK RULES:
+            - For a {req.days}-day trip, do NOT keep the visited places the same as a short trip. Scale the places to visit realistically across the entire region.
+            - Provide a comprehensive, non-repetitive Day-by-Day itinerary that covers different neighborhoods, zones, day trips, and hidden gems.
+            - At the very end of your response, list at least {target_lm_count} real, specific places/landmarks visited in this itinerary, separated by pipe symbols | on a single line starting with LANDMARKS:.
+
             Structure your response strictly in clean Markdown as follows:
             # 🌍 [Catchy Trip Title & Emoji]
 
-            ## 💰 Estimated Student Budget Breakdown ({curr})
+            {budget_hdr}
             - 🏨 **Accommodation ({accom_clean}):** [Estimated cost per night & total in {curr}]
-            - 🍜 **Food & Street Eats:** [Daily & total food estimate in {curr}]
-            - 🚇 **Local Transport:** [Passes/Subway/Bus estimates in {curr}]
+            - 🍜 **Food & Dining:** [Daily & total food estimate in {curr}]
+            - 🚇 **Local Transport:** [Passes/Transit estimates in {curr}]
             - 🎟️ **Activities & Entry Fees:** [Cost estimates for attractions in {curr}]
-            - 💡 **Region-Specific Student Savings Tip:** [1 high-impact money-saving hack tailored for students]
+            {savings_hdr}
 
             ## 🗓️ Day-by-Day Itinerary
 
-            ### Day 1: [Day 1 Theme]
-            - ☀️ **Morning:** [Actionable morning activity + budget tip]
-            - 🌤️ **Afternoon:** [Actionable afternoon activity + food spot recommendation]
-            - 🌙 **Evening:** [Evening vibes, sunset spot, or student nightlife]
+            ### Day 1: [Day 1 Theme & Specific Area/Landmark]
+            - ☀️ **Morning:** [Actionable morning activity at a specific location]
+            - 🌤️ **Afternoon:** [Actionable afternoon activity + authentic food spot recommendation]
+            - 🌙 **Evening:** [Evening vibes, sunset spot, or social spots]
 
-            (Repeat detailed ### Day X format for all {req.days} days)
+            (Continue detailed ### Day X format for all {req.days} days, exploring new areas and landmarks)
 
-            ## 🎒 Essential Student Tips for {destination_clean}
-            - 3 practical tips for safety, local transit apps, SIM cards, or student discounts.
+            {tips_hdr}
+            - 3 practical tips for safety, local transit apps, SIM cards, or local booking advice.
 
-            LANDMARKS: Place 1, Place 2, Place 3
+            LANDMARKS: Place 1 | Place 2 | Place 3 | ... (list at least {target_lm_count} real places separated by |)
             """
 
             models_to_try = [
@@ -281,14 +931,20 @@ def generate_itinerary(req: TripRequest):
             accom_style=accom_clean,
             interests=sanitized_interests,
             must_visit=must_visit_clean,
-            pace=pace_clean
+            pace=pace_clean,
+            student_mode=is_student
         )
 
     raw_landmarks = []
     if "LANDMARKS:" in response_text:
         parts = response_text.split("LANDMARKS:")
         itinerary = parts[0].strip()
-        raw_landmarks = [l.strip().rstrip('.') for l in parts[1].strip().split(",") if l.strip()][:4]
+        lm_str = parts[1].strip()
+        if "|" in lm_str:
+            tokens = lm_str.split("|")
+        else:
+            tokens = lm_str.split(",")
+        raw_landmarks = [re.sub(r'[\r\n]+', '', l).strip().rstrip('.') for l in tokens if l.strip()][:target_lm_count]
     else:
         itinerary = response_text.strip()
         raw_landmarks = [destination_clean]
@@ -303,8 +959,9 @@ def generate_itinerary(req: TripRequest):
             "coords": dest_coords
         })
 
+    mv_coords = None
     if must_visit_clean:
-        mv_coords = get_coordinates(f"{must_visit_clean}, {destination_clean}")
+        mv_coords = get_coordinates(must_visit_clean, destination_clean)
         if mv_coords:
             markers.append({
                 "name": f"Must Visit: {must_visit_clean}",
@@ -312,9 +969,48 @@ def generate_itinerary(req: TripRequest):
                 "coords": mv_coords
             })
 
-    for landmark in raw_landmarks:
-        l_coords = get_coordinates(f"{landmark}, {destination_clean}")
+    placed_coords = []
+    if dest_coords:
+        placed_coords.append(dest_coords)
+    if mv_coords:
+        placed_coords.append(mv_coords)
+
+    def is_too_close(c1, c2, threshold=0.0035):
+        return abs(c1[0] - c2[0]) < threshold and abs(c1[1] - c2[1]) < threshold
+
+    for idx, landmark in enumerate(raw_landmarks):
+        l_coords = get_coordinates(landmark, destination_clean)
+        
+        # If coordinates are missing or if it resolved to the generic destination city center,
+        # spread it out geographically around the destination using a golden-angle spiral
+        need_spread = False
+        if not l_coords:
+            need_spread = True
+        elif dest_coords and is_too_close(l_coords, dest_coords, threshold=0.002):
+            need_spread = True
+
+        if need_spread and dest_coords:
+            angle = idx * 2.39996323  # Golden angle ~137.5 degrees in radians
+            radius = 0.015 + (idx * 0.007)  # Expanding radius from 1.5km to 15km
+            cos_lat = max(0.2, math.cos(math.radians(dest_coords[0])))
+            lat_offset = radius * math.cos(angle)
+            lng_offset = (radius * math.sin(angle)) / cos_lat
+            l_coords = [round(dest_coords[0] + lat_offset, 5), round(dest_coords[1] + lng_offset, 5)]
+
         if l_coords:
+            # Prevent collision with any existing marker
+            collision_count = 0
+            while any(is_too_close(l_coords, p, threshold=0.0035) for p in placed_coords) and collision_count < 16:
+                collision_count += 1
+                bump_angle = (idx * 1.7 + collision_count * 0.85)
+                bump_radius = 0.005 * collision_count
+                cos_lat = max(0.2, math.cos(math.radians(l_coords[0])))
+                l_coords = [
+                    round(l_coords[0] + bump_radius * math.cos(bump_angle), 5),
+                    round(l_coords[1] + (bump_radius * math.sin(bump_angle)) / cos_lat, 5)
+                ]
+
+            placed_coords.append(l_coords)
             markers.append({
                 "name": landmark,
                 "type": "landmark",
@@ -332,14 +1028,16 @@ def generate_itinerary(req: TripRequest):
             "budget_level": budget_level_clean,
             "currency": curr,
             "region": region_info,
-            "interests": sanitized_interests
+            "interests": sanitized_interests,
+            "travel_pace": pace_clean,
+            "student_mode": is_student
         }
     }
 
 # ========================================================
 # 3D MODERN MULTI-PAGE FRONTEND EMBEDDED IN PYTHON
 # ========================================================
-HTML_CONTENT = """<!DOCTYPE html>
+HTML_CONTENT = r"""<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
@@ -402,7 +1100,12 @@ HTML_CONTENT = """<!DOCTYPE html>
 
   <!-- Leaflet CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- Leaflet MarkerCluster for High-Density Multi-Day Pin Grouping -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
   <!-- Marked.js & DOMPurify (Deferred parser & sanitizer) -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
@@ -506,6 +1209,462 @@ HTML_CONTENT = """<!DOCTYPE html>
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       cursor: pointer;
+    }
+
+    /* ========== PREMIUM MAP MARKERS & POPUPS ========== */
+    /* Dark mode: invert OSM tiles to create sleek dark map look */
+    .leaflet-tile-pane {
+      filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9) saturate(0.8);
+    }
+    .light-theme .leaflet-tile-pane {
+      filter: none;
+    }
+    /* Prevent filter from affecting markers and popups */
+    .leaflet-marker-pane,
+    .leaflet-popup-pane,
+    .leaflet-tooltip-pane,
+    .leaflet-shadow-pane {
+      filter: none !important;
+    }
+
+    @keyframes roamPinDrop {
+      0% { opacity: 0; transform: rotate(-45deg) translateY(-30px) scale(0.4); }
+      60% { opacity: 1; transform: rotate(-45deg) translateY(4px) scale(1.08); }
+      100% { opacity: 1; transform: rotate(-45deg) translateY(0) scale(1); }
+    }
+    .roam-marker {
+      background: transparent !important;
+      border: none !important;
+    }
+    .roam-pin {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+    .roam-pin:hover {
+      transform: rotate(-45deg) scale(1.18) !important;
+      filter: brightness(1.15);
+    }
+
+    /* Popup container override */
+    .roam-popup-container .leaflet-popup-content-wrapper {
+      background: rgba(12, 17, 30, 0.92);
+      backdrop-filter: blur(16px) saturate(160%);
+      -webkit-backdrop-filter: blur(16px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      padding: 0;
+      color: #fff;
+    }
+    .roam-popup-container .leaflet-popup-content {
+      margin: 0;
+      line-height: 1.4;
+    }
+    .roam-popup-container .leaflet-popup-tip {
+      background: rgba(12, 17, 30, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .roam-popup-container .leaflet-popup-close-button {
+      color: rgba(255, 255, 255, 0.5) !important;
+      font-size: 18px !important;
+      top: 8px !important;
+      right: 10px !important;
+      transition: color 0.2s;
+    }
+    .roam-popup-container .leaflet-popup-close-button:hover {
+      color: #FF6B4A !important;
+    }
+
+    /* Popup inner content */
+    .roam-popup {
+      padding: 14px 16px;
+    }
+    .roam-popup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .roam-popup-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .roam-popup-coords {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.45);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      letter-spacing: 0.3px;
+    }
+
+    /* Tooltip styling */
+    .roam-tooltip {
+      background: rgba(12, 17, 30, 0.88) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 10px !important;
+      padding: 6px 12px !important;
+      font-size: 12px !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+      white-space: nowrap;
+    }
+    .roam-tooltip::before {
+      border-top-color: rgba(12, 17, 30, 0.88) !important;
+    }
+
+    /* Leaflet zoom controls styling */
+    .leaflet-control-zoom {
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 12px !important;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+    }
+    .leaflet-control-zoom a {
+      background: rgba(12, 17, 30, 0.85) !important;
+      color: rgba(255, 255, 255, 0.8) !important;
+      width: 36px !important;
+      height: 36px !important;
+      line-height: 36px !important;
+      font-size: 18px !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      transition: background 0.2s, color 0.2s;
+    }
+    .leaflet-control-zoom a:hover {
+      background: rgba(255, 107, 74, 0.2) !important;
+      color: #FF6B4A !important;
+    }
+    .leaflet-control-zoom a:last-child {
+      border-bottom: none !important;
+    }
+
+    /* Attribution styling */
+    .leaflet-control-attribution {
+      background: rgba(12, 17, 30, 0.7) !important;
+      color: rgba(255, 255, 255, 0.35) !important;
+      font-size: 10px !important;
+      padding: 2px 8px !important;
+      border-radius: 8px 0 0 0 !important;
+    }
+    .leaflet-control-attribution a {
+      color: rgba(74, 234, 255, 0.5) !important;
+    }
+
+    /* --- LIGHT THEME MAP OVERRIDES --- */
+    .light-theme .roam-popup-container .leaflet-popup-content-wrapper {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+    .light-theme .roam-popup-container .leaflet-popup-tip {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: rgba(0, 0, 0, 0.06);
+    }
+    .light-theme .roam-popup-container .leaflet-popup-close-button {
+      color: rgba(0, 0, 0, 0.4) !important;
+    }
+    .light-theme .roam-popup-name {
+      color: #0F172A;
+    }
+    .light-theme .roam-popup-coords {
+      color: rgba(15, 23, 42, 0.45);
+    }
+    .light-theme .roam-tooltip {
+      background: rgba(255, 255, 255, 0.92) !important;
+      border-color: rgba(0, 0, 0, 0.1) !important;
+      color: #0F172A !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    }
+    .light-theme .leaflet-control-zoom a {
+      background: rgba(255, 255, 255, 0.9) !important;
+      color: #334155 !important;
+      border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+    }
+    .light-theme .leaflet-control-zoom a:hover {
+      background: rgba(255, 107, 74, 0.1) !important;
+      color: #FF6B4A !important;
+    }
+    .light-theme .leaflet-control-zoom {
+      border-color: rgba(0, 0, 0, 0.1) !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    }
+    .light-theme .leaflet-control-attribution {
+      background: rgba(255, 255, 255, 0.7) !important;
+      color: rgba(0, 0, 0, 0.35) !important;
+    }
+
+    /* Map legend overlay */
+    .roam-map-legend {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 1000;
+      background: rgba(12, 17, 30, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.75);
+    }
+    .roam-map-legend .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+      vertical-align: middle;
+      box-shadow: 0 0 6px currentColor;
+    }
+    .light-theme .roam-map-legend {
+      background: rgba(255, 255, 255, 0.88);
+      border-color: rgba(0, 0, 0, 0.08);
+      color: #334155;
+    }
+
+    /* Leaflet MarkerCluster custom sleek styling */
+    .roam-cluster-container {
+      background: transparent !important;
+      border: none !important;
+    }
+    .roam-cluster-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #06B6D4, #3B82F6);
+      border: 2.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.65), 0 4px 12px rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .roam-cluster-badge:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 22px rgba(6, 182, 212, 0.9), 0 6px 16px rgba(0, 0, 0, 0.6);
+    }
+
+
+    /* ========================================================
+       MODERN SEARCH BAR, ITINERARY CONTROLS & SMOOTH ACCORDIONS
+       ======================================================== */
+    .day-card {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15, 23, 42, 0.65);
+      border-radius: 1rem;
+    }
+    .light-theme .day-card {
+      border: 1px solid #E2E8F0;
+      background: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+    .day-card:hover {
+      border-color: rgba(255, 107, 74, 0.4);
+      background: rgba(18, 28, 50, 0.85);
+      box-shadow: 0 8px 24px -6px rgba(255, 107, 74, 0.15);
+      transform: translateY(-1px);
+    }
+    .light-theme .day-card:hover {
+      border-color: rgba(255, 107, 74, 0.45);
+      background: #FFFFFF;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.07);
+      transform: translateY(-1px);
+    }
+
+    .day-card-body {
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, padding 0.3s ease;
+      max-height: 1200px;
+      opacity: 1;
+      transform: translateZ(0);
+    }
+    .day-card-body.collapsed {
+      max-height: 0 !important;
+      opacity: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      margin-top: 0 !important;
+      border-top-color: transparent !important;
+      pointer-events: none;
+    }
+
+    .chevron-icon {
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Itinerary Toolbar in Dark Mode */
+    #itineraryCardsToolbar {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    #itinerarySearchInput {
+      background: rgba(11, 17, 30, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #F8FAFC;
+    }
+    #itinerarySearchInput::placeholder {
+      color: #94A3B8;
+    }
+    #itinerarySearchInput:focus {
+      background: rgba(11, 17, 30, 0.95);
+      border-color: #FF6B4A;
+      box-shadow: 0 0 0 3px rgba(255, 107, 74, 0.25);
+    }
+
+    /* Itinerary Toolbar in Light Theme */
+    .light-theme #itineraryCardsToolbar {
+      background: #FFFFFF !important;
+      border: 1px solid #E2E8F0 !important;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .light-theme #itinerarySearchInput {
+      background: #F8FAFC !important;
+      border: 1.5px solid #CBD5E1 !important;
+      color: #0F172A !important;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    }
+    .light-theme #itinerarySearchInput::placeholder {
+      color: #94A3B8 !important;
+    }
+    .light-theme #itinerarySearchInput:focus {
+      background: #FFFFFF !important;
+      border-color: #FF5E36 !important;
+      box-shadow: 0 0 0 3px rgba(255, 94, 54, 0.18) !important;
+    }
+
+    .light-theme #itinerarySearchClear {
+      color: #64748B !important;
+    }
+    .light-theme #itinerarySearchClear:hover {
+      color: #0F172A !important;
+    }
+
+    .light-theme #itineraryCardsCountBadge {
+      background: #F1F5F9 !important;
+      border: 1px solid #E2E8F0 !important;
+      color: #475569 !important;
+    }
+
+    .light-theme #itineraryCardsToolbar button {
+      background: #FFFFFF !important;
+      border: 1.5px solid #CBD5E1 !important;
+      color: #1E293B !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+    .light-theme #itineraryCardsToolbar button:hover {
+      background: #F8FAFC !important;
+      border-color: #94A3B8 !important;
+      color: #0F172A !important;
+    }
+
+    .light-theme .phase-divider-header {
+      border-bottom-color: #E2E8F0 !important;
+    }
+
+    .light-theme .phase-pill-btn {
+      background: #F1F5F9 !important;
+      border: 1.5px solid #CBD5E1 !important;
+      color: #334155 !important;
+    }
+    .light-theme .phase-pill-btn:hover {
+      background: #E2E8F0 !important;
+      color: #0F172A !important;
+    }
+    .light-theme .phase-pill-btn.active {
+      background: linear-gradient(135deg, #FF5E36, #FFA000) !important;
+      border-color: transparent !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 12px rgba(255, 94, 54, 0.3) !important;
+    }
+
+    /* Tip Boxes Light Theme High-Contrast Polish */
+    .light-theme .tip-box-student {
+      background: #FFFBEB !important;
+      border: 1.5px solid #FDE68A !important;
+      color: #92400E !important;
+    }
+    .light-theme .tip-box-student strong {
+      color: #B45309 !important;
+    }
+    .light-theme .tip-box-student span {
+      color: #78350F !important;
+    }
+
+    .light-theme .tip-box-traveler {
+      background: #F0F9FF !important;
+      border: 1.5px solid #BAE6FD !important;
+      color: #0369A1 !important;
+    }
+    .light-theme .tip-box-traveler strong {
+      color: #0284C7 !important;
+    }
+    .light-theme .tip-box-traveler span {
+      color: #0C4A6E !important;
+    }
+
+    /* Interactive Day Cards Styling */
+    .day-card {
+      transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15, 23, 42, 0.65);
+    }
+    .light-theme .day-card {
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .day-card:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+      background: rgba(18, 28, 50, 0.8);
+      box-shadow: 0 8px 24px -6px rgba(6, 182, 212, 0.15);
+    }
+    .light-theme .day-card:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.08);
+    }
+    .day-card-highlight {
+      animation: dayPulseHighlight 2s ease-in-out;
+      border-color: #06B6D4 !important;
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.5) !important;
+    }
+    @keyframes dayPulseHighlight {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    .phase-pill-btn {
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .phase-pill-btn.active {
+      background: linear-gradient(135deg, #06B6D4, #3B82F6) !important;
+      color: #ffffff !important;
+      border-color: rgba(255, 255, 255, 0.4) !important;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.4) !important;
     }
 
     /* ========================================================
@@ -903,25 +2062,17 @@ HTML_CONTENT = """<!DOCTYPE html>
     }
 
     /* Floating Image Badges & Gradient Buttons ALWAYS keep pure white & bright gold text */
-    .light-theme [class*="bg-spaceDark/80"],
-    .light-theme [class*="bg-black/60"],
-    .light-theme [class*="bg-spaceDark/80"] *,
-    .light-theme [class*="bg-black/60"] *,
     .light-theme .btn-gradient,
     .light-theme .btn-gradient * {
       color: #FFFFFF !important;
     }
-    .light-theme [class*="bg-spaceDark/80"] {
+    .light-theme .image-badge-dark {
       background-color: rgba(11, 15, 25, 0.82) !important;
       border-color: rgba(255, 255, 255, 0.20) !important;
+      color: #FFFFFF !important;
     }
-    .light-theme [class*="bg-black/60"] {
-      background-color: rgba(0, 0, 0, 0.70) !important;
-      border-color: rgba(255, 255, 255, 0.15) !important;
-    }
-    .light-theme [class*="bg-black/60"].text-amberAccent,
-    .light-theme [class*="bg-spaceDark/80"].text-amberAccent {
-      color: #FFA000 !important;
+    .light-theme .image-badge-dark * {
+      color: #FFFFFF !important;
     }
 
     /* Light Theme Map Placeholder & Frame Fix */
@@ -1110,6 +2261,133 @@ HTML_CONTENT = """<!DOCTYPE html>
     .light-theme .orb-3 {
       background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 65%);
     }
+  
+    /* ========================================================
+       MASTER-GRADE ULTRA-SMOOTH ANIMATIONS & 60/120FPS TRANSITIONS
+       ======================================================== */
+    html {
+      scroll-behavior: smooth !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    *, *::before, *::after {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Page Smooth Entrance Transition */
+    @keyframes pageFadeSlideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(14px) translateZ(0);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) translateZ(0);
+      }
+    }
+
+    .page-enter {
+      animation: pageFadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity;
+    }
+
+    /* Universal Hardware-Accelerated Micro-Interactions */
+    .btn-gradient,
+    .btn-secondary,
+    .chip-tag,
+    .nav-tab,
+    .phase-pill-btn,
+    .hotspot-scope-btn,
+    .hotspot-filter-btn {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
+      will-change: transform, box-shadow;
+      transform: translateZ(0);
+    }
+    .btn-gradient:hover,
+    .btn-secondary:hover {
+      transform: translateY(-2px) translateZ(0);
+    }
+    .btn-gradient:active,
+    .btn-secondary:active,
+    .chip-tag:active,
+    button:active {
+      transform: scale(0.96) translateZ(0) !important;
+    }
+
+    /* Glass Cards & Hotspots Smooth Elevation */
+    .glass-card {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background 0.35s ease !important;
+      will-change: transform, box-shadow;
+      transform: translateZ(0);
+    }
+    .glass-card:hover {
+      transform: translateY(-4px) translateZ(0);
+    }
+
+    .hotspot-card {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease !important;
+      will-change: transform, box-shadow;
+      transform: translateZ(0);
+    }
+    .hotspot-card:hover {
+      transform: translateY(-6px) translateZ(0);
+    }
+
+    /* Range Sliders Smooth Physics */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      height: 6px;
+      outline: none;
+      transition: background-color 0.25s ease;
+    }
+    .light-theme input[type="range"] {
+      background: #CBD5E1;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #FF6B4A;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 107, 74, 0.4);
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease;
+      will-change: transform;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+      box-shadow: 0 0 16px rgba(255, 107, 74, 0.7);
+    }
+    input[type="range"]::-webkit-slider-thumb:active {
+      transform: scale(0.95);
+    }
+
+    /* Form Inputs Smooth Focus Ring */
+    input, select {
+      transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, color 0.2s ease !important;
+    }
+
+    /* Modal Backdrop & Pop Animation */
+    #confirmModalBackdrop {
+      transition: opacity 0.25s ease, backdrop-filter 0.25s ease;
+    }
+    #confirmModalCard {
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease !important;
+      will-change: transform, opacity;
+    }
+
+    /* Mobile Bottom Navigation Smooth Active Physics */
+    #mobileBottomNav button {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease !important;
+    }
+    #mobileBottomNav button:active {
+      transform: scale(0.9);
+    }
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
@@ -1961,10 +3239,30 @@ HTML_CONTENT = """<!DOCTYPE html>
                   <label class="block text-xs font-bold uppercase text-gray-300">💰 Tier</label>
                   <select id="plannerTier" class="w-full px-3 py-2.5 bg-spaceDark border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-coralPrimary">
                     <option value="Student (Low)">Student (Low)</option>
-                    <option value="Moderate">Moderate</option>
-                    <option value="Luxury">Luxury</option>
+                    <option value="Moderate Backpacker">Moderate Backpacker</option>
+                    <option value="Luxury Student">Luxury Student</option>
                   </select>
                 </div>
+              </div>
+
+              <!-- Student Mode Toggle Option -->
+              <div id="studentModeCard" class="p-3.5 rounded-2xl bg-gradient-to-r from-coralPrimary/10 via-amberAccent/5 to-cyanAccent/10 border border-coralPrimary/20 flex items-center justify-between gap-3 shadow-inner transition">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-xl" id="studentModeIcon">🎒</span>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-bold text-white">Student Mode</span>
+                      <span id="studentModeBadge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-coralPrimary text-white uppercase tracking-wider shadow-sm">ON</span>
+                    </div>
+                    <p class="text-[11px] text-gray-400 leading-tight mt-0.5" id="studentModeDesc">
+                      Enables student discounts, hostel stays & budget savings hacks
+                    </p>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer select-none">
+                  <input type="checkbox" id="plannerStudentMode" checked class="sr-only peer" onchange="onStudentModeToggle(this.checked)" />
+                  <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-coralPrimary shadow-sm"></div>
+                </label>
               </div>
 
               <div class="grid grid-cols-3 gap-3">
@@ -2062,6 +3360,12 @@ HTML_CONTENT = """<!DOCTYPE html>
 
             <!-- Leaflet Map (Hidden initially until trip coordinates are loaded) -->
             <div id="map" class="hidden w-full h-full min-h-[440px]"></div>
+            <!-- Map Legend (shown with map) -->
+            <div id="mapLegend" class="roam-map-legend hidden">
+              <span><span class="legend-dot" style="background:#FF6B4A; color:#FF6B4A;"></span>Destination</span>
+              <span><span class="legend-dot" style="background:#FFB347; color:#FFB347;"></span>Must Visit</span>
+              <span><span class="legend-dot" style="background:#4AEAFF; color:#4AEAFF;"></span>Landmarks</span>
+            </div>
           </div>
         </div>
 
@@ -2090,28 +3394,174 @@ HTML_CONTENT = """<!DOCTYPE html>
         </div>
 
         <!-- Itinerary Blueprint Card (Full Width: Combination of 1 and 2 below top grids) -->
-        <div id="plannerResults" class="hidden glass-card p-6 sm:p-10 rounded-3xl border border-white/10 space-y-6 shadow-2xl">
+        <div id="plannerResults" class="hidden glass-card p-4 sm:p-8 lg:p-10 rounded-3xl border border-white/10 space-y-6 shadow-2xl">
+          <!-- Top Action Bar -->
           <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-white/10">
             <div>
-              <h3 class="text-xl sm:text-2xl font-extrabold text-white flex items-center gap-2">
-                <span>📝</span> Your Itinerary Blueprint
-              </h3>
-              <p class="text-xs sm:text-sm text-gray-400 mt-0.5">Comprehensive day-by-day plan, budget breakdown & student hacks</p>
+              <div class="flex items-center gap-2">
+                <span class="text-2xl">📝</span>
+                <div>
+                  <h3 id="itineraryMainHeading" class="text-xl sm:text-2xl font-extrabold text-white leading-tight">
+                    Your Itinerary Blueprint
+                  </h3>
+                  <p class="text-xs sm:text-sm text-gray-400 mt-0.5" id="itinerarySubtitle">
+                    Comprehensive day-by-day plan, budget matrix & interactive GPS-synced landmarks
+                  </p>
+                </div>
+              </div>
             </div>
+            
             <div class="flex flex-wrap items-center gap-2.5">
-              <button onclick="saveTrip()" class="btn-secondary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
-                <span>💾 Save Trip</span>
+              <!-- Student / Standard Traveler Mode Switcher Button on Blueprint -->
+              <button id="itineraryStudentModeBtn" type="button" onclick="toggleItineraryStudentMode()" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 border transition shadow-sm bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border-emerald-500/30" title="Switch between Student Mode and Standard Traveler Mode">
+                <span id="itineraryStudentModeIcon">🎓</span>
+                <span id="itineraryStudentModeText">Student Mode: ON</span>
               </button>
-              <button onclick="copyTrip()" class="btn-secondary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
+
+              <!-- View Mode Switcher -->
+              <div class="flex items-center bg-spaceDark/80 p-1 rounded-xl border border-white/10 text-xs shadow-inner">
+                <button id="viewModeCardsBtn" type="button" onclick="setItineraryViewMode('cards')" class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-coralPrimary text-white shadow-sm">
+                  <span>🗂️ Cards</span>
+                </button>
+                <button id="viewModeDocBtn" type="button" onclick="setItineraryViewMode('doc')" class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-gray-400 hover:text-white">
+                  <span>📄 Document</span>
+                </button>
+              </div>
+
+              <button onclick="saveTrip()" class="btn-secondary px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                <span>💾 Save</span>
+              </button>
+              <button onclick="copyTrip()" class="btn-secondary px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm">
                 <span>📋 Copy</span>
               </button>
-              <button onclick="downloadTripPDF()" class="btn-gradient px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+              <button onclick="downloadTripPDF()" class="btn-gradient px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
                 <span>⬇️ Export PDF</span>
               </button>
             </div>
           </div>
 
-          <div id="itineraryView" class="itinerary-prose text-sm p-5 sm:p-8 rounded-2xl bg-spaceDark/70 border border-white/5 shadow-inner"></div>
+          <!-- Trip Overview & Metrics Ribbon -->
+          <div id="itineraryMetricsBar" class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="glass-card p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-coralPrimary/15 border border-coralPrimary/30 flex items-center justify-center text-lg shadow-inner">
+                📅
+              </div>
+              <div class="min-w-0">
+                <div class="text-[10px] uppercase font-bold text-gray-400">Duration</div>
+                <div id="metricDays" class="text-sm sm:text-base font-extrabold text-white truncate">3 Days</div>
+              </div>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-cyanAccent/15 border border-cyanAccent/30 flex items-center justify-center text-lg shadow-inner">
+                📍
+              </div>
+              <div class="min-w-0">
+                <div class="text-[10px] uppercase font-bold text-gray-400">Map Landmarks</div>
+                <div id="metricPins" class="text-sm sm:text-base font-extrabold text-cyanAccent truncate">0 Live Pins</div>
+              </div>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-amberAccent/15 border border-amberAccent/30 flex items-center justify-center text-lg shadow-inner">
+                💰
+              </div>
+              <div class="min-w-0">
+                <div class="text-[10px] uppercase font-bold text-gray-400">Target Budget</div>
+                <div id="metricBudget" class="text-sm sm:text-base font-extrabold text-amberAccent truncate">Estimated</div>
+              </div>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 shadow-sm">
+              <div class="w-10 h-10 rounded-xl bg-emeraldAccent/15 border border-emeraldAccent/30 flex items-center justify-center text-lg shadow-inner">
+                🧭
+              </div>
+              <div class="min-w-0">
+                <div class="text-[10px] uppercase font-bold text-gray-400">Expedition Circuit</div>
+                <div id="metricPhases" class="text-sm sm:text-base font-extrabold text-emeraldAccent truncate">Single Circuit</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Phase Navigation Ribbon (for Multi-Day / Multi-Phase Journeys) -->
+          <div id="itineraryPhaseNavContainer" class="hidden space-y-2 pt-1">
+            <div class="flex items-center justify-between text-xs text-gray-400">
+              <span class="font-bold flex items-center gap-1.5 text-gray-300">
+                <span>⚡</span> Filter by Expedition Phase:
+              </span>
+              <span id="activePhaseCount" class="text-[11px] text-cyanAccent">Showing All Phases</span>
+            </div>
+            <div id="itineraryPhasePills" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+              <!-- Dynamically populated phase pill buttons -->
+            </div>
+          </div>
+
+          <!-- Search & Card Controls Toolbar -->
+          <div id="itineraryCardsToolbar" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-2xl bg-spaceDark/60 border border-white/10">
+            <div class="relative flex-grow max-w-md">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 text-xs">
+                🔍
+              </span>
+              <input
+                type="text"
+                id="itinerarySearchInput"
+                placeholder="Search days, landmarks, dishes, student hacks..."
+                oninput="filterItineraryCards()"
+                class="w-full pl-9 pr-8 py-2 bg-spaceDark border border-white/10 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyanAccent transition shadow-inner"
+              />
+              <button
+                type="button"
+                id="itinerarySearchClear"
+                onclick="clearItinerarySearch()"
+                class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between sm:justify-end gap-2 text-xs">
+              <span id="itineraryCardsCountBadge" class="text-[11px] text-gray-400 px-2.5 py-1 rounded-lg bg-white/5 border border-white/5">
+                Showing all days
+              </span>
+              <button
+                type="button"
+                onclick="toggleAllDayCards(true)"
+                class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition text-xs font-semibold"
+                title="Expand all day cards"
+              >
+                🔽 Expand
+              </button>
+              <button
+                type="button"
+                onclick="toggleAllDayCards(false)"
+                class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition text-xs font-semibold"
+                title="Collapse all day cards"
+              >
+                🔼 Collapse
+              </button>
+            </div>
+          </div>
+
+          <!-- Cards View: Day by Day structured interactive cards -->
+          <div id="itineraryCardsView" class="space-y-4">
+            <!-- Dynamic day cards rendered here -->
+          </div>
+
+          <!-- Document View: Raw sanitized Markdown (Toggleable) -->
+          <div id="itineraryDocView" class="hidden">
+            <div id="itineraryView" class="itinerary-prose text-sm p-5 sm:p-8 rounded-2xl bg-spaceDark/70 border border-white/5 shadow-inner"></div>
+          </div>
+
+          <!-- Essential Student Tips Banner (Always visible in cards view) -->
+          <div id="itineraryTipsCard" class="hidden glass-card p-5 sm:p-6 rounded-2xl border border-cyanAccent/20 bg-gradient-to-br from-cyanAccent/5 to-transparent space-y-3 shadow-lg">
+            <div class="flex items-center gap-2 pb-2 border-b border-white/10">
+              <span class="text-xl">🎒</span>
+              <h4 class="text-sm sm:text-base font-bold text-white">Essential Student Travel Hacks & Safety</h4>
+            </div>
+            <div id="itineraryTipsContent" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gray-300">
+              <!-- Dynamically populated tips -->
+            </div>
+          </div>
         </div>
 
       </div>
@@ -2762,7 +4212,15 @@ HTML_CONTENT = """<!DOCTYPE html>
       }
       ['home', 'planner', 'budget', 'packing', 'saved'].forEach(p => {
         const pageEl = document.getElementById(`page-${p}`);
-        if (pageEl) pageEl.classList.toggle('hidden', p !== page);
+        if (pageEl) {
+          const isTarget = (p === page);
+          pageEl.classList.toggle('hidden', !isTarget);
+          if (isTarget) {
+            pageEl.classList.remove('page-enter');
+            void pageEl.offsetWidth; // Force reflow for smooth animation restart
+            pageEl.classList.add('page-enter');
+          }
+        }
         const t = document.getElementById(`tab-${p}`);
         if (t) t.classList.toggle('active', p === page);
         const m = document.getElementById(`mob-${p}`);
@@ -2788,12 +4246,62 @@ HTML_CONTENT = """<!DOCTYPE html>
     // (Uses sessionStorage: persists during tab refresh, but
     // automatically resets when site is closed & reopened)
     // ========================================================
+    function toggleItineraryStudentMode() {
+      if (!currentTrip) return;
+      if (!currentTrip.trip_summary) currentTrip.trip_summary = {};
+      const currentVal = currentTrip.trip_summary.student_mode !== false;
+      const newVal = !currentVal;
+      currentTrip.trip_summary.student_mode = newVal;
+
+      // Sync the planner form checkbox
+      onStudentModeToggle(newVal, true);
+
+      // Re-render the blueprint with smooth update
+      renderItineraryBlueprint(currentTrip);
+
+      showToast(newVal ? 'Switched to 🎓 Student Explorer Mode' : 'Switched to ✨ Standard Traveler Mode', 'info', 2200);
+    }
+
+    function onStudentModeToggle(isStudent, triggerAutoSave = true) {
+      const checkbox = document.getElementById('plannerStudentMode');
+      if (checkbox && checkbox.checked !== isStudent) {
+        checkbox.checked = isStudent;
+      }
+      const badge = document.getElementById('studentModeBadge');
+      const icon = document.getElementById('studentModeIcon');
+      const desc = document.getElementById('studentModeDesc');
+      const card = document.getElementById('studentModeCard');
+
+      if (isStudent) {
+        if (badge) {
+          badge.innerText = 'ON';
+          badge.className = 'text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-coralPrimary text-white uppercase tracking-wider shadow-sm';
+        }
+        if (icon) icon.innerText = '🎒';
+        if (desc) desc.innerText = 'Enables student discounts, hostel stays & budget savings hacks';
+        if (card) card.className = 'p-3.5 rounded-2xl bg-gradient-to-r from-coralPrimary/10 via-amberAccent/5 to-cyanAccent/10 border border-coralPrimary/30 flex items-center justify-between gap-3 shadow-inner transition';
+      } else {
+        if (badge) {
+          badge.innerText = 'OFF';
+          badge.className = 'text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-700 text-gray-300 uppercase tracking-wider shadow-sm';
+        }
+        if (icon) icon.innerText = '✈️';
+        if (desc) desc.innerText = 'Standard curated travel: boutique stays, gastronomy, skip-the-line admissions';
+        if (card) card.className = 'p-3.5 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-purple-500/10 border border-blue-500/30 flex items-center justify-between gap-3 shadow-inner transition';
+      }
+
+      if (triggerAutoSave) {
+        savePlannerDraft();
+      }
+    }
+
     function savePlannerDraft() {
       try {
         const draft = {
           destination: document.getElementById('plannerDest')?.value || '',
           days: document.getElementById('plannerDays')?.value || '3',
           tier: document.getElementById('plannerTier')?.value || 'Student (Low)',
+          studentMode: document.getElementById('plannerStudentMode') ? document.getElementById('plannerStudentMode').checked : true,
           budgetCap: document.getElementById('plannerBudgetCap')?.value || '',
           mustVisit: document.getElementById('plannerMustVisit')?.value || '',
           pace: document.getElementById('plannerPace')?.value || 'Balanced',
@@ -2826,6 +4334,11 @@ HTML_CONTENT = """<!DOCTYPE html>
           if (draft.budgetCap) document.getElementById('plannerBudgetCap').value = draft.budgetCap;
           if (draft.mustVisit) document.getElementById('plannerMustVisit').value = draft.mustVisit;
           if (draft.pace) document.getElementById('plannerPace').value = draft.pace;
+          if (draft.studentMode !== undefined) {
+            onStudentModeToggle(draft.studentMode, false);
+          } else {
+            onStudentModeToggle(true, false);
+          }
           if (Array.isArray(draft.interests) && draft.interests.length > 0) {
             selectedInterests = draft.interests;
             document.querySelectorAll('#interestPills .chip-tag').forEach(tag => {
@@ -2853,7 +4366,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             currentTrip = tripData;
             document.getElementById('plannerPlaceholder').classList.add('hidden');
             document.getElementById('plannerResults').classList.remove('hidden');
-            document.getElementById('itineraryView').innerHTML = safeMarkdown(tripData.itinerary);
+            renderItineraryBlueprint(tripData);
             if (tripData.trip_summary && tripData.trip_summary.destination) {
               document.getElementById('mapHeading').innerText = `📍 Exploring ${tripData.trip_summary.destination}`;
             }
@@ -2895,6 +4408,7 @@ HTML_CONTENT = """<!DOCTYPE html>
           if (must) must.value = '';
           const pace = document.getElementById('plannerPace');
           if (pace) pace.value = 'Balanced';
+          onStudentModeToggle(true, false);
 
           // Reset interest tags to default
           selectedInterests = ['Street Food', 'History & Shrines'];
@@ -3120,13 +4634,16 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('plannerResults').classList.add('hidden');
       document.getElementById('plannerLoading').classList.remove('hidden');
 
+      const isStudentMode = document.getElementById('plannerStudentMode') ? document.getElementById('plannerStudentMode').checked : true;
+
       try {
         const res = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             destination, days, budget_level: budgetTier, budget_amount: budgetAmount,
-            currency, region: reg.name, interests: selectedInterests, must_visit: mustVisit, travel_pace: pace
+            currency, region: reg.name, interests: selectedInterests, must_visit: mustVisit, travel_pace: pace,
+            student_mode: isStudentMode
           })
         });
 
@@ -3142,8 +4659,8 @@ HTML_CONTENT = """<!DOCTYPE html>
         // Render Map
         renderMap(data.destination_coords, data.markers);
 
-        // Render Markdown safely
-        document.getElementById('itineraryView').innerHTML = safeMarkdown(data.itinerary);
+        // Render Blueprint (Cards + Document)
+        renderItineraryBlueprint(data);
         document.getElementById('mapHeading').innerText = `📍 Exploring ${destination}`;
 
         document.getElementById('plannerLoading').classList.add('hidden');
@@ -3165,43 +4682,704 @@ HTML_CONTENT = """<!DOCTYPE html>
     function renderMap(center, markers = []) {
       const placeholder = document.getElementById('mapPlaceholder');
       const mapEl = document.getElementById('map');
+      const legend = document.getElementById('mapLegend');
       if (placeholder) placeholder.classList.add('hidden');
       if (mapEl) mapEl.classList.remove('hidden');
+      if (legend) legend.classList.remove('hidden');
 
       const badge = document.getElementById('mapStatusBadge');
       if (badge) {
-        badge.innerText = 'Live GPS Pins';
+        badge.innerText = `Live GPS Pins · ${markers.length}`;
         badge.className = 'text-xs text-cyanAccent font-semibold px-2.5 py-0.5 rounded-full bg-cyanAccent/10 border border-cyanAccent/20';
       }
 
       const centerCoords = center || (markers.length > 0 ? markers[0].coords : [20, 0]);
       if (!mapInstance) {
-        mapInstance = L.map('map').setView(centerCoords, 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(mapInstance);
-        markersLayer = L.featureGroup().addTo(mapInstance);
-      } else {
-        markersLayer.clearLayers();
-        mapInstance.setView(centerCoords, 13);
+        mapInstance = L.map('map', {
+          zoomControl: false,
+          attributionControl: false
+        }).setView(centerCoords, 13);
+
+        L.control.zoom({ position: 'topright' }).addTo(mapInstance);
+        L.control.attribution({ position: 'bottomright', prefix: false }).addTo(mapInstance);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(mapInstance);
       }
 
+      // Recreate markersLayer using MarkerClusterGroup when available
+      if (markersLayer) {
+        mapInstance.removeLayer(markersLayer);
+      }
+
+      if (typeof L.markerClusterGroup === 'function') {
+        markersLayer = L.markerClusterGroup({
+          maxClusterRadius: 36,
+          spiderfyOnMaxZoom: true,
+          showCoverageOnHover: false,
+          zoomToBoundsOnClick: true,
+          iconCreateFunction: function(cluster) {
+            const count = cluster.getChildCount();
+            return L.divIcon({
+              html: `<div class="roam-cluster-badge"><span>${count}</span></div>`,
+              className: 'roam-cluster-container',
+              iconSize: [40, 40],
+              iconAnchor: [20, 20]
+            });
+          }
+        });
+        mapInstance.addLayer(markersLayer);
+      } else {
+        markersLayer = L.featureGroup().addTo(mapInstance);
+      }
+
+      /* --- Marker styling by type --- */
+      const markerConfig = {
+        destination: { color: '#FF6B4A', icon: '📍', label: 'Destination', glow: 'rgba(255,107,74,0.4)' },
+        must_visit:  { color: '#FFB347', icon: '⭐', label: 'Must Visit',  glow: 'rgba(255,179,71,0.4)' },
+        landmark:    { color: '#4AEAFF', icon: '🏛️', label: 'Landmark',   glow: 'rgba(74,234,255,0.35)' }
+      };
+
       const bounds = [];
-      markers.forEach(m => {
+      let landmarkIdx = 0;
+      window.leafletMarkersByDay = {};
+      window.leafletMarkersByName = {};
+
+      markers.forEach((m, i) => {
         if (!m.coords) return;
         bounds.push(m.coords);
-        const marker = L.marker(m.coords).addTo(markersLayer);
-        marker.bindPopup(`<b>${m.name}</b>`);
-        marker.bindTooltip(m.name);
+
+        const cfg = markerConfig[m.type] || markerConfig.landmark;
+        const isDestination = m.type === 'destination';
+        const size = isDestination ? 42 : 34;
+        const innerLabel = m.type === 'landmark' ? (++landmarkIdx) : cfg.icon;
+        const borderW = isDestination ? 3 : 2;
+
+        const customIcon = L.divIcon({
+          className: 'roam-marker',
+          html: `<div class="roam-pin" id="pin-marker-${innerLabel}" style="
+            width:${size}px; height:${size}px;
+            background: ${cfg.color};
+            border: ${borderW}px solid rgba(255,255,255,0.9);
+            border-radius: 50% 50% 50% 4px;
+            transform: rotate(-45deg);
+            box-shadow: 0 0 12px ${cfg.glow}, 0 4px 12px rgba(0,0,0,0.4);
+            display:flex; align-items:center; justify-content:center;
+            animation: roamPinDrop 0.5s cubic-bezier(0.34,1.56,0.64,1) ${i * 0.02}s both;
+          ">
+            <span style="transform:rotate(45deg); font-size:${isDestination ? '18px' : '13px'}; line-height:1; color:#fff; font-weight:800; text-shadow:0 1px 3px rgba(0,0,0,0.5);">
+              ${innerLabel}
+            </span>
+          </div>`,
+          iconSize: [size, size],
+          iconAnchor: [size / 2, size],
+          popupAnchor: [0, -size + 4]
+        });
+
+        const marker = L.marker(m.coords, { icon: customIcon });
+        markersLayer.addLayer(marker);
+
+        const displayName = m.name.replace(/^(Destination: |Must Visit: )/, '');
+        const cleanNameKey = displayName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        window.leafletMarkersByName[cleanNameKey] = marker;
+        if (m.type === 'landmark') {
+          window.leafletMarkersByDay[landmarkIdx] = marker;
+        }
+
+        const safeDisplay = displayName.replace(/'/g, "\\'");
+        const popupContent = `
+          <div class="roam-popup">
+            <div class="roam-popup-badge" style="background:${cfg.color}20; color:${cfg.color}; border:1px solid ${cfg.color}40;">
+              ${cfg.icon} ${cfg.label} ${m.type === 'landmark' ? '#' + innerLabel : ''}
+            </div>
+            <div class="roam-popup-name">${displayName}</div>
+            <div class="roam-popup-coords">
+              ${m.coords[0].toFixed(4)}°N, ${m.coords[1].toFixed(4)}°E
+            </div>
+            ${m.type === 'landmark' ? `
+            <button type="button" onclick="highlightItineraryDay(${innerLabel}, '${safeDisplay}')" class="mt-2.5 w-full py-1 text-[11px] font-bold rounded-lg bg-cyanAccent/20 hover:bg-cyanAccent/30 text-cyanAccent border border-cyanAccent/40 transition flex items-center justify-center gap-1 cursor-pointer">
+              <span>📅 View Day ${innerLabel} in Itinerary</span>
+            </button>` : ''}
+          </div>`;
+
+        marker.bindPopup(popupContent, {
+          className: 'roam-popup-container',
+          maxWidth: 270,
+          minWidth: 190
+        });
+
+        marker.bindTooltip(displayName, {
+          className: 'roam-tooltip',
+          direction: 'top',
+          offset: [0, -size + 2]
+        });
+
+        marker.on('click', () => {
+          if (m.type === 'landmark') {
+            highlightItineraryDay(innerLabel, displayName);
+          }
+        });
       });
 
-      if (bounds.length > 1) mapInstance.fitBounds(bounds, { padding: [40, 40] });
+      if (bounds.length > 1) {
+        mapInstance.fitBounds(bounds, { padding: [55, 55], maxZoom: 14 });
+      } else if (bounds.length === 1) {
+        mapInstance.setView(bounds[0], 13);
+      }
       setTimeout(() => mapInstance.invalidateSize(), 300);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function parseItineraryMarkdown(markdown) {
+      const result = {
+        title: '',
+        budgetSummary: '',
+        phases: [],
+        days: [],
+        tips: []
+      };
+
+      if (!markdown) return result;
+
+      const lines = markdown.split(/\r?\n/);
+      let currentPhase = null;
+      let currentDay = null;
+      let inTipsSection = false;
+
+      const titleMatch = markdown.match(/^#\s+(.+)$/m);
+      if (titleMatch) result.title = titleMatch[1].trim();
+
+      const totalBudgetMatch = markdown.match(/Estimated Total:\*{0,2}\s*\*{0,2}(~?[\d,]+\s*[A-Z]+)/i);
+      if (totalBudgetMatch) result.budgetSummary = totalBudgetMatch[1].trim();
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // Check for Tips Section
+        if (/^##\s+(?:🎒|🗺️|💡)?\s*Essential\s+(?:Student|Travel)\s+Tips/i.test(line)) {
+          inTipsSection = true;
+          if (currentDay) { result.days.push(currentDay); currentDay = null; }
+          continue;
+        }
+
+        if (inTipsSection) {
+          if (/^-\s+/.test(line)) {
+            result.tips.push(line.replace(/^-\s+/, ''));
+          }
+          continue;
+        }
+
+        // Check for Phase Header
+        const phaseMatch = line.match(/^###\s+📍?\s*(Phase\s*\d+[^(\n]+(?:\([^\)]+\))?)/i);
+        if (phaseMatch) {
+          if (currentDay) { result.days.push(currentDay); currentDay = null; }
+          currentPhase = {
+            title: phaseMatch[1].trim(),
+            desc: ''
+          };
+          if (lines[i + 1] && lines[i + 1].trim().startsWith('*')) {
+            currentPhase.desc = lines[i + 1].trim().replace(/^\*|\*$/g, '');
+          }
+          result.phases.push(currentPhase);
+          continue;
+        }
+
+        // Check for Day Header
+        const dayMatch = line.match(/^(?:#{3,4}\s*Day\s*(\d+)\s*[:\-–]\s*([^\n]+)|\*\*Day\s*(\d+)\s*[:\-–]\s*([^\n*]+)\*\*)/i);
+        if (dayMatch) {
+          if (currentDay) result.days.push(currentDay);
+          const dayNum = parseInt(dayMatch[1] || dayMatch[3]);
+          const rawTitle = (dayMatch[2] || dayMatch[4]).trim();
+          
+          let landmarkName = rawTitle;
+          let zone = '';
+          const zoneMatch = rawTitle.match(/^(.+?)\s*\(([^)]+)\)$/);
+          if (zoneMatch) {
+            landmarkName = zoneMatch[1].trim();
+            zone = zoneMatch[2].trim();
+          }
+
+          currentDay = {
+            day: dayNum,
+            rawTitle,
+            landmarkName,
+            zone,
+            phaseIdx: result.phases.length > 0 ? result.phases.length - 1 : 0,
+            morning: '',
+            afternoon: '',
+            evening: '',
+            hack: '',
+            budget: ''
+          };
+          continue;
+        }
+
+        // Inside day body
+        if (currentDay) {
+          if (/^-\s*☀️|Morning/i.test(line)) {
+            currentDay.morning = line.replace(/^-\s*☀️\s*(\*\*Morning Exploration:\*\*|\*\*Morning:\*\*|\s*)?/i, '').trim();
+          } else if (/^-\s*🌤️|Afternoon/i.test(line)) {
+            currentDay.afternoon = line.replace(/^-\s*🌤️\s*(\*\*Afternoon Local Vibe & Eatery:\*\*|\*\*Afternoon:\*\*|\s*)?/i, '').trim();
+          } else if (/^-\s*🌙|Evening/i.test(line)) {
+            currentDay.evening = line.replace(/^-\s*🌙\s*(\*\*Evening Social & Sunset:\*\*|\*\*Evening:\*\*|\s*)?/i, '').trim();
+          } else if (/^-\s*💡|Hack|Student Tip|Traveler Pro Tip/i.test(line)) {
+            currentDay.hack = line.replace(/^-\s*💡\s*(\*\*Student Insider Hack:\*\*|\*\*Student Tip:\*\*|\s*)?/i, '').trim();
+          } else if (/^-\s*💰|Daily Target Budget/i.test(line)) {
+            currentDay.budget = line.replace(/^-\s*💰\s*(\*\*Daily Target Budget:\*\*|\*\*Target Budget:\*\*|\s*)?/i, '').trim();
+          }
+        }
+      }
+
+      if (currentDay) result.days.push(currentDay);
+
+      return result;
+    }
+
+    function renderDayCard(d) {
+      const isStudent = (currentTrip && currentTrip.trip_summary && currentTrip.trip_summary.student_mode !== false);
+      const safeName = escapeHtml(d.landmarkName);
+      const safeZone = escapeHtml(d.zone);
+      let safeMorning = escapeHtml(d.morning);
+      let safeAfternoon = escapeHtml(d.afternoon);
+      let safeEvening = escapeHtml(d.evening);
+      let safeHack = escapeHtml(d.hack);
+      const safeBudget = escapeHtml(d.budget);
+
+      // Cleanse student specific keywords if in standard traveler mode
+      if (!isStudent) {
+        safeMorning = safeMorning
+          .replace(/Flash your student ID card at the entry gate for 30% to 50% concession tickets\./gi, 'Pre-book skip-the-line admissions online for effortless priority entry.')
+          .replace(/indie backpacker/gi, 'panoramic boutique');
+
+        safeEvening = safeEvening
+          .replace(/indie backpacker rooftop cafe/gi, 'scenic rooftop lounge')
+          .replace(/communal hostel lounge/gi, 'serene terrace lounge');
+
+        if (safeHack) {
+          safeHack = safeHack
+            .replace(/Carry a refillable water bottle and flash your student ID card at ticket counters for instant 30% to 50% concession discounts\./gi, 'Reserve priority admission tickets online 48 hours in advance to bypass main ticketing queues.')
+            .replace(/Take shared local transit or split a shared cab from the main stand for a fraction of private taxi rates\. Keep local small change handy for vendors\./gi, 'Arrange dedicated private cabs or premium express transit for comfortable, efficient travel between sights.')
+            .replace(/Check local transit timetables with your hostel reception the night before to catch early morning departures and beat tour crowds\./gi, 'Consult your hotel concierge for recommended excursion departure times to experience viewpoints at optimal lighting.')
+            .replace(/Eat where local university students eat; follow the crowds to backstreet family-run kitchens for 50% cheaper authentic regional meals\./gi, 'Explore celebrated neighborhood family-run kitchens and historic culinary spots for authentic regional flavors.')
+            .replace(/student identity card \(ISIC\)/gi, 'verified priority transit pass')
+            .replace(/student discounts?/gi, 'pre-booked priority rates')
+            .replace(/hostel/gi, 'hotel')
+            .replace(/student/gi, 'traveler');
+        }
+      }
+
+      let budgetMain = safeBudget;
+      let budgetDetail = '';
+      if (safeBudget.includes('(')) {
+        const parts = safeBudget.split('(');
+        budgetMain = parts[0].trim();
+        budgetDetail = '(' + parts.slice(1).join('(');
+      }
+
+      const safeJsName = d.landmarkName.replace(/'/g, "\'");
+
+      let hackBoxHtml = '';
+      if (safeHack) {
+        if (isStudent) {
+          hackBoxHtml = `
+            <div class="p-3 rounded-xl bg-amberAccent/10 border border-amberAccent/20 text-amberAccent/90 flex items-start gap-2.5 tip-box-student shadow-sm">
+              <span class="text-base leading-none select-none">💡</span>
+              <div class="min-w-0"><strong class="text-amberAccent font-bold">Student Insider Hack:</strong> <span class="text-gray-200 text-xs">${safeHack}</span></div>
+            </div>`;
+        } else {
+          hackBoxHtml = `
+            <div class="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 flex items-start gap-2.5 tip-box-traveler shadow-sm">
+              <span class="text-base leading-none select-none">✨</span>
+              <div class="min-w-0"><strong class="text-sky-400 font-bold">Traveler Pro Tip:</strong> <span class="text-gray-200 text-xs">${safeHack}</span></div>
+            </div>`;
+        }
+      }
+
+      return `
+      <div class="day-card rounded-2xl p-4 sm:p-5 transition space-y-3 relative shadow-sm" id="day-card-${d.day}" data-day="${d.day}" data-phase="${d.phaseIdx}">
+        <div class="flex items-center justify-between gap-3 cursor-pointer select-none" onclick="toggleDayCard(${d.day})">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="px-2.5 py-1 rounded-xl bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 font-extrabold text-xs whitespace-nowrap">
+              Day ${d.day}
+            </span>
+            <div class="min-w-0">
+              <h4 class="text-sm sm:text-base font-bold text-white truncate">${safeName}</h4>
+              <span class="text-[11px] text-gray-400 flex items-center gap-1.5 truncate">
+                ${safeZone ? `<span>📍 ${safeZone}</span>` : ''}
+                ${budgetMain ? `<span class="text-amberAccent font-semibold">• ${budgetMain}</span>` : ''}
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 whitespace-nowrap">
+            <button type="button" onclick="event.stopPropagation(); focusDayMarker(${d.day}, '${safeJsName}');" class="px-2.5 py-1 rounded-xl bg-cyanAccent/15 hover:bg-cyanAccent/30 text-cyanAccent border border-cyanAccent/30 text-xs font-bold transition flex items-center gap-1 shadow-sm" title="Locate on Map">
+              <span>📍 Map</span>
+            </button>
+            <span id="chevron-${d.day}" class="chevron-icon text-gray-400 text-xs">▼</span>
+          </div>
+        </div>
+        <div id="body-${d.day}" class="day-card-body pt-2 space-y-2.5 text-xs text-gray-300 border-t border-white/5">
+          ${safeMorning ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02]"><span class="text-base leading-none select-none">☀️</span><div class="min-w-0"><strong class="text-white">Morning:</strong> ${safeMorning}</div></div>` : ''}
+          ${safeAfternoon ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02]"><span class="text-base leading-none select-none">🌤️</span><div class="min-w-0"><strong class="text-white">Afternoon:</strong> ${safeAfternoon}</div></div>` : ''}
+          ${safeEvening ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02]"><span class="text-base leading-none select-none">🌙</span><div class="min-w-0"><strong class="text-white">Evening:</strong> ${safeEvening}</div></div>` : ''}
+          ${hackBoxHtml}
+          ${safeBudget ? `<div class="flex items-center justify-between pt-1 text-[11px] text-gray-400"><span class="text-emeraldAccent font-semibold">💰 Target: ${budgetMain}</span><span class="text-gray-500 text-[10px]">${budgetDetail}</span></div>` : ''}
+        </div>
+      </div>`;
+    }
+
+    window.currentItineraryPhase = 'all';
+    window.totalPhasesCount = 0;
+
+    function renderItineraryBlueprint(data) {
+      if (!data) return;
+      const rawMd = data.itinerary || '';
+
+      // 1. Render safe markdown into document view
+      const docEl = document.getElementById('itineraryView');
+      if (docEl) {
+        docEl.innerHTML = safeMarkdown(rawMd);
+      }
+
+      // 2. Parse Markdown
+      const parsed = parseItineraryMarkdown(rawMd);
+      const daysCount = parsed.days.length || (data.trip_summary ? data.trip_summary.days : (data.days || 3));
+      const markersCount = (data.markers ? data.markers.length : 0);
+      const destination = (data.trip_summary ? data.trip_summary.destination : '') || (document.getElementById('plannerDest') ? document.getElementById('plannerDest').value : '');
+
+      // Update Student Mode Button on Blueprint
+      const isStudentMode = (data.trip_summary ? data.trip_summary.student_mode !== false : true);
+      const studentBtn = document.getElementById('itineraryStudentModeBtn');
+      const studentIcon = document.getElementById('itineraryStudentModeIcon');
+      const studentText = document.getElementById('itineraryStudentModeText');
+      const searchInputEl = document.getElementById('itinerarySearchInput');
+
+      if (studentBtn) {
+        if (isStudentMode) {
+          studentBtn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 border transition shadow-sm bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border-emerald-500/30';
+          if (studentIcon) studentIcon.innerText = '🎓';
+          if (studentText) studentText.innerText = 'Student Mode: ON';
+        } else {
+          studentBtn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 border transition shadow-sm bg-blue-500/15 hover:bg-blue-500/25 text-blue-400 border-blue-500/30';
+          if (studentIcon) studentIcon.innerText = '✨';
+          if (studentText) studentText.innerText = 'Traveler Mode (Normal)';
+        }
+      }
+
+      if (searchInputEl) {
+        searchInputEl.placeholder = isStudentMode ? 'Search days, landmarks, dishes, student hacks...' : 'Search days, landmarks, activities, local tips...';
+      }
+
+      // 3. Update Metrics Ribbon
+      const metricDays = document.getElementById('metricDays');
+      if (metricDays) metricDays.innerText = `${daysCount} Days`;
+
+      const metricPins = document.getElementById('metricPins');
+      if (metricPins) metricPins.innerText = `${markersCount} Live GPS Pins`;
+
+      const metricBudget = document.getElementById('metricBudget');
+      if (metricBudget) {
+        metricBudget.innerText = parsed.budgetSummary || (data.trip_summary ? `${data.trip_summary.budget_level}` : 'Custom Tier');
+      }
+
+      const metricPhases = document.getElementById('metricPhases');
+      if (metricPhases) {
+        window.totalPhasesCount = parsed.phases.length;
+        metricPhases.innerText = parsed.phases.length > 1 ? `${parsed.phases.length} Regional Circuits` : 'Direct Itinerary';
+      }
+
+      const mainHeading = document.getElementById('itineraryMainHeading');
+      if (mainHeading && destination) {
+        mainHeading.innerText = `${destination} — ${daysCount} Days Blueprint`;
+      }
+
+      // 4. Render Phase Navigation Pills
+      const phaseNavContainer = document.getElementById('itineraryPhaseNavContainer');
+      const phasePillsContainer = document.getElementById('itineraryPhasePills');
+      if (parsed.phases.length > 1 && phasePillsContainer && phaseNavContainer) {
+        phaseNavContainer.classList.remove('hidden');
+        let pillsHtml = `
+          <button type="button" onclick="filterItineraryPhase('all')" data-phase="all" class="phase-pill-btn active px-3.5 py-1.5 rounded-full text-xs font-bold border border-white/15 bg-white/10 text-white flex items-center gap-1.5 shadow-sm">
+            <span>✨ All Days (${daysCount})</span>
+          </button>
+        `;
+        parsed.phases.forEach((ph, pIdx) => {
+          const daysInPhase = parsed.days.filter(d => d.phaseIdx === pIdx).length;
+          let shortTitle = ph.title.replace(/^Phase\s*\d+\s*:\s*/i, '');
+          if (shortTitle.length > 28) shortTitle = shortTitle.substring(0, 26) + '...';
+          pillsHtml += `
+            <button type="button" onclick="filterItineraryPhase(${pIdx})" data-phase="${pIdx}" class="phase-pill-btn px-3.5 py-1.5 rounded-full text-xs font-bold border border-white/15 bg-white/5 hover:bg-white/10 text-gray-300 flex items-center gap-1.5 shadow-sm" title="${ph.title}">
+              <span>P${pIdx + 1}: ${shortTitle} (${daysInPhase})</span>
+            </button>
+          `;
+        });
+        phasePillsContainer.innerHTML = pillsHtml;
+      } else if (phaseNavContainer) {
+        phaseNavContainer.classList.add('hidden');
+      }
+
+      // 5. Render Day Cards with Phase Headers
+      const cardsView = document.getElementById('itineraryCardsView');
+      if (cardsView) {
+        if (parsed.days.length > 0) {
+          let cardsHtml = '';
+          let lastPhaseIdx = -1;
+
+          parsed.days.forEach(d => {
+            if (d.phaseIdx !== lastPhaseIdx && parsed.phases[d.phaseIdx]) {
+              lastPhaseIdx = d.phaseIdx;
+              const ph = parsed.phases[d.phaseIdx];
+              cardsHtml += `
+                <div class="phase-divider-header pt-4 pb-1 border-b border-white/10" data-phase="${d.phaseIdx}">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs px-2.5 py-0.5 rounded-full bg-cyanAccent/20 text-cyanAccent font-extrabold border border-cyanAccent/30 uppercase tracking-wider">
+                      Circuit ${d.phaseIdx + 1}
+                    </span>
+                    <h4 class="text-sm sm:text-base font-extrabold text-white">${ph.title}</h4>
+                  </div>
+                  ${ph.desc ? `<p class="text-xs text-gray-400 mt-1 italic">${ph.desc}</p>` : ''}
+                </div>
+              `;
+            }
+            cardsHtml += renderDayCard(d);
+          });
+
+          cardsView.innerHTML = cardsHtml;
+          setItineraryViewMode('cards');
+        } else {
+          setItineraryViewMode('doc');
+        }
+      }
+
+      // 6. Render Tips Card
+      const tipsCard = document.getElementById('itineraryTipsCard');
+      const tipsContent = document.getElementById('itineraryTipsContent');
+      if (tipsCard && tipsContent) {
+        if (parsed.tips.length > 0) {
+          tipsContent.innerHTML = parsed.tips.map(tip => `
+            <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2">
+              <span class="text-coralPrimary text-sm leading-none">✓</span>
+              <div>${tip}</div>
+            </div>
+          `).join('');
+          tipsCard.classList.remove('hidden');
+        } else {
+          tipsCard.classList.add('hidden');
+        }
+      }
+
+      // 7. Reset filters
+      window.currentItineraryPhase = 'all';
+      const searchInput = document.getElementById('itinerarySearchInput');
+      if (searchInput) searchInput.value = '';
+      filterItineraryCards();
+    }
+
+    function setItineraryViewMode(mode) {
+      const cardsView = document.getElementById('itineraryCardsView');
+      const docView = document.getElementById('itineraryDocView');
+      const toolbar = document.getElementById('itineraryCardsToolbar');
+      const phaseNav = document.getElementById('itineraryPhaseNavContainer');
+      const tipsCard = document.getElementById('itineraryTipsCard');
+      const btnCards = document.getElementById('viewModeCardsBtn');
+      const btnDoc = document.getElementById('viewModeDocBtn');
+
+      if (mode === 'cards') {
+        if (cardsView) cardsView.classList.remove('hidden');
+        if (toolbar) toolbar.classList.remove('hidden');
+        if (phaseNav && window.totalPhasesCount > 1) phaseNav.classList.remove('hidden');
+        if (tipsCard) tipsCard.classList.remove('hidden');
+        if (docView) docView.classList.add('hidden');
+
+        if (btnCards) {
+          btnCards.className = 'px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-coralPrimary text-white shadow-sm';
+        }
+        if (btnDoc) {
+          btnDoc.className = 'px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-gray-400 hover:text-white';
+        }
+      } else {
+        if (cardsView) cardsView.classList.add('hidden');
+        if (toolbar) toolbar.classList.add('hidden');
+        if (phaseNav) phaseNav.classList.add('hidden');
+        if (tipsCard) tipsCard.classList.add('hidden');
+        if (docView) docView.classList.remove('hidden');
+
+        if (btnCards) {
+          btnCards.className = 'px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-gray-400 hover:text-white';
+        }
+        if (btnDoc) {
+          btnDoc.className = 'px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-coralPrimary text-white shadow-sm';
+        }
+      }
+    }
+
+    function toggleDayCard(dayNum) {
+      const body = document.getElementById('body-' + dayNum);
+      const chevron = document.getElementById('chevron-' + dayNum);
+      if (!body) return;
+      const isCollapsed = body.classList.contains('collapsed');
+      if (isCollapsed) {
+        body.classList.remove('collapsed');
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      } else {
+        body.classList.add('collapsed');
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    function toggleAllDayCards(expand) {
+      document.querySelectorAll('.day-card-body').forEach(b => {
+        b.classList.toggle('collapsed', !expand);
+      });
+      document.querySelectorAll('[id^="chevron-"]').forEach(ch => {
+        ch.style.transform = expand ? 'rotate(0deg)' : 'rotate(-90deg)';
+      });
+      showToast(expand ? 'Expanded all day cards' : 'Collapsed all day cards', 'info', 1500);
+    }
+
+    function filterItineraryPhase(phaseIdx) {
+      window.currentItineraryPhase = phaseIdx;
+
+      document.querySelectorAll('.phase-pill-btn').forEach(btn => {
+        const p = btn.getAttribute('data-phase');
+        const isActive = String(p) === String(phaseIdx);
+        btn.classList.toggle('active', isActive);
+      });
+
+      const phaseCountLabel = document.getElementById('activePhaseCount');
+      if (phaseCountLabel) {
+        phaseCountLabel.innerText = phaseIdx === 'all' ? 'Showing All Phases' : `Showing Phase ${parseInt(phaseIdx) + 1}`;
+      }
+
+      filterItineraryCards();
+    }
+
+    function filterItineraryCards() {
+      const input = document.getElementById('itinerarySearchInput');
+      const query = input ? input.value.toLowerCase().trim() : '';
+      const clearBtn = document.getElementById('itinerarySearchClear');
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', !query);
+      }
+
+      const activePhase = window.currentItineraryPhase || 'all';
+      const cards = document.querySelectorAll('.day-card');
+      const phaseHeaders = document.querySelectorAll('.phase-divider-header');
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const cardPhase = card.getAttribute('data-phase');
+        const text = card.innerText.toLowerCase();
+
+        const matchesPhase = (activePhase === 'all' || cardPhase === String(activePhase));
+        const matchesSearch = (!query || text.includes(query));
+
+        if (matchesPhase && matchesSearch) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      phaseHeaders.forEach(hdr => {
+        const hdrPhase = hdr.getAttribute('data-phase');
+        if (activePhase === 'all') {
+          hdr.classList.remove('hidden');
+        } else if (hdrPhase === String(activePhase)) {
+          hdr.classList.remove('hidden');
+        } else {
+          hdr.classList.add('hidden');
+        }
+      });
+
+      const countBadge = document.getElementById('itineraryCardsCountBadge');
+      if (countBadge) {
+        countBadge.innerText = `Showing ${visibleCount} of ${cards.length} Days`;
+      }
+    }
+
+    function clearItinerarySearch() {
+      const input = document.getElementById('itinerarySearchInput');
+      if (input) input.value = '';
+      filterItineraryCards();
+    }
+
+    function focusDayMarker(dayNum, landmarkName) {
+      const mapCard = document.getElementById('plannerMapCard');
+      if (mapCard) {
+        mapCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      let marker = window.leafletMarkersByDay ? window.leafletMarkersByDay[dayNum] : null;
+      if (!marker && landmarkName && window.leafletMarkersByName) {
+        const cleanKey = landmarkName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        for (const k in window.leafletMarkersByName) {
+          if (k.includes(cleanKey) || cleanKey.includes(k)) {
+            marker = window.leafletMarkersByName[k];
+            break;
+          }
+        }
+      }
+
+      if (marker && mapInstance) {
+        setTimeout(() => {
+          if (markersLayer && typeof markersLayer.zoomToShowLayer === 'function') {
+            markersLayer.zoomToShowLayer(marker, () => {
+              mapInstance.panTo(marker.getLatLng(), { animate: true });
+              marker.openPopup();
+            });
+          } else {
+            mapInstance.setView(marker.getLatLng(), 14, { animate: true });
+            marker.openPopup();
+          }
+        }, 350);
+      } else {
+        showToast(`Day ${dayNum} pin plotted in destination overview!`, 'info', 2000);
+      }
+    }
+
+    function highlightItineraryDay(dayNum, landmarkName) {
+      setItineraryViewMode('cards');
+
+      if (window.currentItineraryPhase !== 'all') {
+        filterItineraryPhase('all');
+      }
+      const searchInput = document.getElementById('itinerarySearchInput');
+      if (searchInput && searchInput.value) {
+        searchInput.value = '';
+        clearItinerarySearch();
+      }
+
+      const card = document.getElementById('day-card-' + dayNum);
+      if (card) {
+        const body = document.getElementById('body-' + dayNum);
+        const chevron = document.getElementById('chevron-' + dayNum);
+        if (body && (body.classList.contains('collapsed') || body.classList.contains('hidden'))) {
+          body.classList.remove('collapsed', 'hidden');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('day-card-highlight');
+        setTimeout(() => card.classList.remove('day-card-highlight'), 2200);
+        showToast(`Jumped to Day ${dayNum}: ${landmarkName || ''}`, 'success', 2000);
+      }
     }
 
     function resetMapPlaceholder() {
       const placeholder = document.getElementById('mapPlaceholder');
       const mapEl = document.getElementById('map');
+      const legend = document.getElementById('mapLegend');
       if (placeholder) placeholder.classList.remove('hidden');
       if (mapEl) mapEl.classList.add('hidden');
+      if (legend) legend.classList.add('hidden');
 
       const badge = document.getElementById('mapStatusBadge');
       if (badge) {
@@ -3243,19 +5421,185 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.head.appendChild(s);
     }
 
+    function buildPrintablePdfDocument(tripData) {
+      if (!tripData) return '';
+      const isStudent = tripData.trip_summary ? tripData.trip_summary.student_mode !== false : true;
+      const destination = (tripData.trip_summary && tripData.trip_summary.destination) ? tripData.trip_summary.destination : 'Your Destination';
+      const daysCount = (tripData.trip_summary && tripData.trip_summary.days) ? tripData.trip_summary.days : (tripData.days || 3);
+      const markersCount = tripData.markers ? tripData.markers.length : 0;
+      const pace = (tripData.trip_summary && tripData.trip_summary.travel_pace) ? tripData.trip_summary.travel_pace : 'Balanced';
+
+      const rawMd = tripData.itinerary || '';
+      const parsed = parseItineraryMarkdown(rawMd);
+      const budgetEstimate = parsed.budgetSummary || (tripData.trip_summary ? `${tripData.trip_summary.budget_level} Tier` : 'Estimated Budget');
+
+      let daysHtml = '';
+      let lastPhaseIdx = -1;
+
+      if (parsed.days && parsed.days.length > 0) {
+        parsed.days.forEach(d => {
+          if (d.phaseIdx !== lastPhaseIdx && parsed.phases && parsed.phases[d.phaseIdx]) {
+            lastPhaseIdx = d.phaseIdx;
+            const ph = parsed.phases[d.phaseIdx];
+            daysHtml += `
+              <div class="pdf-phase-header" style="background:#f1f5f9; border-left: 4px solid #0284c7; border-radius: 6px; padding: 8px 12px; margin-top: 16px; margin-bottom: 10px; page-break-inside: avoid; break-inside: avoid;">
+                <div style="font-size: 12px; font-weight: 800; color: #0f172a;">
+                  🧭 Circuit ${d.phaseIdx + 1}: ${escapeHtml(ph.title)}
+                </div>
+                ${ph.desc ? `<div style="font-size: 10px; color: #475569; font-style: italic; margin-top: 2px;">${escapeHtml(ph.desc)}</div>` : ''}
+              </div>
+            `;
+          }
+
+          const safeName = escapeHtml(d.landmarkName);
+          const safeZone = escapeHtml(d.zone);
+          const safeMorning = escapeHtml(d.morning);
+          const safeAfternoon = escapeHtml(d.afternoon);
+          const safeEvening = escapeHtml(d.evening);
+          const safeHack = escapeHtml(d.hack);
+          const safeBudget = escapeHtml(d.budget);
+
+          daysHtml += `
+            <div class="pdf-day-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #FF6B4A; border-radius: 8px; padding: 11px 14px; margin-bottom: 10px; page-break-inside: avoid; break-inside: avoid; font-family: inherit;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="background: #FF6B4A; color: #ffffff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; text-transform: uppercase;">
+                    Day ${d.day}
+                  </span>
+                  <span style="font-weight: 800; font-size: 12.5px; color: #0f172a;">
+                    ${safeName}
+                  </span>
+                  ${safeZone ? `<span style="font-size: 10.5px; color: #64748b;">(📍 ${safeZone})</span>` : ''}
+                </div>
+                ${safeBudget ? `
+                <span style="font-size: 10px; font-weight: 700; color: #059669; background: #ecfdf5; border: 1px solid #d1fae5; padding: 2px 6px; border-radius: 4px;">
+                  ${safeBudget.split('(')[0].trim()}
+                </span>` : ''}
+              </div>
+
+              <div style="font-size: 10.5px; color: #334155; line-height: 1.45; display: flex; flex-direction: column; gap: 3.5px;">
+                ${safeMorning ? `<div><strong>☀️ Morning:</strong> ${safeMorning}</div>` : ''}
+                ${safeAfternoon ? `<div><strong>🌤️ Afternoon:</strong> ${safeAfternoon}</div>` : ''}
+                ${safeEvening ? `<div><strong>🌙 Evening:</strong> ${safeEvening}</div>` : ''}
+                ${safeHack ? `
+                <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 5px 8px; border-radius: 5px; color: #92400e; margin-top: 2px;">
+                  <strong>💡 ${isStudent ? 'Student Hack' : 'Traveler Pro Tip'}:</strong> ${safeHack}
+                </div>` : ''}
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      let tipsBoxHtml = '';
+      if (parsed.tips && parsed.tips.length > 0) {
+        tipsBoxHtml = `
+          <div class="pdf-tips-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 14px; margin-top: 16px; margin-bottom: 12px; page-break-inside: avoid; break-inside: avoid;">
+            <div style="font-size: 11.5px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">
+              ${isStudent ? '🎒 Essential Student Travel Hacks & Guidance' : '🗺️ Essential Traveler Guidance & Local Tips'}
+            </div>
+            <div style="font-size: 10.5px; color: #334155; line-height: 1.5; display: flex; flex-direction: column; gap: 4px;">
+              ${parsed.tips.map(t => `<div>• ${escapeHtml(t)}</div>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+      <div class="roamai-pdf-doc" style="background:#ffffff; color:#1e293b; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding:20px 24px; line-height:1.5; width:760px; margin:0 auto; box-sizing:border-box;">
+        <!-- Brand Header -->
+        <div style="border-bottom: 2.5px solid #FF6B4A; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <div style="font-size: 10px; font-weight: 800; letter-spacing: 1.5px; color: #FF6B4A; text-transform: uppercase; margin-bottom: 2px;">
+              RoamAI Travel Architect Blueprint
+            </div>
+            <h1 style="font-size: 20px; font-weight: 900; color: #0f172a; margin: 0; line-height: 1.2;">
+              ${escapeHtml(destination)}
+            </h1>
+            <div style="font-size: 12px; font-weight: 600; color: #64748b; margin-top: 3px;">
+              ${daysCount}-Day Comprehensive Itinerary • ${isStudent ? '🎒 Student Explorer Edition' : '✨ Curated Traveler Edition'}
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <span style="display: inline-block; padding: 3px 8px; background: #fff1ee; color: #FF6B4A; font-weight: 800; font-size: 10.5px; border-radius: 6px; border: 1px solid #fed7cc;">
+              ${escapeHtml(budgetEstimate)}
+            </span>
+            <div style="font-size: 9.5px; color: #94a3b8; margin-top: 4px;">
+              Generated: ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip Matrix Box -->
+        <div class="pdf-summary-box" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; page-break-inside: avoid; break-inside: avoid;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 10.5px;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 8px;">
+              <div style="color: #64748b; font-size: 9.5px;">📅 Duration</div>
+              <div style="font-weight: 800; color: #0f172a; font-size: 11.5px;">${daysCount} Days</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 8px;">
+              <div style="color: #64748b; font-size: 9.5px;">📍 Landmarks</div>
+              <div style="font-weight: 800; color: #0284c7; font-size: 11.5px;">${markersCount} GPS Pins</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 8px;">
+              <div style="color: #64748b; font-size: 9.5px;">💰 Budget</div>
+              <div style="font-weight: 800; color: #d97706; font-size: 11.5px;">${escapeHtml(budgetEstimate)}</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 8px;">
+              <div style="color: #64748b; font-size: 9.5px;">🧭 Pace</div>
+              <div style="font-weight: 800; color: #059669; font-size: 11.5px;">${escapeHtml(pace)} Pace</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day by Day Itinerary -->
+        <div>
+          ${daysHtml}
+        </div>
+
+        <!-- Tips Box -->
+        ${tipsBoxHtml}
+
+        <!-- Footer -->
+        <div style="border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 16px; font-size: 9px; color: #94a3b8; text-align: center; page-break-inside: avoid; break-inside: avoid;">
+          Generated with RoamAI Travel Architect • Your Smart AI Companion • Safe Travels!
+        </div>
+      </div>
+      `;
+    }
+
     function downloadTripPDF() {
       if (!currentTrip) return;
       loadPdfEngine(() => {
-        showToast('Generating and downloading your PDF itinerary...', 'info');
-        const el = document.getElementById('itineraryView');
+        showToast('Generating high-resolution print-ready PDF itinerary...', 'info', 3000);
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.left = '-9999px';
+        container.style.top = '0';
+        container.style.width = '794px';
+        container.style.background = '#ffffff';
+        container.style.zIndex = '-9999';
+        container.innerHTML = buildPrintablePdfDocument(currentTrip);
+        document.body.appendChild(container);
+
+        const safeDest = (currentTrip.trip_summary?.destination || 'Destination').replace(/[^a-zA-Z0-9_\-]/g, '_');
         const opt = {
           margin: [10, 10, 10, 10],
-          filename: `Trip_to_${currentTrip.trip_summary.destination}.pdf`,
+          filename: `RoamAI_${safeDest}_Itinerary.pdf`,
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
-        html2pdf().set(opt).from(el).save();
+
+        html2pdf().set(opt).from(container).save().then(() => {
+          if (document.body.contains(container)) document.body.removeChild(container);
+          showToast('PDF downloaded successfully!', 'success');
+        }).catch(err => {
+          if (document.body.contains(container)) document.body.removeChild(container);
+          console.error('PDF export error:', err);
+          showToast('Failed to export PDF. Please try again.', 'error');
+        });
       });
     }
 
@@ -3318,6 +5662,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         itinerary: currentTrip.itinerary,
         markers: currentTrip.markers || [],
         destination_coords: currentTrip.destination_coords || null,
+        student_mode: currentTrip.trip_summary ? (currentTrip.trip_summary.student_mode !== false) : true,
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
       };
 
@@ -3407,7 +5752,7 @@ HTML_CONTENT = """<!DOCTYPE html>
       document.getElementById('plannerLoading').classList.add('hidden');
       document.getElementById('plannerResults').classList.remove('hidden');
 
-      document.getElementById('itineraryView').innerHTML = safeMarkdown(trip.itinerary);
+      renderItineraryBlueprint(trip);
       document.getElementById('mapHeading').innerText = `📍 Exploring ${trip.destination}`;
 
       if (trip.destination_coords || (trip.markers && trip.markers.length > 0)) {
@@ -3423,20 +5768,46 @@ HTML_CONTENT = """<!DOCTYPE html>
       if (!trip) return;
 
       loadPdfEngine(() => {
-        showToast('Preparing PDF export...', 'info');
-        const tempDiv = document.createElement('div');
-        tempDiv.className = 'itinerary-prose p-6 bg-slate-900 text-white rounded-xl';
-        tempDiv.innerHTML = safeMarkdown(trip.itinerary);
-
-        const opt = {
-          margin: [10, 10, 10, 10],
-          filename: `Trip_to_${trip.destination.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true },
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        showToast('Preparing high-resolution PDF export...', 'info', 3000);
+        const tripData = {
+          trip_summary: {
+            destination: trip.destination,
+            days: trip.days,
+            student_mode: trip.student_mode !== undefined ? trip.student_mode : true
+          },
+          itinerary: trip.itinerary,
+          markers: trip.markers || [],
+          destination_coords: trip.destination_coords || null
         };
 
-        html2pdf().set(opt).from(tempDiv).save();
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.left = '-9999px';
+        container.style.top = '0';
+        container.style.width = '794px';
+        container.style.background = '#ffffff';
+        container.style.zIndex = '-9999';
+        container.innerHTML = buildPrintablePdfDocument(tripData);
+        document.body.appendChild(container);
+
+        const safeDest = (trip.destination || 'Trip').replace(/[^a-zA-Z0-9_\-]/g, '_');
+        const opt = {
+          margin: [10, 10, 10, 10],
+          filename: `RoamAI_${safeDest}_Itinerary.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        html2pdf().set(opt).from(container).save().then(() => {
+          if (document.body.contains(container)) document.body.removeChild(container);
+          showToast('PDF downloaded successfully!', 'success');
+        }).catch(err => {
+          if (document.body.contains(container)) document.body.removeChild(container);
+          console.error('PDF export error:', err);
+          showToast('Failed to export PDF. Please try again.', 'error');
+        });
       });
     }
 
