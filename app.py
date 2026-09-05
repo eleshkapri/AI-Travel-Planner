@@ -2388,6 +2388,153 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       transform: scale(0.9);
     }
 
+  
+    /* ========================================================
+       THEME CONTRAST & ACCENT POLISH: STUDENT MODE & BLUEPRINT
+       ======================================================== */
+    /* Student Mode Form Card */
+    .student-card-active {
+      background: linear-gradient(135deg, rgba(255, 107, 74, 0.12), rgba(245, 158, 11, 0.08));
+      border-color: rgba(255, 107, 74, 0.35);
+    }
+    .light-theme .student-card-active {
+      background: linear-gradient(135deg, rgba(255, 107, 74, 0.08), rgba(245, 158, 11, 0.05)) !important;
+      border-color: rgba(255, 107, 74, 0.3) !important;
+    }
+
+    .student-card-inactive {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(99, 102, 241, 0.08));
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+    .light-theme .student-card-inactive {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(99, 102, 241, 0.05)) !important;
+      border-color: rgba(59, 130, 246, 0.3) !important;
+    }
+
+    /* Student Mode Badges */
+    .student-mode-badge-on {
+      background: #10B981 !important;
+      color: #FFFFFF !important;
+      border: 1px solid rgba(16, 185, 129, 0.5) !important;
+    }
+    .light-theme .student-mode-badge-on {
+      background: #059669 !important;
+      color: #FFFFFF !important;
+    }
+
+    .student-mode-badge-off {
+      background: #334155 !important;
+      color: #F1F5F9 !important;
+      border: 1px solid #475569 !important;
+    }
+    .light-theme .student-mode-badge-off {
+      background: #E2E8F0 !important;
+      color: #1E293B !important;
+      border: 1.5px solid #CBD5E1 !important;
+    }
+
+    /* Light Theme Toggle Track when unchecked */
+    .light-theme #plannerStudentMode:not(:checked) + div {
+      background-color: #CBD5E1 !important;
+    }
+
+    /* Blueprint Itinerary Mode Switcher Button */
+    .itin-mode-btn-student {
+      background: rgba(16, 185, 129, 0.15) !important;
+      color: #34D399 !important;
+      border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    }
+    .itin-mode-btn-student:hover {
+      background: rgba(16, 185, 129, 0.25) !important;
+    }
+    .light-theme .itin-mode-btn-student {
+      background: #ECFDF5 !important;
+      color: #047857 !important;
+      border: 1.5px solid #6EE7B7 !important;
+    }
+    .light-theme .itin-mode-btn-student:hover {
+      background: #D1FAE5 !important;
+    }
+
+    .itin-mode-btn-traveler {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #60A5FA !important;
+      border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    }
+    .itin-mode-btn-traveler:hover {
+      background: rgba(59, 130, 246, 0.25) !important;
+    }
+    .light-theme .itin-mode-btn-traveler {
+      background: #EFF6FF !important;
+      color: #1D4ED8 !important;
+      border: 1.5px solid #93C5FD !important;
+    }
+    .light-theme .itin-mode-btn-traveler:hover {
+      background: #DBEAFE !important;
+    }
+
+    /* View Mode Switcher Container (Cards / Document) */
+    .light-theme #viewModeSwitcherContainer {
+      background: #F1F5F9 !important;
+      border: 1px solid #CBD5E1 !important;
+    }
+    .light-theme .view-mode-btn.inactive {
+      color: #475569 !important;
+    }
+    .light-theme .view-mode-btn.inactive:hover {
+      color: #0F172A !important;
+    }
+
+    /* Tip Boxes: Student Hack & Traveler Pro Tip (Dark Mode) */
+    .tip-box-student {
+      background: rgba(245, 158, 11, 0.12) !important;
+      border: 1px solid rgba(245, 158, 11, 0.30) !important;
+    }
+    .tip-box-student .tip-title {
+      color: #FBBF24 !important;
+    }
+    .tip-box-student .tip-content {
+      color: #F8FAFC !important;
+    }
+
+    .tip-box-traveler {
+      background: rgba(14, 165, 233, 0.12) !important;
+      border: 1px solid rgba(14, 165, 233, 0.30) !important;
+    }
+    .tip-box-traveler .tip-title {
+      color: #38BDF8 !important;
+    }
+    .tip-box-traveler .tip-content {
+      color: #F8FAFC !important;
+    }
+
+    /* Tip Boxes: High-Contrast Light Theme */
+    .light-theme .tip-box-student {
+      background: #FFFBEB !important;
+      border: 1.5px solid #FCD34D !important;
+      box-shadow: 0 1px 3px rgba(245, 158, 11, 0.08) !important;
+    }
+    .light-theme .tip-box-student .tip-title {
+      color: #B45309 !important;
+    }
+    .light-theme .tip-box-student .tip-content {
+      color: #78350F !important;
+      font-weight: 500 !important;
+    }
+
+    .light-theme .tip-box-traveler {
+      background: #F0F9FF !important;
+      border: 1.5px solid #BAE6FD !important;
+      box-shadow: 0 1px 3px rgba(14, 165, 233, 0.08) !important;
+    }
+    .light-theme .tip-box-traveler .tip-title {
+      color: #0284C7 !important;
+    }
+    .light-theme .tip-box-traveler .tip-content {
+      color: #0C4A6E !important;
+      font-weight: 500 !important;
+    }
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased relative">
@@ -2411,7 +2558,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
         </div>
         <div class="flex items-center gap-1.5">
           <span class="text-lg sm:text-xl font-extrabold tracking-tight brand-logo-title">RoamAI</span>
-          <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase">Student</span>
+          <span id="brandModePill" class="hidden sm:inline-block text-[9px] sm:text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase transition">Student</span>
         </div>
       </div>
 
@@ -2427,6 +2574,18 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       <!-- Theme Switcher, Region Selector & CTA (Right) -->
       <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         
+        <!-- Global Student Mode Switcher (Site-Wide) -->
+        <button
+          id="navStudentModeToggle"
+          type="button"
+          onclick="toggleGlobalStudentMode()"
+          class="px-2.5 sm:px-3 py-1.5 rounded-xl border text-[10px] sm:text-xs font-extrabold transition flex items-center gap-1.5 shadow-sm shrink-0 itin-mode-btn-student"
+          title="Toggle Student Mode vs Standard Traveler Mode across the whole site"
+        >
+          <span id="navStudentModeIcon">🎒</span>
+          <span id="navStudentModeText" class="hidden md:inline">Student: ON</span>
+        </button>
+
         <!-- Theme Mood Switcher (Dark / Light) -->
         <button
           id="themeToggleBtn"
@@ -2521,19 +2680,19 @@ HTML_CONTENT = r"""<!DOCTYPE html>
           <div class="lg:col-span-7 space-y-5 sm:space-y-6">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] sm:text-xs font-semibold text-amberAccent shadow-inner max-w-full">
               <span class="w-2 h-2 rounded-full bg-emeraldAccent shrink-0 animate-ping"></span>
-              <span class="text-white truncate">Next-Gen Student Travel</span>
+              <span id="heroBadgeText" class="text-white truncate">Next-Gen Student Travel</span>
               <span class="text-gray-400 hidden sm:inline">•</span>
               <span class="hidden sm:inline">Sub-Second AI Engine</span>
             </div>
 
             <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
-              Plan Epic Student Adventures <br/>
+              <span id="heroMainHeading">Plan Epic Student Adventures</span> <br/>
               <span class="bg-clip-text text-transparent bg-gradient-to-r from-coralPrimary via-amberAccent to-cyanAccent animate-text-shimmer">
                 On Any Budget in Seconds.
               </span>
             </h1>
 
-            <p class="text-gray-300 text-xs sm:text-base leading-relaxed max-w-xl">
+            <p id="heroDescText" class="text-gray-300 text-xs sm:text-base leading-relaxed max-w-xl">
               Day-by-day itineraries, verified local student discounts, interactive 3D map pins, and offline PDF exports powered by high-speed Groq AI.
             </p>
 
@@ -2579,7 +2738,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
               </div>
               <div>
                 <p class="text-2xl sm:text-3xl font-extrabold text-cyanAccent">100% Free</p>
-                <p class="text-xs text-gray-400 font-medium">For All Students</p>
+                <p id="heroTrustStudents" class="text-xs text-gray-400 font-medium">For All Students</p>
               </div>
             </div>
           </div>
@@ -2596,7 +2755,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
                 <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end">
                   <div>
                     <h4 class="text-sm font-bold text-white">Tokyo, Japan</h4>
-                    <p class="text-[11px] text-gray-300">3 Days • Student Low Budget</p>
+                    <p id="heroPreviewEdition" class="text-[11px] text-gray-300">3 Days • Student Low Budget</p>
                   </div>
                   <span class="text-xs font-extrabold px-2 py-1 rounded-lg bg-coralPrimary/90 text-white shadow">~₹4,000 / day</span>
                 </div>
@@ -3419,7 +3578,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
               </button>
 
               <!-- View Mode Switcher -->
-              <div class="flex items-center bg-spaceDark/80 p-1 rounded-xl border border-white/10 text-xs shadow-inner">
+              <div id="viewModeSwitcherContainer" class="flex items-center bg-spaceDark/80 p-1 rounded-xl border border-white/10 text-xs shadow-inner transition">
                 <button id="viewModeCardsBtn" type="button" onclick="setItineraryViewMode('cards')" class="px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-coralPrimary text-white shadow-sm">
                   <span>🗂️ Cards</span>
                 </button>
@@ -3555,8 +3714,8 @@ HTML_CONTENT = r"""<!DOCTYPE html>
           <!-- Essential Student Tips Banner (Always visible in cards view) -->
           <div id="itineraryTipsCard" class="hidden glass-card p-5 sm:p-6 rounded-2xl border border-cyanAccent/20 bg-gradient-to-br from-cyanAccent/5 to-transparent space-y-3 shadow-lg">
             <div class="flex items-center gap-2 pb-2 border-b border-white/10">
-              <span class="text-xl">🎒</span>
-              <h4 class="text-sm sm:text-base font-bold text-white">Essential Student Travel Hacks & Safety</h4>
+              <span class="text-xl" id="itineraryTipsIcon">🎒</span>
+              <h4 id="itineraryTipsTitle" class="text-sm sm:text-base font-bold text-white">Essential Student Travel Hacks & Safety</h4>
             </div>
             <div id="itineraryTipsContent" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-gray-300">
               <!-- Dynamically populated tips -->
@@ -3571,7 +3730,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
     <!-- PAGE 3: BUDGET CALCULATOR -->
     <section id="page-budget" class="hidden space-y-8 max-w-4xl mx-auto">
       <div class="text-center space-y-2">
-        <h2 class="text-3xl font-extrabold text-white">💰 Student Trip Budget Calculator</h2>
+        <h2 id="budgetPageTitle" class="text-3xl font-extrabold text-white">💰 Student Trip Budget Calculator</h2>
         <p class="text-gray-400 text-sm">Estimate and balance your trip expenses synced to your selected region currency.</p>
       </div>
 
@@ -3582,7 +3741,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
             <div><label class="text-xs font-bold text-gray-300">Region Currency</label><input type="text" id="bCurrDisplay" readonly value="INR (₹)" class="w-full px-3 py-2 bg-spaceDark/60 border border-white/10 rounded-xl text-sm text-amberAccent font-bold" /></div>
           </div>
           <div><div class="flex justify-between text-xs text-gray-300"><span>🚆 Flights / Trains</span><span id="bValTrans">₹3,000</span></div><input type="range" id="bTrans" min="0" max="50000" step="500" value="3000" class="w-full accent-coralPrimary cursor-pointer" oninput="debouncedCalcBudget()" /></div>
-          <div><div class="flex justify-between text-xs text-gray-300"><span>🏨 Hostel (Per Night)</span><span id="bValStay">₹800</span></div><input type="range" id="bStay" min="200" max="10000" step="100" value="800" class="w-full accent-cyanAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
+          <div><div class="flex justify-between text-xs text-gray-300"><span id="budgetStayLabel">🏨 Hostel (Per Night)</span><span id="bValStay">₹800</span></div><input type="range" id="bStay" min="200" max="10000" step="100" value="800" class="w-full accent-cyanAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
           <div><div class="flex justify-between text-xs text-gray-300"><span>🍜 Food (Per Day)</span><span id="bValFood">₹600</span></div><input type="range" id="bFood" min="100" max="8000" step="100" value="600" class="w-full accent-amberAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
           <div><div class="flex justify-between text-xs text-gray-300"><span>🎟️ Activities (Per Day)</span><span id="bValAct">₹400</span></div><input type="range" id="bAct" min="0" max="5000" step="100" value="400" class="w-full accent-emeraldAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
           <div><div class="flex justify-between text-xs text-gray-300"><span>🛡️ Emergency Buffer</span><span id="bValBuf">₹1,500</span></div><input type="range" id="bBuf" min="0" max="15000" step="250" value="1500" class="w-full accent-purpleAccent cursor-pointer" oninput="debouncedCalcBudget()" /></div>
@@ -3607,7 +3766,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
     <section id="page-packing" class="hidden space-y-8 max-w-5xl mx-auto">
       <div class="text-center space-y-2">
         <span class="text-xs font-bold uppercase tracking-wider text-emeraldAccent">🎒 Never Forget Essentials</span>
-        <h2 class="text-3xl font-extrabold text-white">Smart Student Packing Checklist</h2>
+        <h2 id="packingPageTitle" class="text-3xl font-extrabold text-white">Smart Student Packing Checklist</h2>
         <p class="text-gray-400 text-sm max-w-lg mx-auto">
           Customized checklist tailored to your planned destination, itinerary vibe, and personal essentials.
         </p>
@@ -3633,7 +3792,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
               <option value="mountain">🏔️ Mountains, Hiking & Trekking (Manali, Alps)</option>
               <option value="city">🏙️ City Sightseeing & Culture (Tokyo, Rome, London)</option>
               <option value="winter">❄️ Cold Weather & Snow (Alps, Sapporo, Kashmir)</option>
-              <option value="hostel">🎒 Classic Backpacker & Hostel Dorm</option>
+              <option id="packVibeHostelOption" value="hostel">🎒 Classic Backpacker & Hostel Dorm</option>
             </select>
           </div>
 
@@ -3764,7 +3923,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
         <span class="font-extrabold tracking-tight brand-logo-title">RoamAI</span>
         <span class="text-gray-500">•</span>
         <span class="flex items-center gap-1.5 text-emeraldAccent font-bold text-[11px]">
-          <span class="w-1.5 h-1.5 rounded-full bg-emeraldAccent animate-pulse"></span> Free for Students
+          <span class="w-1.5 h-1.5 rounded-full bg-emeraldAccent animate-pulse"></span> <span id="footerStudentPill">Free for Students</span>
         </span>
       </div>
 
@@ -4262,6 +4421,141 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       showToast(newVal ? 'Switched to 🎓 Student Explorer Mode' : 'Switched to ✨ Standard Traveler Mode', 'info', 2200);
     }
 
+    // ========================================================
+    // GLOBAL SITE-WIDE STUDENT MODE ENGINE (PERSISTED)
+    // ========================================================
+    let siteWideStudentMode = true;
+
+    function initSiteWideStudentMode() {
+      try {
+        const saved = localStorage.getItem('roamai_student_mode');
+        if (saved !== null) {
+          siteWideStudentMode = (saved === 'true');
+        } else {
+          siteWideStudentMode = true;
+        }
+      } catch (e) {
+        siteWideStudentMode = true;
+      }
+      applySiteWideStudentMode(siteWideStudentMode, false);
+    }
+
+    function toggleGlobalStudentMode() {
+      siteWideStudentMode = !siteWideStudentMode;
+      try {
+        localStorage.setItem('roamai_student_mode', siteWideStudentMode ? 'true' : 'false');
+      } catch (e) {}
+      applySiteWideStudentMode(siteWideStudentMode, true);
+    }
+
+    function applySiteWideStudentMode(isStudent, showNotification = true) {
+      siteWideStudentMode = isStudent;
+
+      // 1. Header Navbar Elements
+      const brandPill = document.getElementById('brandModePill');
+      if (brandPill) {
+        if (isStudent) {
+          brandPill.innerText = 'Student';
+          brandPill.className = 'hidden sm:inline-block text-[9px] sm:text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-coralPrimary/20 text-coralPrimary border border-coralPrimary/30 uppercase transition';
+        } else {
+          brandPill.innerText = 'Traveler';
+          brandPill.className = 'hidden sm:inline-block text-[9px] sm:text-[10px] font-bold tracking-widest px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 uppercase transition';
+        }
+      }
+
+      const navBtn = document.getElementById('navStudentModeToggle');
+      const navIcon = document.getElementById('navStudentModeIcon');
+      const navText = document.getElementById('navStudentModeText');
+      if (navBtn) {
+        if (isStudent) {
+          navBtn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl border text-[10px] sm:text-xs font-extrabold transition flex items-center gap-1.5 shadow-sm shrink-0 itin-mode-btn-student';
+          if (navIcon) navIcon.innerText = '🎒';
+          if (navText) navText.innerText = 'Student: ON';
+        } else {
+          navBtn.className = 'px-2.5 sm:px-3 py-1.5 rounded-xl border text-[10px] sm:text-xs font-extrabold transition flex items-center gap-1.5 shadow-sm shrink-0 itin-mode-btn-traveler';
+          if (navIcon) navIcon.innerText = '✈️';
+          if (navText) navText.innerText = 'Standard Traveler';
+        }
+      }
+
+      // 2. Home Page Elements
+      const heroBadge = document.getElementById('heroBadgeText');
+      if (heroBadge) heroBadge.innerText = isStudent ? 'Next-Gen Student Travel' : 'Next-Gen Global Travel';
+
+      const heroHeading = document.getElementById('heroMainHeading');
+      if (heroHeading) heroHeading.innerText = isStudent ? 'Plan Epic Student Adventures' : 'Plan Curated Travel Adventures';
+
+      const heroDesc = document.getElementById('heroDescText');
+      if (heroDesc) {
+        heroDesc.innerText = isStudent
+          ? 'Day-by-day itineraries, verified local student discounts, interactive 3D map pins, and offline PDF exports powered by high-speed Groq AI.'
+          : 'Day-by-day itineraries, boutique & budget stays, interactive 3D map pins, and offline PDF exports powered by high-speed Groq AI.';
+      }
+
+      const heroTrust = document.getElementById('heroTrustStudents');
+      if (heroTrust) heroTrust.innerText = isStudent ? 'For All Students' : 'For All Travelers';
+
+      const heroPrevSub = document.getElementById('heroPreviewEdition');
+      if (heroPrevSub) heroPrevSub.innerText = isStudent ? '3 Days • Student Low Budget' : '3 Days • Curated Traveler Edition';
+
+      const hotspotBadge = document.getElementById('hotspotSectionBadge');
+      if (hotspotBadge) hotspotBadge.innerText = isStudent ? 'Curated For Students' : 'Curated For Travelers';
+
+      const hotspotTitle = document.getElementById('hotspotSectionTitle');
+      if (hotspotTitle) hotspotTitle.innerText = isStudent ? '🔥 Trending Student Destinations' : '🔥 Trending Travel Destinations';
+
+      const hotspotDesc = document.getElementById('hotspotSectionDesc');
+      if (hotspotDesc) {
+        hotspotDesc.innerText = isStudent
+          ? 'Classified by National (India) and International hotspots with authentic student discounts & budget estimates'
+          : 'Classified by National (India) and International hotspots with curated highlights & regional budget estimates';
+      }
+
+      const footerPill = document.getElementById('footerStudentPill');
+      if (footerPill) footerPill.innerText = isStudent ? 'Free for Students' : 'Free for All Travelers';
+
+      // 3. Budget Calculator Page
+      const budgetTitle = document.getElementById('budgetPageTitle');
+      if (budgetTitle) budgetTitle.innerText = isStudent ? '💰 Student Trip Budget Calculator' : '💰 Trip Budget Calculator';
+
+      const stayLabel = document.getElementById('budgetStayLabel');
+      if (stayLabel) stayLabel.innerText = isStudent ? '🏨 Hostel (Per Night)' : '🏨 Hotel / Stay (Per Night)';
+
+      const bStay = document.getElementById('bStay');
+      const bTrans = document.getElementById('bTrans');
+      const bFood = document.getElementById('bFood');
+      const bAct = document.getElementById('bAct');
+      if (bStay && bTrans && bFood && bAct) {
+        const reg = (typeof REGIONS !== 'undefined' && REGIONS[activeRegionKey]) ? REGIONS[activeRegionKey] : { defaults: { trans: 3000, stay: 800, food: 600, act: 400 } };
+        if (isStudent) {
+          bStay.value = reg.defaults.stay;
+          bTrans.value = reg.defaults.trans;
+          bFood.value = reg.defaults.food;
+          bAct.value = reg.defaults.act;
+        } else {
+          bStay.value = Math.round(reg.defaults.stay * 2.75);
+          bTrans.value = Math.round(reg.defaults.trans * 1.5);
+          bFood.value = Math.round(reg.defaults.food * 1.6);
+          bAct.value = Math.round(reg.defaults.act * 2.0);
+        }
+        if (typeof calcBudget === 'function') calcBudget();
+      }
+
+      // 4. Packing List Page
+      const packTitle = document.getElementById('packingPageTitle');
+      if (packTitle) packTitle.innerText = isStudent ? 'Smart Student Packing Checklist' : 'Smart Travel Packing Checklist';
+
+      const packHostelOpt = document.getElementById('packVibeHostelOption');
+      if (packHostelOpt) packHostelOpt.innerText = isStudent ? '🎒 Classic Backpacker & Hostel Dorm' : '🏨 Hotel, Resort & Boutique Stay';
+
+      // 5. Trip Architect Sidebar & Active Itinerary
+      onStudentModeToggle(isStudent, true);
+
+      if (showNotification) {
+        showToast(isStudent ? 'Site transformed to 🎒 Student Explorer Mode' : 'Site transformed to ✨ Standard Traveler Mode', 'info', 2200);
+      }
+    }
+
     function onStudentModeToggle(isStudent, triggerAutoSave = true) {
       const checkbox = document.getElementById('plannerStudentMode');
       if (checkbox && checkbox.checked !== isStudent) {
@@ -4271,23 +4565,77 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       const icon = document.getElementById('studentModeIcon');
       const desc = document.getElementById('studentModeDesc');
       const card = document.getElementById('studentModeCard');
+      const tierSelect = document.getElementById('plannerTier');
 
+      // 1. Update Badge, Icon, Description & Card Styling
       if (isStudent) {
         if (badge) {
           badge.innerText = 'ON';
-          badge.className = 'text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-coralPrimary text-white uppercase tracking-wider shadow-sm';
+          badge.className = 'text-[10px] font-extrabold px-2.5 py-0.5 rounded-full student-mode-badge-on uppercase tracking-wider shadow-sm';
         }
         if (icon) icon.innerText = '🎒';
         if (desc) desc.innerText = 'Enables student discounts, hostel stays & budget savings hacks';
-        if (card) card.className = 'p-3.5 rounded-2xl bg-gradient-to-r from-coralPrimary/10 via-amberAccent/5 to-cyanAccent/10 border border-coralPrimary/30 flex items-center justify-between gap-3 shadow-inner transition';
+        if (card) {
+          card.className = 'p-3.5 rounded-2xl student-card-active border flex items-center justify-between gap-3 shadow-inner transition';
+        }
       } else {
         if (badge) {
           badge.innerText = 'OFF';
-          badge.className = 'text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-700 text-gray-300 uppercase tracking-wider shadow-sm';
+          badge.className = 'text-[10px] font-extrabold px-2.5 py-0.5 rounded-full student-mode-badge-off uppercase tracking-wider shadow-sm';
         }
         if (icon) icon.innerText = '✈️';
         if (desc) desc.innerText = 'Standard curated travel: boutique stays, gastronomy, skip-the-line admissions';
-        if (card) card.className = 'p-3.5 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-purple-500/10 border border-blue-500/30 flex items-center justify-between gap-3 shadow-inner transition';
+        if (card) {
+          card.className = 'p-3.5 rounded-2xl student-card-inactive border flex items-center justify-between gap-3 shadow-inner transition';
+        }
+      }
+
+      // 2. Dynamically update the TIER select options based on Student Mode!
+      if (tierSelect) {
+        const currentTier = tierSelect.value;
+        if (isStudent) {
+          tierSelect.innerHTML = `
+            <option value="Student (Low)">Student (Low)</option>
+            <option value="Moderate Backpacker">Moderate Backpacker</option>
+            <option value="Luxury Student">Luxury Student</option>
+          `;
+          if (currentTier === 'Economy Traveler' || currentTier === 'Budget Traveler') {
+            tierSelect.value = 'Student (Low)';
+          } else if (currentTier === 'Comfort Explorer' || currentTier === 'Moderate Explorer') {
+            tierSelect.value = 'Moderate Backpacker';
+          } else if (currentTier === 'Boutique Luxury' || currentTier === 'Luxury Traveler') {
+            tierSelect.value = 'Luxury Student';
+          } else {
+            tierSelect.value = 'Student (Low)';
+          }
+        } else {
+          tierSelect.innerHTML = `
+            <option value="Economy Traveler">Economy Traveler</option>
+            <option value="Comfort Explorer">Comfort Explorer</option>
+            <option value="Boutique Luxury">Boutique Luxury</option>
+          `;
+          if (currentTier === 'Student (Low)') {
+            tierSelect.value = 'Economy Traveler';
+          } else if (currentTier === 'Moderate Backpacker') {
+            tierSelect.value = 'Comfort Explorer';
+          } else if (currentTier === 'Luxury Student') {
+            tierSelect.value = 'Boutique Luxury';
+          } else {
+            tierSelect.value = 'Economy Traveler';
+          }
+        }
+      }
+
+      // 3. IMMEDIATELY update and re-render the active itinerary if one is loaded!
+      if (currentTrip) {
+        if (!currentTrip.trip_summary) currentTrip.trip_summary = {};
+        const modeChanged = (currentTrip.trip_summary.student_mode !== isStudent);
+        currentTrip.trip_summary.student_mode = isStudent;
+        currentTrip.student_mode = isStudent;
+        renderItineraryBlueprint(currentTrip);
+        if (modeChanged) {
+          showToast(isStudent ? 'Adapted to 🎓 Student Explorer Mode' : 'Adapted to ✨ Standard Traveler Mode', 'info', 2000);
+        }
       }
 
       if (triggerAutoSave) {
@@ -4831,6 +5179,20 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       setTimeout(() => mapInstance.invalidateSize(), 300);
     }
 
+    function sanitizeTipContent(raw) {
+      let s = String(raw || '').trim();
+      let prev = '';
+      while (s !== prev) {
+        prev = s;
+        s = s.replace(/^[\s\-•*]*(?:💡|✨)?[\s\-•*]*/i, '')
+             .replace(/^\*\*(?:Student Insider Hack|Traveler Pro Tip|Student Tip|Traveler Tip|Pro Tip|Insider Hack|Local Insider Tip):\*\*\s*/i, '')
+             .replace(/^(?:Student Insider Hack|Traveler Pro Tip|Student Tip|Traveler Tip|Pro Tip|Insider Hack|Local Insider Tip)[:\* ]*\s*/i, '')
+             .replace(/^\*\*|\*\*$/g, '')
+             .trim();
+      }
+      return s;
+    }
+
     function escapeHtml(str) {
       if (!str) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -4942,6 +5304,42 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       return result;
     }
 
+    function getAdaptedBudget(tripData, isStudent) {
+      const reg = (typeof REGIONS !== 'undefined' && REGIONS[activeRegionKey]) ? REGIONS[activeRegionKey] : { curr: 'INR' };
+      const curr = (tripData && tripData.trip_summary && tripData.trip_summary.currency) ? tripData.trip_summary.currency : (reg ? reg.curr : 'INR');
+      const multipliers = {
+        "INR": 1.0, "USD": 0.012, "EUR": 0.011, "GBP": 0.0095, "JPY": 1.8,
+        "AUD": 0.018, "CAD": 0.016, "AED": 0.044, "THB": 0.44
+      };
+      const m = multipliers[curr] || 1.0;
+      const tier = (tripData && tripData.trip_summary && tripData.trip_summary.budget_level) ? tripData.trip_summary.budget_level : 'Standard';
+      const tierMult = (tier.includes('Moderate') || tier.includes('Comfort')) ? 1.8 : ((tier.includes('Luxury') || tier.includes('Boutique')) ? 3.2 : 1.0);
+
+      if (isStudent) {
+        const stay = Math.round(800 * m * tierMult);
+        const food = Math.round(500 * m * tierMult);
+        const trans = Math.round(300 * m * tierMult);
+        const total = stay + food + trans;
+        return {
+          curr,
+          totalPerDay: total,
+          main: `~${total.toLocaleString()} ${curr}`,
+          detail: `(Stay: ~${stay.toLocaleString()} ${curr} • Food: ~${food.toLocaleString()} ${curr} • Transit: ~${trans.toLocaleString()} ${curr})`
+        };
+      } else {
+        const stay = Math.round(2200 * m * tierMult);
+        const food = Math.round(1000 * m * tierMult);
+        const trans = Math.round(600 * m * tierMult);
+        const total = stay + food + trans;
+        return {
+          curr,
+          totalPerDay: total,
+          main: `~${total.toLocaleString()} ${curr}`,
+          detail: `(Stay: ~${stay.toLocaleString()} ${curr} • Food: ~${food.toLocaleString()} ${curr} • Transit: ~${trans.toLocaleString()} ${curr})`
+        };
+      }
+    }
+
     function renderDayCard(d) {
       const isStudent = (currentTrip && currentTrip.trip_summary && currentTrip.trip_summary.student_mode !== false);
       const safeName = escapeHtml(d.landmarkName);
@@ -4949,21 +5347,34 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       let safeMorning = escapeHtml(d.morning);
       let safeAfternoon = escapeHtml(d.afternoon);
       let safeEvening = escapeHtml(d.evening);
-      let safeHack = escapeHtml(d.hack);
-      const safeBudget = escapeHtml(d.budget);
+      let rawCleanHack = sanitizeTipContent(d.hack);
 
-      // Cleanse student specific keywords if in standard traveler mode
+      const budgetInfo = getAdaptedBudget(currentTrip, isStudent);
+      const budgetMain = budgetInfo.main;
+      const budgetDetail = budgetInfo.detail;
+
+      // Cleanse and enrich content when switching between Student and Standard Traveler Modes
       if (!isStudent) {
         safeMorning = safeMorning
-          .replace(/Flash your student ID card at the entry gate for 30% to 50% concession tickets\./gi, 'Pre-book skip-the-line admissions online for effortless priority entry.')
-          .replace(/indie backpacker/gi, 'panoramic boutique');
+          .replace(/Flash your student ID card at the entry gate for 30% to 50% concession tickets\./gi, 'Pre-book priority admission online for effortless skip-the-line entry.')
+          .replace(/Carry a refillable water bottle and flash your student ID card at ticket counters for instant 30% to 50% concession discounts\./gi, 'Reserve priority admission tickets online 48 hours in advance to bypass main queuing lines.')
+          .replace(/indie backpacker/gi, 'panoramic boutique')
+          .replace(/hostel/gi, 'hotel')
+          .replace(/dorm/gi, 'private suite');
+
+        safeAfternoon = safeAfternoon
+          .replace(/Eat where local university students eat; follow the crowds to backstreet family-run kitchens for 50% cheaper authentic regional meals\./gi, 'Explore celebrated neighborhood family-run kitchens and historic culinary spots for authentic regional flavors.')
+          .replace(/budget street food stall/gi, 'celebrated local kitchen & artisan eatery')
+          .replace(/cheap student/gi, 'authentic regional');
 
         safeEvening = safeEvening
           .replace(/indie backpacker rooftop cafe/gi, 'scenic rooftop lounge')
-          .replace(/communal hostel lounge/gi, 'serene terrace lounge');
+          .replace(/communal hostel lounge/gi, 'serene heritage terrace lounge')
+          .replace(/communal hostel hearth/gi, 'refined fireside terrace lounge')
+          .replace(/hostel common room/gi, 'hotel lounge');
 
-        if (safeHack) {
-          safeHack = safeHack
+        if (rawCleanHack) {
+          rawCleanHack = rawCleanHack
             .replace(/Carry a refillable water bottle and flash your student ID card at ticket counters for instant 30% to 50% concession discounts\./gi, 'Reserve priority admission tickets online 48 hours in advance to bypass main ticketing queues.')
             .replace(/Take shared local transit or split a shared cab from the main stand for a fraction of private taxi rates\. Keep local small change handy for vendors\./gi, 'Arrange dedicated private cabs or premium express transit for comfortable, efficient travel between sights.')
             .replace(/Check local transit timetables with your hostel reception the night before to catch early morning departures and beat tour crowds\./gi, 'Consult your hotel concierge for recommended excursion departure times to experience viewpoints at optimal lighting.')
@@ -4975,29 +5386,28 @@ HTML_CONTENT = r"""<!DOCTYPE html>
         }
       }
 
-      let budgetMain = safeBudget;
-      let budgetDetail = '';
-      if (safeBudget.includes('(')) {
-        const parts = safeBudget.split('(');
-        budgetMain = parts[0].trim();
-        budgetDetail = '(' + parts.slice(1).join('(');
-      }
-
+      let safeHack = escapeHtml(sanitizeTipContent(rawCleanHack));
       const safeJsName = d.landmarkName.replace(/'/g, "\'");
 
       let hackBoxHtml = '';
       if (safeHack) {
         if (isStudent) {
           hackBoxHtml = `
-            <div class="p-3 rounded-xl bg-amberAccent/10 border border-amberAccent/20 text-amberAccent/90 flex items-start gap-2.5 tip-box-student shadow-sm">
+            <div class="p-3 rounded-xl tip-box-student flex items-start gap-2.5 shadow-sm">
               <span class="text-base leading-none select-none">💡</span>
-              <div class="min-w-0"><strong class="text-amberAccent font-bold">Student Insider Hack:</strong> <span class="text-gray-200 text-xs">${safeHack}</span></div>
+              <div class="min-w-0">
+                <strong class="font-bold tip-title">Student Insider Hack:</strong>
+                <span class="tip-content text-xs ml-1">${safeHack}</span>
+              </div>
             </div>`;
         } else {
           hackBoxHtml = `
-            <div class="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-300 flex items-start gap-2.5 tip-box-traveler shadow-sm">
+            <div class="p-3 rounded-xl tip-box-traveler flex items-start gap-2.5 shadow-sm">
               <span class="text-base leading-none select-none">✨</span>
-              <div class="min-w-0"><strong class="text-sky-400 font-bold">Traveler Pro Tip:</strong> <span class="text-gray-200 text-xs">${safeHack}</span></div>
+              <div class="min-w-0">
+                <strong class="font-bold tip-title">Traveler Pro Tip:</strong>
+                <span class="tip-content text-xs ml-1">${safeHack}</span>
+              </div>
             </div>`;
         }
       }
@@ -5029,7 +5439,7 @@ HTML_CONTENT = r"""<!DOCTYPE html>
           ${safeAfternoon ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02]"><span class="text-base leading-none select-none">🌤️</span><div class="min-w-0"><strong class="text-white">Afternoon:</strong> ${safeAfternoon}</div></div>` : ''}
           ${safeEvening ? `<div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/[0.02]"><span class="text-base leading-none select-none">🌙</span><div class="min-w-0"><strong class="text-white">Evening:</strong> ${safeEvening}</div></div>` : ''}
           ${hackBoxHtml}
-          ${safeBudget ? `<div class="flex items-center justify-between pt-1 text-[11px] text-gray-400"><span class="text-emeraldAccent font-semibold">💰 Target: ${budgetMain}</span><span class="text-gray-500 text-[10px]">${budgetDetail}</span></div>` : ''}
+          ${budgetMain ? `<div class="flex items-center justify-between pt-1 text-[11px] text-gray-400"><span class="text-emeraldAccent font-semibold">💰 Target: ${budgetMain}</span><span class="text-gray-500 text-[10px]">${budgetDetail}</span></div>` : ''}
         </div>
       </div>`;
     }
@@ -5039,12 +5449,31 @@ HTML_CONTENT = r"""<!DOCTYPE html>
 
     function renderItineraryBlueprint(data) {
       if (!data) return;
+      const isStudentMode = (data.trip_summary ? data.trip_summary.student_mode !== false : true);
       const rawMd = data.itinerary || '';
 
-      // 1. Render safe markdown into document view
+      // 1. Render adaptive markdown into document view
       const docEl = document.getElementById('itineraryView');
       if (docEl) {
-        docEl.innerHTML = safeMarkdown(rawMd);
+        let displayMd = rawMd;
+        if (!isStudentMode) {
+          displayMd = displayMd
+            .replace(/^#\s+🌍\s*(\d+)-Day\s+Grand\s+Explorer:\s*/m, '# 🌍 $1-Day Curated Journey: ')
+            .replace(/##\s+💰\s*Estimated\s+Student\s+Budget\s+Breakdown/gi, '## 💰 Estimated Travel Budget Breakdown')
+            .replace(/##\s+🎒\s*Essential\s+Student\s+Tips/gi, '## 🗺️ Essential Travel Tips & Guidance')
+            .replace(/Flash your student ID card at the entry gate for 30% to 50% concession tickets\./gi, 'Pre-book skip-the-line admissions online for effortless priority entry.')
+            .replace(/Carry a refillable water bottle and flash your student ID card at ticket counters for instant 30% to 50% concession discounts\./gi, 'Reserve priority admission tickets online 48 hours in advance to bypass main queuing lines.')
+            .replace(/Take shared local transit or split a shared cab from the main stand for a fraction of private taxi rates\. Keep local small change handy for vendors\./gi, 'Arrange dedicated private cabs or premium express transit for comfortable, efficient travel between sights.')
+            .replace(/Check local transit timetables with your hostel reception the night before to catch early morning departures and beat tour crowds\./gi, 'Consult your hotel concierge for recommended excursion departure times to experience viewpoints at optimal lighting.')
+            .replace(/Eat where local university students eat; follow the crowds to backstreet family-run kitchens for 50% cheaper authentic regional meals\./gi, 'Explore celebrated neighborhood family-run kitchens and historic culinary spots for authentic regional flavors.')
+            .replace(/\*\*Student Insider Hack:\*\*/gi, '**Traveler Pro Tip:**')
+            .replace(/\*\*Student Tip:\*\*/gi, '**Traveler Pro Tip:**')
+            .replace(/Student Backpacker District/gi, 'Charming Bohemian Arts Quarter')
+            .replace(/Youth Quarter/gi, 'Arts & Heritage Quarter')
+            .replace(/indie backpacker rooftop cafe/gi, 'scenic panoramic rooftop lounge')
+            .replace(/communal hostel lounge/gi, 'serene heritage terrace lounge');
+        }
+        docEl.innerHTML = safeMarkdown(displayMd);
       }
 
       // 2. Parse Markdown
@@ -5054,7 +5483,6 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       const destination = (data.trip_summary ? data.trip_summary.destination : '') || (document.getElementById('plannerDest') ? document.getElementById('plannerDest').value : '');
 
       // Update Student Mode Button on Blueprint
-      const isStudentMode = (data.trip_summary ? data.trip_summary.student_mode !== false : true);
       const studentBtn = document.getElementById('itineraryStudentModeBtn');
       const studentIcon = document.getElementById('itineraryStudentModeIcon');
       const studentText = document.getElementById('itineraryStudentModeText');
@@ -5062,11 +5490,11 @@ HTML_CONTENT = r"""<!DOCTYPE html>
 
       if (studentBtn) {
         if (isStudentMode) {
-          studentBtn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 border transition shadow-sm bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border-emerald-500/30';
+          studentBtn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 border transition shadow-sm itin-mode-btn-student';
           if (studentIcon) studentIcon.innerText = '🎓';
           if (studentText) studentText.innerText = 'Student Mode: ON';
         } else {
-          studentBtn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 border transition shadow-sm bg-blue-500/15 hover:bg-blue-500/25 text-blue-400 border-blue-500/30';
+          studentBtn.className = 'px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 border transition shadow-sm itin-mode-btn-traveler';
           if (studentIcon) studentIcon.innerText = '✨';
           if (studentText) studentText.innerText = 'Traveler Mode (Normal)';
         }
@@ -5085,7 +5513,25 @@ HTML_CONTENT = r"""<!DOCTYPE html>
 
       const metricBudget = document.getElementById('metricBudget');
       if (metricBudget) {
-        metricBudget.innerText = parsed.budgetSummary || (data.trip_summary ? `${data.trip_summary.budget_level}` : 'Custom Tier');
+        const budgetInfo = getAdaptedBudget(data, isStudentMode);
+        const totalTripBudget = budgetInfo.totalPerDay * daysCount;
+        metricBudget.innerText = `~${totalTripBudget.toLocaleString()} ${budgetInfo.curr} (${isStudentMode ? 'Student Tier' : 'Curated Tier'})`;
+      }
+
+      const subtitleEl = document.getElementById('itinerarySubtitle');
+      if (subtitleEl) {
+        subtitleEl.innerText = isStudentMode 
+          ? '🎒 Student Explorer Edition • Youth Hostels, Concessions & Budget Slices'
+          : '✨ Curated Traveler Edition • Boutique Stays, Gastronomy & Express Transit';
+      }
+
+      const tipsTitleEl = document.getElementById('itineraryTipsTitle');
+      const tipsIconEl = document.getElementById('itineraryTipsIcon');
+      if (tipsTitleEl) {
+        tipsTitleEl.innerText = isStudentMode ? 'Essential Student Travel Hacks & Safety' : 'Essential Traveler Guidance & Local Tips';
+      }
+      if (tipsIconEl) {
+        tipsIconEl.innerText = isStudentMode ? '🎒' : '🗺️';
       }
 
       const metricPhases = document.getElementById('metricPhases');
@@ -5096,7 +5542,9 @@ HTML_CONTENT = r"""<!DOCTYPE html>
 
       const mainHeading = document.getElementById('itineraryMainHeading');
       if (mainHeading && destination) {
-        mainHeading.innerText = `${destination} — ${daysCount} Days Blueprint`;
+        mainHeading.innerText = isStudentMode 
+          ? `${destination} — ${daysCount} Days Blueprint (Student Explorer Edition)`
+          : `${destination} — ${daysCount} Days Blueprint (Curated Traveler Edition)`;
       }
 
       // 4. Render Phase Navigation Pills
@@ -5162,12 +5610,24 @@ HTML_CONTENT = r"""<!DOCTYPE html>
       const tipsContent = document.getElementById('itineraryTipsContent');
       if (tipsCard && tipsContent) {
         if (parsed.tips.length > 0) {
-          tipsContent.innerHTML = parsed.tips.map(tip => `
-            <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2">
-              <span class="text-coralPrimary text-sm leading-none">✓</span>
-              <div>${tip}</div>
-            </div>
-          `).join('');
+          tipsContent.innerHTML = parsed.tips.map(rawTip => {
+            let tip = rawTip;
+            if (!isStudentMode) {
+              tip = tip
+                .replace(/Flash your student ID card at ticket counters for instant 30% to 50% concession discounts\./gi, 'Reserve priority admission tickets online 48 hours in advance to bypass ticketing queues.')
+                .replace(/Flash your student ID at transit ticketing booths and monuments for 20% to 50% off\./gi, 'Book priority admissions online in advance to bypass main queuing lines.')
+                .replace(/Stay in highly-rated youth hostels with social common areas to meet fellow explorers\./gi, 'Reserve verified boutique heritage hotels or trusted private guesthouses in advance.')
+                .replace(/Stay in backpacker hostels.*$/gi, 'Book verified heritage hotels or boutique stays with private amenities.')
+                .replace(/student/gi, 'traveler')
+                .replace(/hostel/gi, 'hotel');
+            }
+            return `
+              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-start gap-2">
+                <span class="text-coralPrimary text-sm leading-none">✓</span>
+                <div class="text-xs text-gray-300 dark:text-gray-300 light:text-slate-700">${escapeHtml(tip)}</div>
+              </div>
+            `;
+          }).join('');
           tipsCard.classList.remove('hidden');
         } else {
           tipsCard.classList.add('hidden');
@@ -5198,10 +5658,10 @@ HTML_CONTENT = r"""<!DOCTYPE html>
         if (docView) docView.classList.add('hidden');
 
         if (btnCards) {
-          btnCards.className = 'px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-coralPrimary text-white shadow-sm';
+          btnCards.className = 'view-mode-btn active px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-coralPrimary text-white shadow-sm';
         }
         if (btnDoc) {
-          btnDoc.className = 'px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-gray-400 hover:text-white';
+          btnDoc.className = 'view-mode-btn inactive px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-gray-400 hover:text-white';
         }
       } else {
         if (cardsView) cardsView.classList.add('hidden');
@@ -5211,10 +5671,10 @@ HTML_CONTENT = r"""<!DOCTYPE html>
         if (docView) docView.classList.remove('hidden');
 
         if (btnCards) {
-          btnCards.className = 'px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-gray-400 hover:text-white';
+          btnCards.className = 'view-mode-btn inactive px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 text-gray-400 hover:text-white';
         }
         if (btnDoc) {
-          btnDoc.className = 'px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-coralPrimary text-white shadow-sm';
+          btnDoc.className = 'view-mode-btn active px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 bg-coralPrimary text-white shadow-sm';
         }
       }
     }
